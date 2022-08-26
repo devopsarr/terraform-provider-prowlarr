@@ -5,7 +5,7 @@ import (
 	"flag"
 	"log"
 
-	"github.com/Fuochi/terraform-provider-prowlarr/internal/provider"
+	"github.com/devopsarr/terraform-provider-prowlarr/internal/provider"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 )
 
@@ -19,14 +19,9 @@ import (
 // can be customized.
 //go:generate go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs
 
-var (
-	// these will be set by the goreleaser configuration
-	// to appropriate values for the compiled binary
-	version string = "dev"
-
-	// goreleaser can also pass the specific commit if you want
-	// commit  string = ""
-)
+// this will be set by the goreleaser configuration
+// to appropriate values for the compiled binary.
+var version string = "dev"
 
 func main() {
 	var debug bool
@@ -36,7 +31,7 @@ func main() {
 
 	opts := providerserver.ServeOpts{
 		// TODO: Update this string with the published name of your provider.
-		Address: "registry.terraform.io/fuochi/prowlarr",
+		Address: "registry.terraform.io/devopsarr/prowlarr",
 		Debug:   debug,
 	}
 
