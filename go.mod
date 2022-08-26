@@ -1,4 +1,4 @@
-module github.com/Fuochi/terraform-provider-prowlarr
+module github.com/devopsarr/terraform-provider-prowlarr
 
 go 1.18
 
