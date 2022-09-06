@@ -123,7 +123,9 @@ func (p *prowlarrProvider) GetResources(ctx context.Context) (map[string]provide
 
 func (p *prowlarrProvider) GetDataSources(ctx context.Context) (map[string]provider.DataSourceType, diag.Diagnostics) {
 	return map[string]provider.DataSourceType{
-		"prowlarr_tags": dataTagsType{},
+		"prowlarr_system_status": dataSystemStatusType{},
+		"prowlarr_tag":           dataTagType{},
+		"prowlarr_tags":          dataTagsType{},
 	}, nil
 }
 
