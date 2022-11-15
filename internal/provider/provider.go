@@ -132,6 +132,7 @@ func (p *ProwlarrProvider) Configure(ctx context.Context, req provider.Configure
 
 func (p *ProwlarrProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
+		NewNotificationResource,
 		NewTagResource,
 	}
 }
