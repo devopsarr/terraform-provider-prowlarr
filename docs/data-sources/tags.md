@@ -8,8 +8,7 @@ description: |-
 
 # prowlarr_tags (Data Source)
 
-[subcategory:Tags]: #
-List all available [Tags](../resources/tag).
+<!-- subcategory:Tags -->List all available [Tags](../resources/tag).
 
 ## Example Usage
 
@@ -24,14 +23,14 @@ data "prowlarr_tags" "example" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `tags` (Attributes Set) List of tags (see [below for nested schema](#nestedatt--tags))
+- `tags` (Attributes Set) Tag list. (see [below for nested schema](#nestedatt--tags))
 
 <a id="nestedatt--tags"></a>
 ### Nested Schema for `tags`
 
 Read-Only:
 
-- `id` (Number) ID of tag
-- `label` (String) Actual tag
+- `id` (Number) Tag ID.
+- `label` (String) Tag label.
 
 
