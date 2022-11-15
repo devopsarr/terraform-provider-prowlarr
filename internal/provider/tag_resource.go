@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
+	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -31,8 +31,8 @@ type TagResource struct {
 
 // Tag describes the tag data model.
 type Tag struct {
-	ID    types.Int64  `tfsdk:"id"`
 	Label types.String `tfsdk:"label"`
+	ID    types.Int64  `tfsdk:"id"`
 }
 
 func (r *TagResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -41,14 +41,14 @@ func (r *TagResource) Metadata(ctx context.Context, req resource.MetadataRequest
 
 func (r *TagResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "[subcategory:Tags]: #\nTag resource.\nFor more information refer to [Tags](https://wiki.servarr.com/prowlarr/settings#tags) documentation.",
+		MarkdownDescription: "<!-- subcategory:Tags -->Tag resource.\nFor more information refer to [Tags](https://wiki.servarr.com/prowlarr/settings#tags) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
 			"label": {
 				MarkdownDescription: "Tag label. It must be lowercase.",
 				Required:            true,
 				Type:                types.StringType,
 				Validators: []tfsdk.AttributeValidator{
-					helpers.StringLowercase(),
+					tools.StringLowercase(),
 				},
 			},
 			"id": {
@@ -72,7 +72,7 @@ func (r *TagResource) Configure(ctx context.Context, req resource.ConfigureReque
 	client, ok := req.ProviderData.(*prowlarr.Prowlarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedResourceConfigureType,
+			tools.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *prowlarr.Prowlarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -94,12 +94,12 @@ func (r *TagResource) Create(ctx context.Context, req resource.CreateRequest, re
 
 	// Create new Tag
 	request := starr.Tag{
-		Label: plan.Label.Value,
+		Label: plan.Label.ValueString(),
 	}
 
 	response, err := r.client.AddTagContext(ctx, &request)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to create tag, got error: %s", err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create tag, got error: %s", err))
 
 		return
 	}
@@ -121,9 +121,9 @@ func (r *TagResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 	}
 
 	// Get tag current value
-	response, err := r.client.GetTagContext(ctx, int(state.ID.Value))
+	response, err := r.client.GetTagContext(ctx, int(state.ID.ValueInt64()))
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read tags, got error: %s", err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read tags, got error: %s", err))
 
 		return
 	}
@@ -146,13 +146,13 @@ func (r *TagResource) Update(ctx context.Context, req resource.UpdateRequest, re
 
 	// Update Tag
 	request := starr.Tag{
-		Label: plan.Label.Value,
-		ID:    int(plan.ID.Value),
+		Label: plan.Label.ValueString(),
+		ID:    int(plan.ID.ValueInt64()),
 	}
 
 	response, err := r.client.UpdateTagContext(ctx, &request)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to update tag, got error: %s", err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update tag, got error: %s", err))
 
 		return
 	}
@@ -173,14 +173,14 @@ func (r *TagResource) Delete(ctx context.Context, req resource.DeleteRequest, re
 	}
 
 	// Delete tag current value
-	err := r.client.DeleteTagContext(ctx, int(state.ID.Value))
+	err := r.client.DeleteTagContext(ctx, int(state.ID.ValueInt64()))
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read tags, got error: %s", err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read tags, got error: %s", err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted tag: "+strconv.Itoa(int(state.ID.Value)))
+	tflog.Trace(ctx, "deleted tag: "+strconv.Itoa(int(state.ID.ValueInt64())))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -189,7 +189,7 @@ func (r *TagResource) ImportState(ctx context.Context, req resource.ImportStateR
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			UnexpectedImportIdentifier,
+			tools.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
@@ -202,7 +202,7 @@ func (r *TagResource) ImportState(ctx context.Context, req resource.ImportStateR
 
 func writeTag(tag *starr.Tag) *Tag {
 	return &Tag{
-		ID:    types.Int64{Value: int64(tag.ID)},
-		Label: types.String{Value: tag.Label},
+		ID:    types.Int64Value(int64(tag.ID)),
+		Label: types.StringValue(tag.Label),
 	}
 }
