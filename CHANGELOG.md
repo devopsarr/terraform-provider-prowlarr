@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.2.0](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v1.1.0...v1.2.0) (2022-11-15)
+
+
+### Features
+
+* add notification custom script resource ([87e73b1](https://github.com/devopsarr/terraform-provider-prowlarr/commit/87e73b109a1f461cb95acfc6a9c5b9ae4536cd8c))
+* add notification data source ([38ba9e6](https://github.com/devopsarr/terraform-provider-prowlarr/commit/38ba9e6f7d9514804a642666ee48a1d8a55d22ea))
+* add notification resource ([df92d68](https://github.com/devopsarr/terraform-provider-prowlarr/commit/df92d6847c7c9886cad777cbb3570df1cac013a6))
+* add notification webhook resource ([1789d9a](https://github.com/devopsarr/terraform-provider-prowlarr/commit/1789d9aab728159e894cda0a48a8f5c2762dff5e))
+* add notifications data source ([2ee2e21](https://github.com/devopsarr/terraform-provider-prowlarr/commit/2ee2e21f194e7596e4817bb7f54d87daabf8156e))
+* add system status datasource ([1f2efa4](https://github.com/devopsarr/terraform-provider-prowlarr/commit/1f2efa4a239732bc15da64691650ccdd9e49a3dc))
+* add tag datasource ([2f9d1cc](https://github.com/devopsarr/terraform-provider-prowlarr/commit/2f9d1cc7cd116578455c07d4a2653db90e054b5e))
+
 ## [1.1.0](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v1.0.0...v1.1.0) (2022-08-29)
 
 
