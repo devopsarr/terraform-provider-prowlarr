@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.3.0](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v1.2.0...v1.3.0) (2022-11-17)
+
+
+### Features
+
+* add download client datasource ([584dc9f](https://github.com/devopsarr/terraform-provider-prowlarr/commit/584dc9f3088ff48f5930087da18cae7aa6e08047))
+* add download client resource ([bf9c502](https://github.com/devopsarr/terraform-provider-prowlarr/commit/bf9c5026074ef559ecae860313e41b70119fe1fc))
+* add download client transmission resource ([98911d4](https://github.com/devopsarr/terraform-provider-prowlarr/commit/98911d456e803b7aef88aad9e39b431e93fe9083))
+* add download clients datasource ([d5d63ca](https://github.com/devopsarr/terraform-provider-prowlarr/commit/d5d63ca8a2f378ad097ccfd9168dcd3f11c874ad))
+
 ## [1.2.0](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v1.1.0...v1.2.0) (2022-11-15)
 
 
