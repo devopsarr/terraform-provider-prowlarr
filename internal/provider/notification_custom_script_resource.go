@@ -6,9 +6,11 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -74,60 +76,51 @@ func (r *NotificationCustomScriptResource) Metadata(ctx context.Context, req res
 	resp.TypeName = req.ProviderTypeName + "_" + notificationCustomScriptResourceName
 }
 
-func (r *NotificationCustomScriptResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (r *NotificationCustomScriptResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Custom Script resource.\nFor more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect) and [Custom Script](https://wiki.servarr.com/prowlarr/supported#customscript).",
-		Attributes: map[string]tfsdk.Attribute{
-			"on_health_issue": {
+		Attributes: map[string]schema.Attribute{
+			"on_health_issue": schema.BoolAttribute{
 				MarkdownDescription: "On health issue flag.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"on_application_update": {
+			"on_application_update": schema.BoolAttribute{
 				MarkdownDescription: "On application update flag.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"include_health_warnings": {
+			"include_health_warnings": schema.BoolAttribute{
 				MarkdownDescription: "Include health warnings.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				MarkdownDescription: "NotificationCustomScript name.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"tags": {
+			"tags": schema.SetAttribute{
 				MarkdownDescription: "List of associated tags.",
 				Optional:            true,
 				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
+				ElementType:         types.Int64Type,
 			},
-			"id": {
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Notification ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
 				},
 			},
 			// Field values
-			"arguments": {
+			"arguments": schema.StringAttribute{
 				MarkdownDescription: "Arguments.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"path": {
+			"path": schema.StringAttribute{
 				MarkdownDescription: "Path.",
 				Required:            true,
-				Type:                types.StringType,
 			},
 		},
-	}, nil
+	}
 }
 
 func (r *NotificationCustomScriptResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
