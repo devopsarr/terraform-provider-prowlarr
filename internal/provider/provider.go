@@ -18,7 +18,6 @@ import (
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ provider.Provider = &ProwlarrProvider{}
-var _ provider.ProviderWithMetadata = &ProwlarrProvider{}
 
 // ScaffoldingProvider defines the provider implementation.
 type ProwlarrProvider struct {
