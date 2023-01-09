@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/prowlarr-go/prowlarr"
+
+	"github.com/devopsarr/terraform-provider-prowlarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/prowlarr"
 )
 
 const downloadClientDataSourceName = "download_client"
@@ -23,7 +24,7 @@ func NewDownloadClientDataSource() datasource.DataSource {
 
 // DownloadClientDataSource defines the download_client implementation.
 type DownloadClientDataSource struct {
-	client *prowlarr.Prowlarr
+	client *prowlarr.APIClient
 }
 
 func (d *DownloadClientDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -214,11 +215,11 @@ func (d *DownloadClientDataSource) Configure(ctx context.Context, req datasource
 		return
 	}
 
-	client, ok := req.ProviderData.(*prowlarr.Prowlarr)
+	client, ok := req.ProviderData.(*prowlarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *prowlarr.Prowlarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *prowlarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -236,7 +237,7 @@ func (d *DownloadClientDataSource) Read(ctx context.Context, req datasource.Read
 		return
 	}
 	// Get downloadClient current value
-	response, err := d.client.GetDownloadClientsContext(ctx)
+	response, _, err := d.client.DownloadClientApi.ListDownloadClient(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientDataSourceName, err))
 
@@ -255,9 +256,9 @@ func (d *DownloadClientDataSource) Read(ctx context.Context, req datasource.Read
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findDownloadClient(name string, downloadClients []*prowlarr.DownloadClientOutput) (*prowlarr.DownloadClientOutput, error) {
+func findDownloadClient(name string, downloadClients []*prowlarr.DownloadClientResource) (*prowlarr.DownloadClientResource, error) {
 	for _, i := range downloadClients {
-		if i.Name == name {
+		if i.GetName() == name {
 			return i, nil
 		}
 	}

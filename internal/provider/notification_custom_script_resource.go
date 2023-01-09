@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/prowlarr-go/prowlarr"
+
+	"github.com/devopsarr/terraform-provider-prowlarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -14,13 +16,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/prowlarr"
 )
 
 const (
 	notificationCustomScriptResourceName   = "notification_custom_script"
-	NotificationCustomScriptImplementation = "CustomScript"
-	NotificationCustomScriptConfigContrat  = "CustomScriptSettings"
+	notificationCustomScriptImplementation = "CustomScript"
+	notificationCustomScriptConfigContract = "CustomScriptSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -35,7 +36,7 @@ func NewNotificationCustomScriptResource() resource.Resource {
 
 // NotificationCustomScriptResource defines the notification implementation.
 type NotificationCustomScriptResource struct {
-	client *prowlarr.Prowlarr
+	client *prowlarr.APIClient
 }
 
 // NotificationCustomScript describes the notification data model.
@@ -131,11 +132,11 @@ func (r *NotificationCustomScriptResource) Configure(ctx context.Context, req re
 		return
 	}
 
-	client, ok := req.ProviderData.(*prowlarr.Prowlarr)
+	client, ok := req.ProviderData.(*prowlarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedResourceConfigureType,
-			fmt.Sprintf("Expected *prowlarr.Prowlarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *prowlarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -157,14 +158,14 @@ func (r *NotificationCustomScriptResource) Create(ctx context.Context, req resou
 	// Create new NotificationCustomScript
 	request := notification.read(ctx)
 
-	response, err := r.client.AddNotificationContext(ctx, request)
+	response, _, err := r.client.NotificationApi.CreateNotification(ctx).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", notificationCustomScriptResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created "+notificationCustomScriptResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+notificationCustomScriptResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	notification.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &notification)...)
@@ -181,14 +182,14 @@ func (r *NotificationCustomScriptResource) Read(ctx context.Context, req resourc
 	}
 
 	// Get NotificationCustomScript current value
-	response, err := r.client.GetNotificationContext(ctx, int(notification.ID.ValueInt64()))
+	response, _, err := r.client.NotificationApi.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationCustomScriptResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+notificationCustomScriptResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+notificationCustomScriptResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
 	notification.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &notification)...)
@@ -207,14 +208,14 @@ func (r *NotificationCustomScriptResource) Update(ctx context.Context, req resou
 	// Update NotificationCustomScript
 	request := notification.read(ctx)
 
-	response, err := r.client.UpdateNotificationContext(ctx, request)
+	response, _, err := r.client.NotificationApi.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", notificationCustomScriptResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated "+notificationCustomScriptResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+notificationCustomScriptResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	notification.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &notification)...)
@@ -230,7 +231,7 @@ func (r *NotificationCustomScriptResource) Delete(ctx context.Context, req resou
 	}
 
 	// Delete NotificationCustomScript current value
-	err := r.client.DeleteNotificationContext(ctx, notification.ID.ValueInt64())
+	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationCustomScriptResourceName, err))
 
@@ -257,13 +258,13 @@ func (r *NotificationCustomScriptResource) ImportState(ctx context.Context, req 
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func (n *NotificationCustomScript) write(ctx context.Context, notification *prowlarr.NotificationOutput) {
+func (n *NotificationCustomScript) write(ctx context.Context, notification *prowlarr.NotificationResource) {
 	genericNotification := Notification{
-		OnHealthIssue:         types.BoolValue(notification.OnHealthIssue),
-		OnApplicationUpdate:   types.BoolValue(notification.OnApplicationUpdate),
-		IncludeHealthWarnings: types.BoolValue(notification.IncludeHealthWarnings),
-		ID:                    types.Int64Value(notification.ID),
-		Name:                  types.StringValue(notification.Name),
+		OnHealthIssue:         types.BoolValue(notification.GetOnHealthIssue()),
+		OnApplicationUpdate:   types.BoolValue(notification.GetOnApplicationUpdate()),
+		IncludeHealthWarnings: types.BoolValue(notification.GetIncludeHealthWarnings()),
+		ID:                    types.Int64Value(int64(notification.GetId())),
+		Name:                  types.StringValue(notification.GetName()),
 		Tags:                  types.SetValueMust(types.Int64Type, nil),
 	}
 	tfsdk.ValueFrom(ctx, notification.Tags, genericNotification.Tags.Type(ctx), &genericNotification.Tags)
@@ -271,20 +272,21 @@ func (n *NotificationCustomScript) write(ctx context.Context, notification *prow
 	n.fromNotification(&genericNotification)
 }
 
-func (n *NotificationCustomScript) read(ctx context.Context) *prowlarr.NotificationInput {
-	var tags []int
+func (n *NotificationCustomScript) read(ctx context.Context) *prowlarr.NotificationResource {
+	var tags []*int32
 
 	tfsdk.ValueAs(ctx, n.Tags, &tags)
 
-	return &prowlarr.NotificationInput{
-		OnHealthIssue:         n.OnHealthIssue.ValueBool(),
-		OnApplicationUpdate:   n.OnApplicationUpdate.ValueBool(),
-		IncludeHealthWarnings: n.IncludeHealthWarnings.ValueBool(),
-		ConfigContract:        NotificationCustomScriptConfigContrat,
-		Implementation:        NotificationCustomScriptImplementation,
-		ID:                    n.ID.ValueInt64(),
-		Name:                  n.Name.ValueString(),
-		Tags:                  tags,
-		Fields:                n.toNotification().readFields(ctx),
-	}
+	notification := prowlarr.NewNotificationResource()
+	notification.SetOnHealthIssue(n.OnHealthIssue.ValueBool())
+	notification.SetOnApplicationUpdate(n.OnApplicationUpdate.ValueBool())
+	notification.SetIncludeHealthWarnings(n.IncludeHealthWarnings.ValueBool())
+	notification.SetId(int32(n.ID.ValueInt64()))
+	notification.SetName(n.Name.ValueString())
+	notification.SetConfigContract(notificationCustomScriptConfigContract)
+	notification.SetImplementation(notificationCustomScriptImplementation)
+	notification.SetTags(tags)
+	notification.SetFields(n.toNotification().readFields(ctx))
+
+	return notification
 }

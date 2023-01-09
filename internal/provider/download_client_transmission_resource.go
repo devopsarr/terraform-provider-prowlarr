@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/prowlarr-go/prowlarr"
+
+	"github.com/devopsarr/terraform-provider-prowlarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -16,14 +18,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/prowlarr"
 )
 
 const (
 	downloadClientTransmissionResourceName   = "download_client_transmission"
-	DownloadClientTransmissionImplementation = "Transmission"
-	DownloadClientTransmissionConfigContrat  = "TransmissionSettings"
-	DownloadClientTransmissionProtocol       = "torrent"
+	downloadClientTransmissionImplementation = "Transmission"
+	downloadClientTransmissionConfigContract = "TransmissionSettings"
+	downloadClientTransmissionProtocol       = "torrent"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -38,7 +39,7 @@ func NewDownloadClientTransmissionResource() resource.Resource {
 
 // DownloadClientTransmissionResource defines the download client implementation.
 type DownloadClientTransmissionResource struct {
-	client *prowlarr.Prowlarr
+	client *prowlarr.APIClient
 }
 
 // DownloadClientTransmission describes the download client data model.
@@ -208,11 +209,11 @@ func (r *DownloadClientTransmissionResource) Configure(ctx context.Context, req 
 		return
 	}
 
-	client, ok := req.ProviderData.(*prowlarr.Prowlarr)
+	client, ok := req.ProviderData.(*prowlarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedResourceConfigureType,
-			fmt.Sprintf("Expected *prowlarr.Prowlarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *prowlarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -234,14 +235,14 @@ func (r *DownloadClientTransmissionResource) Create(ctx context.Context, req res
 	// Create new DownloadClientTransmission
 	request := client.read(ctx)
 
-	response, err := r.client.AddDownloadClientContext(ctx, request)
+	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", downloadClientTransmissionResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created "+downloadClientTransmissionResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+downloadClientTransmissionResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	client.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
@@ -258,14 +259,14 @@ func (r *DownloadClientTransmissionResource) Read(ctx context.Context, req resou
 	}
 
 	// Get DownloadClientTransmission current value
-	response, err := r.client.GetDownloadClientContext(ctx, client.ID.ValueInt64())
+	response, _, err := r.client.DownloadClientApi.GetDownloadClientById(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientTransmissionResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+downloadClientTransmissionResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+downloadClientTransmissionResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
 	client.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
@@ -284,14 +285,14 @@ func (r *DownloadClientTransmissionResource) Update(ctx context.Context, req res
 	// Update DownloadClientTransmission
 	request := client.read(ctx)
 
-	response, err := r.client.UpdateDownloadClientContext(ctx, request)
+	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", downloadClientTransmissionResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated "+downloadClientTransmissionResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+downloadClientTransmissionResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	client.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
@@ -307,7 +308,7 @@ func (r *DownloadClientTransmissionResource) Delete(ctx context.Context, req res
 	}
 
 	// Delete DownloadClientTransmission current value
-	err := r.client.DeleteDownloadClientContext(ctx, client.ID.ValueInt64())
+	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientTransmissionResourceName, err))
 
@@ -334,12 +335,12 @@ func (r *DownloadClientTransmissionResource) ImportState(ctx context.Context, re
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func (d *DownloadClientTransmission) write(ctx context.Context, downloadClient *prowlarr.DownloadClientOutput) {
+func (d *DownloadClientTransmission) write(ctx context.Context, downloadClient *prowlarr.DownloadClientResource) {
 	genericDownloadClient := DownloadClient{
-		Enable:   types.BoolValue(downloadClient.Enable),
-		Priority: types.Int64Value(int64(downloadClient.Priority)),
-		ID:       types.Int64Value(downloadClient.ID),
-		Name:     types.StringValue(downloadClient.Name),
+		Enable:   types.BoolValue(downloadClient.GetEnable()),
+		Priority: types.Int64Value(int64(downloadClient.GetPriority())),
+		ID:       types.Int64Value(int64(downloadClient.GetId())),
+		Name:     types.StringValue(downloadClient.GetName()),
 		Tags:     types.SetValueMust(types.Int64Type, nil),
 	}
 	tfsdk.ValueFrom(ctx, downloadClient.Tags, genericDownloadClient.Tags.Type(ctx), &genericDownloadClient.Tags)
@@ -347,20 +348,21 @@ func (d *DownloadClientTransmission) write(ctx context.Context, downloadClient *
 	d.fromDownloadClient(&genericDownloadClient)
 }
 
-func (d *DownloadClientTransmission) read(ctx context.Context) *prowlarr.DownloadClientInput {
-	var tags []int
+func (d *DownloadClientTransmission) read(ctx context.Context) *prowlarr.DownloadClientResource {
+	var tags []*int32
 
 	tfsdk.ValueAs(ctx, d.Tags, &tags)
 
-	return &prowlarr.DownloadClientInput{
-		Enable:         d.Enable.ValueBool(),
-		Priority:       int(d.Priority.ValueInt64()),
-		ID:             d.ID.ValueInt64(),
-		ConfigContract: DownloadClientTransmissionConfigContrat,
-		Implementation: DownloadClientTransmissionImplementation,
-		Name:           d.Name.ValueString(),
-		Protocol:       DownloadClientTransmissionProtocol,
-		Tags:           tags,
-		Fields:         d.toDownloadClient().readFields(ctx),
-	}
+	client := prowlarr.NewDownloadClientResource()
+	client.SetEnable(d.Enable.ValueBool())
+	client.SetPriority(int32(d.Priority.ValueInt64()))
+	client.SetId(int32(d.ID.ValueInt64()))
+	client.SetConfigContract(downloadClientTransmissionConfigContract)
+	client.SetImplementation(downloadClientTransmissionImplementation)
+	client.SetName(d.Name.ValueString())
+	client.SetProtocol(downloadClientTransmissionProtocol)
+	client.SetTags(tags)
+	client.SetFields(d.toDownloadClient().readFields(ctx))
+
+	return client
 }

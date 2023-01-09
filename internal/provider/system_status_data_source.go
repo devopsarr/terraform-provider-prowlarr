@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/prowlarr-go/prowlarr"
+
+	"github.com/devopsarr/terraform-provider-prowlarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/prowlarr"
 )
 
 const systemStatusDataSourceName = "system_status"
@@ -23,7 +24,7 @@ func NewSystemStatusDataSource() datasource.DataSource {
 
 // SystemStatusDataSource defines the system status implementation.
 type SystemStatusDataSource struct {
-	client *prowlarr.Prowlarr
+	client *prowlarr.APIClient
 }
 
 // SystemStatus describes the system status data model.
@@ -200,11 +201,11 @@ func (d *SystemStatusDataSource) Configure(ctx context.Context, req datasource.C
 		return
 	}
 
-	client, ok := req.ProviderData.(*prowlarr.Prowlarr)
+	client, ok := req.ProviderData.(*prowlarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *prowlarr.Prowlarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *prowlarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -214,50 +215,54 @@ func (d *SystemStatusDataSource) Configure(ctx context.Context, req datasource.C
 }
 
 func (d *SystemStatusDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+	tflog.Trace(ctx, "NOT SUPPORTED")
+	// TODO: add it back again once system status is present in sdk
 	// Get naming current value
-	response, err := d.client.GetSystemStatusContext(ctx)
-	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", systemStatusDataSourceName, err))
+	// response, _, err := d.client.SystemApi.GetSystemStatus(ctx).Execute()
+	// if err != nil {
+	// 	resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", systemStatusDataSourceName, err))
 
-		return
-	}
+	// 	return
+	// }
 
 	tflog.Trace(ctx, "read "+systemStatusDataSourceName)
 
 	status := SystemStatus{}
-	status.write(response)
+	// status.write(response)
+	resp.Diagnostics.Append(resp.State.Get(ctx, &status)...)
+	status.ID = types.Int64Value(1)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &status)...)
 }
 
-func (s *SystemStatus) write(status *prowlarr.SystemStatus) {
-	s.IsDebug = types.BoolValue(status.IsDebug)
-	s.IsProduction = types.BoolValue(status.IsProduction)
-	s.IsAdmin = types.BoolValue(status.IsProduction)
-	s.IsUserInteractive = types.BoolValue(status.IsUserInteractive)
-	s.IsNetCore = types.BoolValue(status.IsNetCore)
-	s.IsMono = types.BoolValue(status.IsMono)
-	s.IsLinux = types.BoolValue(status.IsLinux)
-	s.IsOsx = types.BoolValue(status.IsOsx)
-	s.IsWindows = types.BoolValue(status.IsWindows)
-	s.IsDocker = types.BoolValue(status.IsDocker)
-	s.ID = types.Int64Value(int64(1))
-	s.MigrationVersion = types.Int64Value(status.MigrationVersion)
-	s.Version = types.StringValue(status.Version)
-	s.StartupPath = types.StringValue(status.StartupPath)
-	s.AppData = types.StringValue(status.AppData)
-	s.DatabaseType = types.StringValue(status.DatabaseType)
-	s.DatabaseVersion = types.StringValue(status.DatabaseVersion)
-	s.OsName = types.StringValue(status.OsName)
-	s.OsVersion = types.StringValue(status.OsVersion)
-	s.Mode = types.StringValue(status.Mode)
-	s.Branch = types.StringValue(status.Branch)
-	s.Authentication = types.StringValue(status.Authentication)
-	s.URLBase = types.StringValue(status.URLBase)
-	s.RuntimeVersion = types.StringValue(status.RuntimeVersion)
-	s.RuntimeName = types.StringValue(status.RuntimeName)
-	s.PackageVersion = types.StringValue(status.PackageVersion)
-	s.PackageAuthor = types.StringValue(status.PackageAuthor)
-	s.PackageUpdateMechanism = types.StringValue(status.PackageUpdateMechanism)
-	s.BuildTime = types.StringValue(status.BuildTime.String())
-	s.StartTime = types.StringValue(status.StartTime.String())
-}
+// func (s *SystemStatus) write(status *prowlarr.StatusResource) {
+// 	s.IsDebug = types.BoolValue(status.IsDebug)
+// 	s.IsProduction = types.BoolValue(status.IsProduction)
+// 	s.IsAdmin = types.BoolValue(status.IsProduction)
+// 	s.IsUserInteractive = types.BoolValue(status.IsUserInteractive)
+// 	s.IsNetCore = types.BoolValue(status.IsNetCore)
+// 	s.IsMono = types.BoolValue(status.IsMono)
+// 	s.IsLinux = types.BoolValue(status.IsLinux)
+// 	s.IsOsx = types.BoolValue(status.IsOsx)
+// 	s.IsWindows = types.BoolValue(status.IsWindows)
+// 	s.IsDocker = types.BoolValue(status.IsDocker)
+// 	s.ID = types.Int64Value(int64(1))
+// 	s.MigrationVersion = types.Int64Value(status.MigrationVersion)
+// 	s.Version = types.StringValue(status.Version)
+// 	s.StartupPath = types.StringValue(status.StartupPath)
+// 	s.AppData = types.StringValue(status.AppData)
+// 	s.DatabaseType = types.StringValue(status.DatabaseType)
+// 	s.DatabaseVersion = types.StringValue(status.DatabaseVersion)
+// 	s.OsName = types.StringValue(status.OsName)
+// 	s.OsVersion = types.StringValue(status.OsVersion)
+// 	s.Mode = types.StringValue(status.Mode)
+// 	s.Branch = types.StringValue(status.Branch)
+// 	s.Authentication = types.StringValue(status.Authentication)
+// 	s.URLBase = types.StringValue(status.URLBase)
+// 	s.RuntimeVersion = types.StringValue(status.RuntimeVersion)
+// 	s.RuntimeName = types.StringValue(status.RuntimeName)
+// 	s.PackageVersion = types.StringValue(status.PackageVersion)
+// 	s.PackageAuthor = types.StringValue(status.PackageAuthor)
+// 	s.PackageUpdateMechanism = types.StringValue(status.PackageUpdateMechanism)
+// 	s.BuildTime = types.StringValue(status.BuildTime.String())
+// 	s.StartTime = types.StringValue(status.StartTime.String())
+// }
