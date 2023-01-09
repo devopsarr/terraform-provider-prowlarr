@@ -4,13 +4,13 @@ import (
 	"context"
 	"os"
 
+	"github.com/devopsarr/prowlarr-go/prowlarr"
+
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"golift.io/starr"
-	"golift.io/starr/prowlarr"
 )
 
 // needed for tf debug mode
@@ -119,9 +119,13 @@ func (p *ProwlarrProvider) Configure(ctx context.Context, req provider.Configure
 
 		return
 	}
-	// If the upstream provider SDK or HTTP client requires configuration, such
-	// as authentication or logging, this is a great opportunity to do so.
-	client := prowlarr.New(starr.New(key, url, 0))
+
+	// Configuring client. API Key management could be changed once new options avail in sdk.
+	config := prowlarr.NewConfiguration()
+	config.AddDefaultHeader("X-Api-Key", key)
+	config.Servers[0].URL = url
+	client := prowlarr.NewAPIClient(config)
+
 	resp.DataSourceData = client
 	resp.ResourceData = client
 }

@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/prowlarr-go/prowlarr"
+
+	"github.com/devopsarr/terraform-provider-prowlarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/prowlarr"
 )
 
 const downloadClientDataSourceName = "download_client"
@@ -23,7 +24,7 @@ func NewDownloadClientDataSource() datasource.DataSource {
 
 // DownloadClientDataSource defines the download_client implementation.
 type DownloadClientDataSource struct {
-	client *prowlarr.Prowlarr
+	client *prowlarr.APIClient
 }
 
 func (d *DownloadClientDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -63,6 +64,23 @@ func (d *DownloadClientDataSource) Schema(ctx context.Context, req datasource.Sc
 				MarkdownDescription: "List of associated tags.",
 				Computed:            true,
 				ElementType:         types.Int64Type,
+			},
+			"categories": schema.SetNestedAttribute{
+				MarkdownDescription: "List of mapped categories.",
+				Computed:            true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"name": schema.StringAttribute{
+							MarkdownDescription: "Name of client category.",
+							Computed:            true,
+						},
+						"categories": schema.SetAttribute{
+							MarkdownDescription: "List of categories.",
+							Computed:            true,
+							ElementType:         types.Int64Type,
+						},
+					},
+				},
 			},
 			"id": schema.Int64Attribute{
 				MarkdownDescription: "Download Client ID.",
@@ -109,12 +127,8 @@ func (d *DownloadClientDataSource) Schema(ctx context.Context, req datasource.Sc
 				MarkdownDescription: "Port.",
 				Computed:            true,
 			},
-			"recent_tv_priority": schema.Int64Attribute{
-				MarkdownDescription: "Recent TV priority. `0` Last, `1` First.",
-				Computed:            true,
-			},
-			"older_tv_priority": schema.Int64Attribute{
-				MarkdownDescription: "Older TV priority. `0` Last, `1` First.",
+			"item_priority": schema.Int64Attribute{
+				MarkdownDescription: "Priority. `0` Last, `1` First.",
 				Computed:            true,
 			},
 			"initial_state": schema.Int64Attribute{
@@ -153,16 +167,12 @@ func (d *DownloadClientDataSource) Schema(ctx context.Context, req datasource.Sc
 				MarkdownDescription: "Password.",
 				Computed:            true,
 			},
-			"tv_category": schema.StringAttribute{
-				MarkdownDescription: "TV category.",
-				Computed:            true,
-			},
 			"tv_imported_category": schema.StringAttribute{
 				MarkdownDescription: "TV imported category.",
 				Computed:            true,
 			},
-			"tv_directory": schema.StringAttribute{
-				MarkdownDescription: "TV directory.",
+			"directory": schema.StringAttribute{
+				MarkdownDescription: "Directory.",
 				Computed:            true,
 			},
 			"destination": schema.StringAttribute{
@@ -214,11 +224,11 @@ func (d *DownloadClientDataSource) Configure(ctx context.Context, req datasource
 		return
 	}
 
-	client, ok := req.ProviderData.(*prowlarr.Prowlarr)
+	client, ok := req.ProviderData.(*prowlarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *prowlarr.Prowlarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *prowlarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -236,7 +246,7 @@ func (d *DownloadClientDataSource) Read(ctx context.Context, req datasource.Read
 		return
 	}
 	// Get downloadClient current value
-	response, err := d.client.GetDownloadClientsContext(ctx)
+	response, _, err := d.client.DownloadClientApi.ListDownloadClient(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientDataSourceName, err))
 
@@ -255,9 +265,9 @@ func (d *DownloadClientDataSource) Read(ctx context.Context, req datasource.Read
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findDownloadClient(name string, downloadClients []*prowlarr.DownloadClientOutput) (*prowlarr.DownloadClientOutput, error) {
+func findDownloadClient(name string, downloadClients []*prowlarr.DownloadClientResource) (*prowlarr.DownloadClientResource, error) {
 	for _, i := range downloadClients {
-		if i.Name == name {
+		if i.GetName() == name {
 			return i, nil
 		}
 	}

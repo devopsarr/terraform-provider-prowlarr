@@ -3,9 +3,12 @@ package provider
 import (
 	"context"
 	"fmt"
+	"io"
 	"strconv"
 
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/prowlarr-go/prowlarr"
+
+	"github.com/devopsarr/terraform-provider-prowlarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -16,14 +19,13 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/prowlarr"
 )
 
 const (
 	downloadClientTransmissionResourceName   = "download_client_transmission"
-	DownloadClientTransmissionImplementation = "Transmission"
-	DownloadClientTransmissionConfigContrat  = "TransmissionSettings"
-	DownloadClientTransmissionProtocol       = "torrent"
+	downloadClientTransmissionImplementation = "Transmission"
+	downloadClientTransmissionConfigContract = "TransmissionSettings"
+	downloadClientTransmissionProtocol       = "torrent"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -38,61 +40,61 @@ func NewDownloadClientTransmissionResource() resource.Resource {
 
 // DownloadClientTransmissionResource defines the download client implementation.
 type DownloadClientTransmissionResource struct {
-	client *prowlarr.Prowlarr
+	client *prowlarr.APIClient
 }
 
 // DownloadClientTransmission describes the download client data model.
 type DownloadClientTransmission struct {
-	Tags             types.Set    `tfsdk:"tags"`
-	Name             types.String `tfsdk:"name"`
-	Host             types.String `tfsdk:"host"`
-	URLBase          types.String `tfsdk:"url_base"`
-	Username         types.String `tfsdk:"username"`
-	Password         types.String `tfsdk:"password"`
-	TvCategory       types.String `tfsdk:"tv_category"`
-	TvDirectory      types.String `tfsdk:"tv_directory"`
-	RecentTvPriority types.Int64  `tfsdk:"recent_tv_priority"`
-	OlderTvPriority  types.Int64  `tfsdk:"older_tv_priority"`
-	Priority         types.Int64  `tfsdk:"priority"`
-	Port             types.Int64  `tfsdk:"port"`
-	ID               types.Int64  `tfsdk:"id"`
-	AddPaused        types.Bool   `tfsdk:"add_paused"`
-	UseSsl           types.Bool   `tfsdk:"use_ssl"`
-	Enable           types.Bool   `tfsdk:"enable"`
+	Tags         types.Set    `tfsdk:"tags"`
+	Categories   types.Set    `tfsdk:"categories"`
+	Name         types.String `tfsdk:"name"`
+	Host         types.String `tfsdk:"host"`
+	URLBase      types.String `tfsdk:"url_base"`
+	Username     types.String `tfsdk:"username"`
+	Password     types.String `tfsdk:"password"`
+	Category     types.String `tfsdk:"category"`
+	Directory    types.String `tfsdk:"directory"`
+	ItemPriority types.Int64  `tfsdk:"item_priority"`
+	Priority     types.Int64  `tfsdk:"priority"`
+	Port         types.Int64  `tfsdk:"port"`
+	ID           types.Int64  `tfsdk:"id"`
+	AddPaused    types.Bool   `tfsdk:"add_paused"`
+	UseSsl       types.Bool   `tfsdk:"use_ssl"`
+	Enable       types.Bool   `tfsdk:"enable"`
 }
 
 func (d DownloadClientTransmission) toDownloadClient() *DownloadClient {
 	return &DownloadClient{
-		Tags:             d.Tags,
-		Name:             d.Name,
-		Host:             d.Host,
-		URLBase:          d.URLBase,
-		Username:         d.Username,
-		Password:         d.Password,
-		TvCategory:       d.TvCategory,
-		TvDirectory:      d.TvDirectory,
-		RecentTvPriority: d.RecentTvPriority,
-		OlderTvPriority:  d.OlderTvPriority,
-		Priority:         d.Priority,
-		Port:             d.Port,
-		ID:               d.ID,
-		AddPaused:        d.AddPaused,
-		UseSsl:           d.UseSsl,
-		Enable:           d.Enable,
+		Tags:         d.Tags,
+		Categories:   d.Categories,
+		Name:         d.Name,
+		Host:         d.Host,
+		URLBase:      d.URLBase,
+		Username:     d.Username,
+		Password:     d.Password,
+		Category:     d.Category,
+		Directory:    d.Directory,
+		ItemPriority: d.ItemPriority,
+		Priority:     d.Priority,
+		Port:         d.Port,
+		ID:           d.ID,
+		AddPaused:    d.AddPaused,
+		UseSsl:       d.UseSsl,
+		Enable:       d.Enable,
 	}
 }
 
 func (d *DownloadClientTransmission) fromDownloadClient(client *DownloadClient) {
 	d.Tags = client.Tags
+	d.Categories = client.Categories
 	d.Name = client.Name
 	d.Host = client.Host
 	d.URLBase = client.URLBase
 	d.Username = client.Username
 	d.Password = client.Password
-	d.TvCategory = client.TvCategory
-	d.TvDirectory = client.TvDirectory
-	d.RecentTvPriority = client.RecentTvPriority
-	d.OlderTvPriority = client.OlderTvPriority
+	d.Category = client.Category
+	d.Directory = client.Directory
+	d.ItemPriority = client.ItemPriority
 	d.Priority = client.Priority
 	d.Port = client.Port
 	d.ID = client.ID
@@ -129,6 +131,14 @@ func (r *DownloadClientTransmissionResource) Schema(ctx context.Context, req res
 				Computed:            true,
 				ElementType:         types.Int64Type,
 			},
+			"categories": schema.SetNestedAttribute{
+				MarkdownDescription: "List of mapped categories.",
+				Optional:            true,
+				Computed:            true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: DownloadClientResource{}.getClientCategorySchema().Attributes,
+				},
+			},
 			"id": schema.Int64Attribute{
 				MarkdownDescription: "Download Client ID.",
 				Computed:            true,
@@ -152,16 +162,8 @@ func (r *DownloadClientTransmissionResource) Schema(ctx context.Context, req res
 				Optional:            true,
 				Computed:            true,
 			},
-			"recent_tv_priority": schema.Int64Attribute{
-				MarkdownDescription: "Recent TV priority. `0` Last, `1` First.",
-				Optional:            true,
-				Computed:            true,
-				Validators: []validator.Int64{
-					int64validator.OneOf(0, 1),
-				},
-			},
-			"older_tv_priority": schema.Int64Attribute{
-				MarkdownDescription: "Older TV priority. `0` Last, `1` First.",
+			"item_priority": schema.Int64Attribute{
+				MarkdownDescription: "Priority. `0` Last, `1` First.",
 				Optional:            true,
 				Computed:            true,
 				Validators: []validator.Int64{
@@ -188,13 +190,13 @@ func (r *DownloadClientTransmissionResource) Schema(ctx context.Context, req res
 				Optional:            true,
 				Computed:            true,
 			},
-			"tv_category": schema.StringAttribute{
-				MarkdownDescription: "TV category.",
+			"category": schema.StringAttribute{
+				MarkdownDescription: "Category.",
 				Optional:            true,
 				Computed:            true,
 			},
-			"tv_directory": schema.StringAttribute{
-				MarkdownDescription: "TV directory.",
+			"directory": schema.StringAttribute{
+				MarkdownDescription: "Directory.",
 				Optional:            true,
 				Computed:            true,
 			},
@@ -208,11 +210,11 @@ func (r *DownloadClientTransmissionResource) Configure(ctx context.Context, req 
 		return
 	}
 
-	client, ok := req.ProviderData.(*prowlarr.Prowlarr)
+	client, ok := req.ProviderData.(*prowlarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedResourceConfigureType,
-			fmt.Sprintf("Expected *prowlarr.Prowlarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *prowlarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -234,14 +236,16 @@ func (r *DownloadClientTransmissionResource) Create(ctx context.Context, req res
 	// Create new DownloadClientTransmission
 	request := client.read(ctx)
 
-	response, err := r.client.AddDownloadClientContext(ctx, request)
+	response, aaa, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
+		test, _ := io.ReadAll(aaa.Body)
+		resp.Diagnostics.AddError(tools.ClientError, string(test))
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", downloadClientTransmissionResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created "+downloadClientTransmissionResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+downloadClientTransmissionResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	client.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
@@ -258,14 +262,14 @@ func (r *DownloadClientTransmissionResource) Read(ctx context.Context, req resou
 	}
 
 	// Get DownloadClientTransmission current value
-	response, err := r.client.GetDownloadClientContext(ctx, client.ID.ValueInt64())
+	response, _, err := r.client.DownloadClientApi.GetDownloadClientById(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientTransmissionResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+downloadClientTransmissionResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+downloadClientTransmissionResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
 	client.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
@@ -284,14 +288,14 @@ func (r *DownloadClientTransmissionResource) Update(ctx context.Context, req res
 	// Update DownloadClientTransmission
 	request := client.read(ctx)
 
-	response, err := r.client.UpdateDownloadClientContext(ctx, request)
+	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", downloadClientTransmissionResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated "+downloadClientTransmissionResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+downloadClientTransmissionResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	client.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
@@ -307,7 +311,7 @@ func (r *DownloadClientTransmissionResource) Delete(ctx context.Context, req res
 	}
 
 	// Delete DownloadClientTransmission current value
-	err := r.client.DeleteDownloadClientContext(ctx, client.ID.ValueInt64())
+	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientTransmissionResourceName, err))
 
@@ -334,33 +338,39 @@ func (r *DownloadClientTransmissionResource) ImportState(ctx context.Context, re
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func (d *DownloadClientTransmission) write(ctx context.Context, downloadClient *prowlarr.DownloadClientOutput) {
+func (d *DownloadClientTransmission) write(ctx context.Context, downloadClient *prowlarr.DownloadClientResource) {
 	genericDownloadClient := DownloadClient{
-		Enable:   types.BoolValue(downloadClient.Enable),
-		Priority: types.Int64Value(int64(downloadClient.Priority)),
-		ID:       types.Int64Value(downloadClient.ID),
-		Name:     types.StringValue(downloadClient.Name),
-		Tags:     types.SetValueMust(types.Int64Type, nil),
+		Enable:     types.BoolValue(downloadClient.GetEnable()),
+		Priority:   types.Int64Value(int64(downloadClient.GetPriority())),
+		ID:         types.Int64Value(int64(downloadClient.GetId())),
+		Name:       types.StringValue(downloadClient.GetName()),
+		Tags:       types.SetValueMust(types.Int64Type, nil),
+		Categories: types.SetValueMust(DownloadClientResource{}.getClientCategorySchema().Type(), nil),
 	}
+
 	tfsdk.ValueFrom(ctx, downloadClient.Tags, genericDownloadClient.Tags.Type(ctx), &genericDownloadClient.Tags)
 	genericDownloadClient.writeFields(ctx, downloadClient.Fields)
 	d.fromDownloadClient(&genericDownloadClient)
 }
 
-func (d *DownloadClientTransmission) read(ctx context.Context) *prowlarr.DownloadClientInput {
-	var tags []int
+func (d *DownloadClientTransmission) read(ctx context.Context) *prowlarr.DownloadClientResource {
+	tags := make([]*int32, len(d.Tags.Elements()))
+	categories := make([]*prowlarr.DownloadClientCategory, 0)
 
+	tfsdk.ValueAs(ctx, d.Categories, &categories)
 	tfsdk.ValueAs(ctx, d.Tags, &tags)
 
-	return &prowlarr.DownloadClientInput{
-		Enable:         d.Enable.ValueBool(),
-		Priority:       int(d.Priority.ValueInt64()),
-		ID:             d.ID.ValueInt64(),
-		ConfigContract: DownloadClientTransmissionConfigContrat,
-		Implementation: DownloadClientTransmissionImplementation,
-		Name:           d.Name.ValueString(),
-		Protocol:       DownloadClientTransmissionProtocol,
-		Tags:           tags,
-		Fields:         d.toDownloadClient().readFields(ctx),
-	}
+	client := prowlarr.NewDownloadClientResource()
+	client.SetEnable(d.Enable.ValueBool())
+	client.SetPriority(int32(d.Priority.ValueInt64()))
+	client.SetId(int32(d.ID.ValueInt64()))
+	client.SetConfigContract(downloadClientTransmissionConfigContract)
+	client.SetImplementation(downloadClientTransmissionImplementation)
+	client.SetName(d.Name.ValueString())
+	client.SetProtocol(downloadClientTransmissionProtocol)
+	client.SetTags(tags)
+	client.SetCategories(categories)
+	client.SetFields(d.toDownloadClient().readFields(ctx))
+
+	return client
 }

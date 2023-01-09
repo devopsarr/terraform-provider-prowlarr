@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/prowlarr-go/prowlarr"
+
+	"github.com/devopsarr/terraform-provider-prowlarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -17,8 +19,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golang.org/x/exp/slices"
-	"golift.io/starr"
-	"golift.io/starr/prowlarr"
 )
 
 const notificationResourceName = "notification"
@@ -43,7 +43,7 @@ func NewNotificationResource() resource.Resource {
 
 // NotificationResource defines the notification implementation.
 type NotificationResource struct {
-	client *prowlarr.Prowlarr
+	client *prowlarr.APIClient
 }
 
 // Notification describes the notification data model.
@@ -528,11 +528,11 @@ func (r *NotificationResource) Configure(ctx context.Context, req resource.Confi
 		return
 	}
 
-	client, ok := req.ProviderData.(*prowlarr.Prowlarr)
+	client, ok := req.ProviderData.(*prowlarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedResourceConfigureType,
-			fmt.Sprintf("Expected *prowlarr.Prowlarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *prowlarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -554,14 +554,14 @@ func (r *NotificationResource) Create(ctx context.Context, req resource.CreateRe
 	// Create new Notification
 	request := notification.read(ctx)
 
-	response, err := r.client.AddNotificationContext(ctx, request)
+	response, _, err := r.client.NotificationApi.CreateNotification(ctx).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", notificationResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created "+notificationResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+notificationResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Notification
@@ -581,14 +581,14 @@ func (r *NotificationResource) Read(ctx context.Context, req resource.ReadReques
 	}
 
 	// Get Notification current value
-	response, err := r.client.GetNotificationContext(ctx, int(notification.ID.ValueInt64()))
+	response, _, err := r.client.NotificationApi.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+notificationResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+notificationResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Notification
@@ -610,14 +610,14 @@ func (r *NotificationResource) Update(ctx context.Context, req resource.UpdateRe
 	// Update Notification
 	request := notification.read(ctx)
 
-	response, err := r.client.UpdateNotificationContext(ctx, request)
+	response, _, err := r.client.NotificationApi.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", notificationResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated "+notificationResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+notificationResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Notification
@@ -636,7 +636,7 @@ func (r *NotificationResource) Delete(ctx context.Context, req resource.DeleteRe
 	}
 
 	// Delete Notification current value
-	err := r.client.DeleteNotificationContext(ctx, notification.ID.ValueInt64())
+	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationResourceName, err))
 
@@ -663,14 +663,14 @@ func (r *NotificationResource) ImportState(ctx context.Context, req resource.Imp
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func (n *Notification) write(ctx context.Context, notification *prowlarr.NotificationOutput) {
-	n.OnHealthIssue = types.BoolValue(notification.OnHealthIssue)
-	n.OnApplicationUpdate = types.BoolValue(notification.OnApplicationUpdate)
-	n.IncludeHealthWarnings = types.BoolValue(notification.IncludeHealthWarnings)
-	n.ID = types.Int64Value(notification.ID)
-	n.Name = types.StringValue(notification.Name)
-	n.Implementation = types.StringValue(notification.Implementation)
-	n.ConfigContract = types.StringValue(notification.ConfigContract)
+func (n *Notification) write(ctx context.Context, notification *prowlarr.NotificationResource) {
+	n.OnHealthIssue = types.BoolValue(notification.GetOnHealthIssue())
+	n.OnApplicationUpdate = types.BoolValue(notification.GetOnApplicationUpdate())
+	n.IncludeHealthWarnings = types.BoolValue(notification.GetIncludeHealthWarnings())
+	n.ID = types.Int64Value(int64(notification.GetId()))
+	n.Name = types.StringValue(notification.GetName())
+	n.Implementation = types.StringValue(notification.GetImplementation())
+	n.ConfigContract = types.StringValue(notification.GetConfigContract())
 	n.Tags = types.SetValueMust(types.Int64Type, nil)
 	n.ChannelTags = types.SetValueMust(types.StringType, nil)
 	n.DeviceIds = types.SetValueMust(types.Int64Type, nil)
@@ -682,60 +682,61 @@ func (n *Notification) write(ctx context.Context, notification *prowlarr.Notific
 	n.writeFields(ctx, notification.Fields)
 }
 
-func (n *Notification) writeFields(ctx context.Context, fields []*starr.FieldOutput) {
+func (n *Notification) writeFields(ctx context.Context, fields []*prowlarr.Field) {
 	for _, f := range fields {
 		if f.Value == nil {
 			continue
 		}
 
-		if slices.Contains(notificationStringFields, f.Name) {
+		if slices.Contains(notificationStringFields, f.GetName()) {
 			tools.WriteStringField(f, n)
 
 			continue
 		}
 
-		if slices.Contains(notificationBoolFields, f.Name) {
+		if slices.Contains(notificationBoolFields, f.GetName()) {
 			tools.WriteBoolField(f, n)
 
 			continue
 		}
 
-		if slices.Contains(notificationIntFields, f.Name) {
+		if slices.Contains(notificationIntFields, f.GetName()) {
 			tools.WriteIntField(f, n)
 
 			continue
 		}
 
-		if slices.Contains(notificationStringSliceFields, f.Name) {
+		if slices.Contains(notificationStringSliceFields, f.GetName()) {
 			tools.WriteStringSliceField(ctx, f, n)
 		}
 
-		if slices.Contains(notificationIntSliceFields, f.Name) {
+		if slices.Contains(notificationIntSliceFields, f.GetName()) {
 			tools.WriteIntSliceField(ctx, f, n)
 		}
 	}
 }
 
-func (n *Notification) read(ctx context.Context) *prowlarr.NotificationInput {
-	var tags []int
+func (n *Notification) read(ctx context.Context) *prowlarr.NotificationResource {
+	var tags []*int32
 
 	tfsdk.ValueAs(ctx, n.Tags, &tags)
 
-	return &prowlarr.NotificationInput{
-		OnHealthIssue:         n.OnHealthIssue.ValueBool(),
-		OnApplicationUpdate:   n.OnApplicationUpdate.ValueBool(),
-		IncludeHealthWarnings: n.IncludeHealthWarnings.ValueBool(),
-		ID:                    n.ID.ValueInt64(),
-		Name:                  n.Name.ValueString(),
-		Implementation:        n.Implementation.ValueString(),
-		ConfigContract:        n.ConfigContract.ValueString(),
-		Tags:                  tags,
-		Fields:                n.readFields(ctx),
-	}
+	notification := prowlarr.NewNotificationResource()
+	notification.SetOnHealthIssue(n.OnHealthIssue.ValueBool())
+	notification.SetOnApplicationUpdate(n.OnApplicationUpdate.ValueBool())
+	notification.SetIncludeHealthWarnings(n.IncludeHealthWarnings.ValueBool())
+	notification.SetId(int32(n.ID.ValueInt64()))
+	notification.SetName(n.Name.ValueString())
+	notification.SetImplementation(n.Implementation.ValueString())
+	notification.SetConfigContract(n.ConfigContract.ValueString())
+	notification.SetTags(tags)
+	notification.SetFields(n.readFields(ctx))
+
+	return notification
 }
 
-func (n *Notification) readFields(ctx context.Context) []*starr.FieldInput {
-	var output []*starr.FieldInput
+func (n *Notification) readFields(ctx context.Context) []*prowlarr.Field {
+	var output []*prowlarr.Field
 
 	for _, b := range notificationBoolFields {
 		if field := tools.ReadBoolField(b, n); field != nil {
