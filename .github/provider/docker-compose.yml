@@ -2,7 +2,7 @@
 version: "3.9"
 services:
   prowlarr:
-    image: linuxserver/prowlarr:1.0.1
+    image: linuxserver/prowlarr:1.8.1259
     container_name: prowlarr
     depends_on:
       - transmission
