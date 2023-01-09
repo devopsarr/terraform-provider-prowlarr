@@ -32,8 +32,8 @@ var (
 
 var (
 	downloadClientBoolFields        = []string{"addPaused", "useSsl", "startOnAdd", "sequentialOrder", "firstAndLast", "addStopped", "saveMagnetFiles", "readOnly", "watchFolder"}
-	downloadClientIntFields         = []string{"port", "recentTvPriority", "olderTvPriority", "initialState", "intialState"}
-	downloadClientStringFields      = []string{"host", "apiKey", "urlBase", "rpcPath", "secretToken", "password", "username", "tvCategory", "tvImportedCategory", "tvDirectory", "destination", "category", "nzbFolder", "strmFolder", "torrentFolder", "magnetFileExtension"}
+	downloadClientIntFields         = []string{"port", "priority", "initialState", "intialState"}
+	downloadClientStringFields      = []string{"host", "apiKey", "urlBase", "rpcPath", "secretToken", "password", "username", "tvImportedCategory", "directory", "destination", "category", "nzbFolder", "strmFolder", "torrentFolder", "magnetFileExtension"}
 	downloadClientStringSliceFields = []string{"fieldTags", "postImTags"}
 	downloadClientIntSliceFields    = []string{"additionalTags"}
 )
@@ -53,6 +53,7 @@ type DownloadClient struct {
 	PostImTags          types.Set    `tfsdk:"post_im_tags"`
 	FieldTags           types.Set    `tfsdk:"field_tags"`
 	AdditionalTags      types.Set    `tfsdk:"additional_tags"`
+	Categories          types.Set    `tfsdk:"categories"`
 	NzbFolder           types.String `tfsdk:"nzb_folder"`
 	Category            types.String `tfsdk:"category"`
 	Implementation      types.String `tfsdk:"implementation"`
@@ -64,19 +65,17 @@ type DownloadClient struct {
 	Host                types.String `tfsdk:"host"`
 	ConfigContract      types.String `tfsdk:"config_contract"`
 	Destination         types.String `tfsdk:"destination"`
-	TvDirectory         types.String `tfsdk:"tv_directory"`
+	Directory           types.String `tfsdk:"directory"`
 	Username            types.String `tfsdk:"username"`
 	TvImportedCategory  types.String `tfsdk:"tv_imported_category"`
-	TvCategory          types.String `tfsdk:"tv_category"`
 	Password            types.String `tfsdk:"password"`
 	SecretToken         types.String `tfsdk:"secret_token"`
 	RPCPath             types.String `tfsdk:"rpc_path"`
 	URLBase             types.String `tfsdk:"url_base"`
 	APIKey              types.String `tfsdk:"api_key"`
-	RecentTvPriority    types.Int64  `tfsdk:"recent_tv_priority"`
+	ItemPriority        types.Int64  `tfsdk:"item_priority"`
 	IntialState         types.Int64  `tfsdk:"intial_state"`
 	InitialState        types.Int64  `tfsdk:"initial_state"`
-	OlderTvPriority     types.Int64  `tfsdk:"older_tv_priority"`
 	Priority            types.Int64  `tfsdk:"priority"`
 	Port                types.Int64  `tfsdk:"port"`
 	ID                  types.Int64  `tfsdk:"id"`
@@ -90,6 +89,12 @@ type DownloadClient struct {
 	AddPaused           types.Bool   `tfsdk:"add_paused"`
 	WatchFolder         types.Bool   `tfsdk:"watch_folder"`
 	Enable              types.Bool   `tfsdk:"enable"`
+}
+
+// ClientCategory is part of DownloadClient.
+type ClientCategory struct {
+	Categories types.Set    `tfsdk:"categories"`
+	Name       types.String `tfsdk:"name"`
 }
 
 func (r *DownloadClientResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -134,6 +139,14 @@ func (r *DownloadClientResource) Schema(ctx context.Context, req resource.Schema
 				Optional:            true,
 				Computed:            true,
 				ElementType:         types.Int64Type,
+			},
+			"categories": schema.SetNestedAttribute{
+				MarkdownDescription: "List of mapped categories.",
+				Optional:            true,
+				Computed:            true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: r.getClientCategorySchema().Attributes,
+				},
 			},
 			"id": schema.Int64Attribute{
 				MarkdownDescription: "Download Client ID.",
@@ -193,16 +206,8 @@ func (r *DownloadClientResource) Schema(ctx context.Context, req resource.Schema
 				Optional:            true,
 				Computed:            true,
 			},
-			"recent_tv_priority": schema.Int64Attribute{
-				MarkdownDescription: "Recent TV priority. `0` Last, `1` First.",
-				Optional:            true,
-				Computed:            true,
-				Validators: []validator.Int64{
-					int64validator.OneOf(0, 1),
-				},
-			},
-			"older_tv_priority": schema.Int64Attribute{
-				MarkdownDescription: "Older TV priority. `0` Last, `1` First.",
+			"item_priority": schema.Int64Attribute{
+				MarkdownDescription: "Priority. `0` Last, `1` First.",
 				Optional:            true,
 				Computed:            true,
 				Validators: []validator.Int64{
@@ -257,18 +262,13 @@ func (r *DownloadClientResource) Schema(ctx context.Context, req resource.Schema
 				Optional:            true,
 				Computed:            true,
 			},
-			"tv_category": schema.StringAttribute{
-				MarkdownDescription: "TV category.",
-				Optional:            true,
-				Computed:            true,
-			},
 			"tv_imported_category": schema.StringAttribute{
 				MarkdownDescription: "TV imported category.",
 				Optional:            true,
 				Computed:            true,
 			},
-			"tv_directory": schema.StringAttribute{
-				MarkdownDescription: "TV directory.",
+			"directory": schema.StringAttribute{
+				MarkdownDescription: "Directory.",
 				Optional:            true,
 				Computed:            true,
 			},
@@ -319,6 +319,24 @@ func (r *DownloadClientResource) Schema(ctx context.Context, req resource.Schema
 				Optional:            true,
 				Computed:            true,
 				ElementType:         types.StringType,
+			},
+		},
+	}
+}
+
+func (r DownloadClientResource) getClientCategorySchema() schema.Schema {
+	return schema.Schema{
+		Attributes: map[string]schema.Attribute{
+			"name": schema.StringAttribute{
+				MarkdownDescription: "Name of client category.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"categories": schema.SetAttribute{
+				MarkdownDescription: "List of categories.",
+				Optional:            true,
+				Computed:            true,
+				ElementType:         types.Int64Type,
 			},
 		},
 	}
@@ -477,8 +495,21 @@ func (d *DownloadClient) write(ctx context.Context, downloadClient *prowlarr.Dow
 	d.AdditionalTags = types.SetValueMust(types.Int64Type, nil)
 	d.FieldTags = types.SetValueMust(types.StringType, nil)
 	d.PostImTags = types.SetValueMust(types.StringType, nil)
+	d.Categories = types.SetValueMust(DownloadClientResource{}.getClientCategorySchema().Type(), nil)
+
+	categories := make([]ClientCategory, len(downloadClient.GetCategories()))
+	for i, c := range downloadClient.GetCategories() {
+		categories[i].write(ctx, c)
+	}
+
+	tfsdk.ValueFrom(ctx, downloadClient.Categories, d.Categories.Type(ctx), &categories)
 	tfsdk.ValueFrom(ctx, downloadClient.Tags, d.Tags.Type(ctx), &d.Tags)
 	d.writeFields(ctx, downloadClient.Fields)
+}
+
+func (c *ClientCategory) write(ctx context.Context, category *prowlarr.DownloadClientCategory) {
+	tfsdk.ValueFrom(ctx, category.Categories, c.Categories.Type(ctx), &c.Categories)
+	c.Name = types.StringValue(category.GetClientCategory())
 }
 
 func (d *DownloadClient) writeFields(ctx context.Context, fields []*prowlarr.Field) {
@@ -518,8 +549,10 @@ func (d *DownloadClient) writeFields(ctx context.Context, fields []*prowlarr.Fie
 }
 
 func (d *DownloadClient) read(ctx context.Context) *prowlarr.DownloadClientResource {
-	var tags []*int32
+	tags := make([]*int32, len(d.Tags.Elements()))
+	categories := make([]*prowlarr.DownloadClientCategory, len(d.Categories.Elements()))
 
+	tfsdk.ValueAs(ctx, d.Categories, &categories)
 	tfsdk.ValueAs(ctx, d.Tags, &tags)
 
 	client := prowlarr.NewDownloadClientResource()
@@ -532,6 +565,7 @@ func (d *DownloadClient) read(ctx context.Context) *prowlarr.DownloadClientResou
 	client.SetProtocol(prowlarr.DownloadProtocol(d.Protocol.ValueString()))
 	client.SetTags(tags)
 	client.SetFields(d.readFields(ctx))
+	client.SetCategories(categories)
 
 	return client
 }

@@ -23,6 +23,10 @@ func getFieldExceptions() []fieldException {
 			tfName:  "fieldTags",
 		},
 		{
+			apiName: "priority",
+			tfName:  "itemPriority",
+		},
+		{
 			apiName: "seedCriteria.seedTime",
 			tfName:  "seedTime",
 		},

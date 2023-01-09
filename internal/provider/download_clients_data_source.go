@@ -82,6 +82,23 @@ func (d *DownloadClientsDataSource) Schema(ctx context.Context, req datasource.S
 							Computed:            true,
 							ElementType:         types.Int64Type,
 						},
+						"categories": schema.SetNestedAttribute{
+							MarkdownDescription: "List of mapped categories.",
+							Computed:            true,
+							NestedObject: schema.NestedAttributeObject{
+								Attributes: map[string]schema.Attribute{
+									"name": schema.StringAttribute{
+										MarkdownDescription: "Name of client category.",
+										Computed:            true,
+									},
+									"categories": schema.SetAttribute{
+										MarkdownDescription: "List of categories.",
+										Computed:            true,
+										ElementType:         types.Int64Type,
+									},
+								},
+							},
+						},
 						"id": schema.Int64Attribute{
 							MarkdownDescription: "Download Client ID.",
 							Computed:            true,
@@ -127,12 +144,8 @@ func (d *DownloadClientsDataSource) Schema(ctx context.Context, req datasource.S
 							MarkdownDescription: "Port.",
 							Computed:            true,
 						},
-						"recent_tv_priority": schema.Int64Attribute{
-							MarkdownDescription: "Recent TV priority. `0` Last, `1` First.",
-							Computed:            true,
-						},
-						"older_tv_priority": schema.Int64Attribute{
-							MarkdownDescription: "Older TV priority. `0` Last, `1` First.",
+						"item_priority": schema.Int64Attribute{
+							MarkdownDescription: "Priority. `0` Last, `1` First.",
 							Computed:            true,
 						},
 						"initial_state": schema.Int64Attribute{
@@ -171,16 +184,12 @@ func (d *DownloadClientsDataSource) Schema(ctx context.Context, req datasource.S
 							MarkdownDescription: "Password.",
 							Computed:            true,
 						},
-						"tv_category": schema.StringAttribute{
-							MarkdownDescription: "TV category.",
-							Computed:            true,
-						},
 						"tv_imported_category": schema.StringAttribute{
 							MarkdownDescription: "TV imported category.",
 							Computed:            true,
 						},
-						"tv_directory": schema.StringAttribute{
-							MarkdownDescription: "TV directory.",
+						"directory": schema.StringAttribute{
+							MarkdownDescription: "Directory.",
 							Computed:            true,
 						},
 						"destination": schema.StringAttribute{

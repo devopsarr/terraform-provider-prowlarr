@@ -35,16 +35,16 @@ resource "prowlarr_download_client_transmission" "example" {
 ### Optional
 
 - `add_paused` (Boolean) Add paused flag.
+- `categories` (Attributes Set) List of mapped categories. (see [below for nested schema](#nestedatt--categories))
+- `category` (String) Category.
+- `directory` (String) Directory.
 - `enable` (Boolean) Enable flag.
 - `host` (String) host.
-- `older_tv_priority` (Number) Older TV priority. `0` Last, `1` First.
+- `item_priority` (Number) Priority. `0` Last, `1` First.
 - `password` (String) Password.
 - `port` (Number) Port.
 - `priority` (Number) Priority.
-- `recent_tv_priority` (Number) Recent TV priority. `0` Last, `1` First.
 - `tags` (Set of Number) List of associated tags.
-- `tv_category` (String) TV category.
-- `tv_directory` (String) TV directory.
 - `url_base` (String) Base URL.
 - `use_ssl` (Boolean) Use SSL flag.
 - `username` (String) Username.
@@ -52,6 +52,14 @@ resource "prowlarr_download_client_transmission" "example" {
 ### Read-Only
 
 - `id` (Number) Download Client ID.
+
+<a id="nestedatt--categories"></a>
+### Nested Schema for `categories`
+
+Optional:
+
+- `categories` (Set of Number) List of categories.
+- `name` (String) Name of client category.
 
 ## Import
 
