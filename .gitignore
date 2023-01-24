@@ -26,6 +26,7 @@ website/node_modules
 *.test
 *.iml
 terraform-provider-prowlarr
+.github/provider/config.xml
 
 website/vendor
 

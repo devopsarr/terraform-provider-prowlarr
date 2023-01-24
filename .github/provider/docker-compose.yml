@@ -2,13 +2,14 @@
 version: "3.9"
 services:
   prowlarr:
-    image: linuxserver/prowlarr:1.0.1
+    image: hotio/prowlarr:testing-1.1.1.2377@sha256:9ae356d7688e264f08b5485f8590d239939cd9b4819786147c1c55a5fe2c35ce
     container_name: prowlarr
     depends_on:
       - transmission
     environment:
       - PUID=1000
       - PGID=1000
+      - UMASK=002
       - TZ=Europe/London
     volumes:
       - ./test.sh:/scripts/test.sh
@@ -17,7 +18,7 @@ services:
       - 9696:9696
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", " http://localhost:9696/system/status"]
+      test: ["CMD", "curl", "-f", "http://localhost:9696/system/status"]
   transmission:
     image: linuxserver/transmission:latest
     container_name: transmission

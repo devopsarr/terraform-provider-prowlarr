@@ -1,4 +1,4 @@
-package tools
+package helpers
 
 import (
 	"context"
@@ -21,10 +21,6 @@ func getFieldExceptions() []fieldException {
 		{
 			apiName: "tags",
 			tfName:  "fieldTags",
-		},
-		{
-			apiName: "priority",
-			tfName:  "itemPriority",
 		},
 		{
 			apiName: "seedCriteria.seedTime",

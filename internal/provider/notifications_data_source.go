@@ -2,12 +2,11 @@ package provider
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 
 	"github.com/devopsarr/prowlarr-go/prowlarr"
+	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 
-	"github.com/devopsarr/terraform-provider-prowlarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -365,22 +364,9 @@ func (d *NotificationsDataSource) Schema(ctx context.Context, req datasource.Sch
 }
 
 func (d *NotificationsDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	// Prevent panic if the provider has not been configured.
-	if req.ProviderData == nil {
-		return
+	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+		d.client = client
 	}
-
-	client, ok := req.ProviderData.(*prowlarr.APIClient)
-	if !ok {
-		resp.Diagnostics.AddError(
-			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *prowlarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
-		)
-
-		return
-	}
-
-	d.client = client
 }
 
 func (d *NotificationsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
@@ -394,7 +380,7 @@ func (d *NotificationsDataSource) Read(ctx context.Context, req datasource.ReadR
 	// Get notifications current value
 	response, _, err := d.client.NotificationApi.ListNotification(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationsDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationsDataSourceName, err))
 
 		return
 	}
