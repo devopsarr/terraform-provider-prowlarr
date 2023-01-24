@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/devopsarr/prowlarr-go/prowlarr"
+	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 
-	"github.com/devopsarr/terraform-provider-prowlarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -345,22 +345,9 @@ func (d *NotificationDataSource) Schema(ctx context.Context, req datasource.Sche
 }
 
 func (d *NotificationDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	// Prevent panic if the provider has not been configured.
-	if req.ProviderData == nil {
-		return
+	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+		d.client = client
 	}
-
-	client, ok := req.ProviderData.(*prowlarr.APIClient)
-	if !ok {
-		resp.Diagnostics.AddError(
-			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *prowlarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
-		)
-
-		return
-	}
-
-	d.client = client
 }
 
 func (d *NotificationDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
@@ -374,14 +361,14 @@ func (d *NotificationDataSource) Read(ctx context.Context, req datasource.ReadRe
 	// Get notification current value
 	response, _, err := d.client.NotificationApi.ListNotification(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationDataSourceName, err))
 
 		return
 	}
 
 	notification, err := findNotification(data.Name.ValueString(), response)
 	if err != nil {
-		resp.Diagnostics.AddError(tools.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", notificationDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", notificationDataSourceName, err))
 
 		return
 	}
@@ -398,5 +385,5 @@ func findNotification(name string, notifications []*prowlarr.NotificationResourc
 		}
 	}
 
-	return nil, tools.ErrDataNotFoundError(notificationDataSourceName, "name", name)
+	return nil, helpers.ErrDataNotFoundError(notificationDataSourceName, "name", name)
 }

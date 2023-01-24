@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/devopsarr/prowlarr-go/prowlarr"
+	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 
-	"github.com/devopsarr/terraform-provider-prowlarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -219,22 +219,9 @@ func (d *DownloadClientDataSource) Schema(ctx context.Context, req datasource.Sc
 }
 
 func (d *DownloadClientDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	// Prevent panic if the provider has not been configured.
-	if req.ProviderData == nil {
-		return
+	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+		d.client = client
 	}
-
-	client, ok := req.ProviderData.(*prowlarr.APIClient)
-	if !ok {
-		resp.Diagnostics.AddError(
-			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *prowlarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
-		)
-
-		return
-	}
-
-	d.client = client
 }
 
 func (d *DownloadClientDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
@@ -248,14 +235,14 @@ func (d *DownloadClientDataSource) Read(ctx context.Context, req datasource.Read
 	// Get downloadClient current value
 	response, _, err := d.client.DownloadClientApi.ListDownloadClient(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientDataSourceName, err))
 
 		return
 	}
 
 	downloadClient, err := findDownloadClient(data.Name.ValueString(), response)
 	if err != nil {
-		resp.Diagnostics.AddError(tools.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", downloadClientDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", downloadClientDataSourceName, err))
 
 		return
 	}
@@ -272,5 +259,5 @@ func findDownloadClient(name string, downloadClients []*prowlarr.DownloadClientR
 		}
 	}
 
-	return nil, tools.ErrDataNotFoundError(downloadClientDataSourceName, "name", name)
+	return nil, helpers.ErrDataNotFoundError(downloadClientDataSourceName, "name", name)
 }

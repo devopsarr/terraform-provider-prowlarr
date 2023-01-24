@@ -2,12 +2,11 @@ package provider
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 
 	"github.com/devopsarr/prowlarr-go/prowlarr"
+	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 
-	"github.com/devopsarr/terraform-provider-prowlarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -523,22 +522,9 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 }
 
 func (r *NotificationResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	// Prevent panic if the provider has not been configured.
-	if req.ProviderData == nil {
-		return
+	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+		r.client = client
 	}
-
-	client, ok := req.ProviderData.(*prowlarr.APIClient)
-	if !ok {
-		resp.Diagnostics.AddError(
-			tools.UnexpectedResourceConfigureType,
-			fmt.Sprintf("Expected *prowlarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
-		)
-
-		return
-	}
-
-	r.client = client
 }
 
 func (r *NotificationResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
@@ -556,7 +542,7 @@ func (r *NotificationResource) Create(ctx context.Context, req resource.CreateRe
 
 	response, _, err := r.client.NotificationApi.CreateNotification(ctx).NotificationResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", notificationResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, notificationResourceName, err))
 
 		return
 	}
@@ -583,7 +569,7 @@ func (r *NotificationResource) Read(ctx context.Context, req resource.ReadReques
 	// Get Notification current value
 	response, _, err := r.client.NotificationApi.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationResourceName, err))
 
 		return
 	}
@@ -612,7 +598,7 @@ func (r *NotificationResource) Update(ctx context.Context, req resource.UpdateRe
 
 	response, _, err := r.client.NotificationApi.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", notificationResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, notificationResourceName, err))
 
 		return
 	}
@@ -638,7 +624,7 @@ func (r *NotificationResource) Delete(ctx context.Context, req resource.DeleteRe
 	// Delete Notification current value
 	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationResourceName, err))
 
 		return
 	}
@@ -648,19 +634,8 @@ func (r *NotificationResource) Delete(ctx context.Context, req resource.DeleteRe
 }
 
 func (r *NotificationResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
-	id, err := strconv.Atoi(req.ID)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			tools.UnexpectedImportIdentifier,
-			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
-		)
-
-		return
-	}
-
-	tflog.Trace(ctx, "imported "+notificationResourceName+": "+strconv.Itoa(id))
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
+	helpers.ImportStatePassthroughIntID(ctx, path.Root("id"), req, resp)
+	tflog.Trace(ctx, "imported "+notificationResourceName+": "+req.ID)
 }
 
 func (n *Notification) write(ctx context.Context, notification *prowlarr.NotificationResource) {
@@ -689,29 +664,29 @@ func (n *Notification) writeFields(ctx context.Context, fields []*prowlarr.Field
 		}
 
 		if slices.Contains(notificationStringFields, f.GetName()) {
-			tools.WriteStringField(f, n)
+			helpers.WriteStringField(f, n)
 
 			continue
 		}
 
 		if slices.Contains(notificationBoolFields, f.GetName()) {
-			tools.WriteBoolField(f, n)
+			helpers.WriteBoolField(f, n)
 
 			continue
 		}
 
 		if slices.Contains(notificationIntFields, f.GetName()) {
-			tools.WriteIntField(f, n)
+			helpers.WriteIntField(f, n)
 
 			continue
 		}
 
 		if slices.Contains(notificationStringSliceFields, f.GetName()) {
-			tools.WriteStringSliceField(ctx, f, n)
+			helpers.WriteStringSliceField(ctx, f, n)
 		}
 
 		if slices.Contains(notificationIntSliceFields, f.GetName()) {
-			tools.WriteIntSliceField(ctx, f, n)
+			helpers.WriteIntSliceField(ctx, f, n)
 		}
 	}
 }
@@ -739,31 +714,31 @@ func (n *Notification) readFields(ctx context.Context) []*prowlarr.Field {
 	var output []*prowlarr.Field
 
 	for _, b := range notificationBoolFields {
-		if field := tools.ReadBoolField(b, n); field != nil {
+		if field := helpers.ReadBoolField(b, n); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, i := range notificationIntFields {
-		if field := tools.ReadIntField(i, n); field != nil {
+		if field := helpers.ReadIntField(i, n); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, s := range notificationStringFields {
-		if field := tools.ReadStringField(s, n); field != nil {
+		if field := helpers.ReadStringField(s, n); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, s := range notificationStringSliceFields {
-		if field := tools.ReadStringSliceField(ctx, s, n); field != nil {
+		if field := helpers.ReadStringSliceField(ctx, s, n); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, s := range notificationIntSliceFields {
-		if field := tools.ReadIntSliceField(ctx, s, n); field != nil {
+		if field := helpers.ReadIntSliceField(ctx, s, n); field != nil {
 			output = append(output, field)
 		}
 	}
