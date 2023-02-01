@@ -215,7 +215,7 @@ func (d *SystemStatusDataSource) Read(ctx context.Context, req datasource.ReadRe
 
 	status := SystemStatus{}
 	// status.write(response)
-	resp.Diagnostics.Append(resp.State.Get(ctx, &status)...)
+	resp.Diagnostics.Append(req.Config.Get(ctx, &status)...)
 	status.ID = types.Int64Value(1)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &status)...)
 }
