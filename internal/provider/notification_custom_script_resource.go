@@ -243,13 +243,12 @@ func (n *NotificationCustomScript) write(ctx context.Context, notification *prow
 		Tags:                  types.SetValueMust(types.Int64Type, nil),
 	}
 	tfsdk.ValueFrom(ctx, notification.Tags, genericNotification.Tags.Type(ctx), &genericNotification.Tags)
-	genericNotification.writeFields(ctx, notification.Fields)
+	genericNotification.writeFields(ctx, notification.GetFields())
 	n.fromNotification(&genericNotification)
 }
 
 func (n *NotificationCustomScript) read(ctx context.Context) *prowlarr.NotificationResource {
-	var tags []*int32
-
+	tags := make([]*int32, len(n.Tags.Elements()))
 	tfsdk.ValueAs(ctx, n.Tags, &tags)
 
 	notification := prowlarr.NewNotificationResource()

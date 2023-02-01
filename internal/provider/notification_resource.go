@@ -129,7 +129,7 @@ func (r *NotificationResource) Metadata(ctx context.Context, req resource.Metada
 
 func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Notifications -->Notification resource.\nFor more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect).",
+		MarkdownDescription: "<!-- subcategory:Notifications -->Generic Notification resource. When possible use a specific resource instead.\nFor more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect).",
 		Attributes: map[string]schema.Attribute{
 			"on_health_issue": schema.BoolAttribute{
 				MarkdownDescription: "On health issue flag.",
@@ -654,7 +654,7 @@ func (n *Notification) write(ctx context.Context, notification *prowlarr.Notific
 	n.Recipients = types.SetValueMust(types.StringType, nil)
 	n.FieldTags = types.SetValueMust(types.StringType, nil)
 	tfsdk.ValueFrom(ctx, notification.Tags, n.Tags.Type(ctx), &n.Tags)
-	n.writeFields(ctx, notification.Fields)
+	n.writeFields(ctx, notification.GetFields())
 }
 
 func (n *Notification) writeFields(ctx context.Context, fields []*prowlarr.Field) {
@@ -692,8 +692,7 @@ func (n *Notification) writeFields(ctx context.Context, fields []*prowlarr.Field
 }
 
 func (n *Notification) read(ctx context.Context) *prowlarr.NotificationResource {
-	var tags []*int32
-
+	tags := make([]*int32, len(n.Tags.Elements()))
 	tfsdk.ValueAs(ctx, n.Tags, &tags)
 
 	notification := prowlarr.NewNotificationResource()

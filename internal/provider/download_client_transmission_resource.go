@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-	"io"
 	"strconv"
 
 	"github.com/devopsarr/prowlarr-go/prowlarr"
@@ -222,10 +221,8 @@ func (r *DownloadClientTransmissionResource) Create(ctx context.Context, req res
 	// Create new DownloadClientTransmission
 	request := client.read(ctx)
 
-	response, aaa, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
+	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
-		test, _ := io.ReadAll(aaa.Body)
-		resp.Diagnostics.AddError(helpers.ClientError, string(test))
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, downloadClientTransmissionResourceName, err))
 
 		return
@@ -324,7 +321,7 @@ func (d *DownloadClientTransmission) write(ctx context.Context, downloadClient *
 	}
 
 	tfsdk.ValueFrom(ctx, downloadClient.Tags, genericDownloadClient.Tags.Type(ctx), &genericDownloadClient.Tags)
-	genericDownloadClient.writeFields(ctx, downloadClient.Fields)
+	genericDownloadClient.writeFields(ctx, downloadClient.GetFields())
 	d.fromDownloadClient(&genericDownloadClient)
 }
 

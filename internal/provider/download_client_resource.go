@@ -102,7 +102,7 @@ func (r *DownloadClientResource) Metadata(ctx context.Context, req resource.Meta
 
 func (r *DownloadClientResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Download Clients -->Download Client resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/prowlarr/settings#download-clients).",
+		MarkdownDescription: "<!-- subcategory:Download Clients -->Generic Download Client resource. When possible use a specific resource instead.\nFor more information refer to [Download Client](https://wiki.servarr.com/prowlarr/settings#download-clients).",
 		Attributes: map[string]schema.Attribute{
 			"enable": schema.BoolAttribute{
 				MarkdownDescription: "Enable flag.",
@@ -479,7 +479,7 @@ func (d *DownloadClient) write(ctx context.Context, downloadClient *prowlarr.Dow
 
 	tfsdk.ValueFrom(ctx, downloadClient.Categories, d.Categories.Type(ctx), &categories)
 	tfsdk.ValueFrom(ctx, downloadClient.Tags, d.Tags.Type(ctx), &d.Tags)
-	d.writeFields(ctx, downloadClient.Fields)
+	d.writeFields(ctx, downloadClient.GetFields())
 }
 
 func (c *ClientCategory) write(ctx context.Context, category *prowlarr.DownloadClientCategory) {
