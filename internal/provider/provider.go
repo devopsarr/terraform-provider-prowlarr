@@ -132,22 +132,37 @@ func (p *ProwlarrProvider) Configure(ctx context.Context, req provider.Configure
 
 func (p *ProwlarrProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
+		// Download Clients
 		NewDownloadClientResource,
 		NewDownloadClientTransmissionResource,
+
+		// Indexer Proxies
+		NewIndexerProxyResource,
+
+		// Notifications
 		NewNotificationResource,
 		NewNotificationCustomScriptResource,
 		NewNotificationWebhookResource,
+
+		// Tags
 		NewTagResource,
 	}
 }
 
 func (p *ProwlarrProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
+		// Download Clients
 		NewDownloadClientDataSource,
 		NewDownloadClientsDataSource,
+
+		// Notifications
 		NewNotificationDataSource,
 		NewNotificationsDataSource,
+
+		// System Status
 		NewSystemStatusDataSource,
+
+		// Tags
 		NewTagDataSource,
 		NewTagsDataSource,
 	}
