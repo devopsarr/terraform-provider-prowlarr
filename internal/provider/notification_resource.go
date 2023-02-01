@@ -654,7 +654,7 @@ func (n *Notification) write(ctx context.Context, notification *prowlarr.Notific
 	n.Recipients = types.SetValueMust(types.StringType, nil)
 	n.FieldTags = types.SetValueMust(types.StringType, nil)
 	tfsdk.ValueFrom(ctx, notification.Tags, n.Tags.Type(ctx), &n.Tags)
-	n.writeFields(ctx, notification.Fields)
+	n.writeFields(ctx, notification.GetFields())
 }
 
 func (n *Notification) writeFields(ctx context.Context, fields []*prowlarr.Field) {
@@ -692,8 +692,7 @@ func (n *Notification) writeFields(ctx context.Context, fields []*prowlarr.Field
 }
 
 func (n *Notification) read(ctx context.Context) *prowlarr.NotificationResource {
-	var tags []*int32
-
+	tags := make([]*int32, len(n.Tags.Elements()))
 	tfsdk.ValueAs(ctx, n.Tags, &tags)
 
 	notification := prowlarr.NewNotificationResource()

@@ -324,7 +324,7 @@ func (d *DownloadClientTransmission) write(ctx context.Context, downloadClient *
 	}
 
 	tfsdk.ValueFrom(ctx, downloadClient.Tags, genericDownloadClient.Tags.Type(ctx), &genericDownloadClient.Tags)
-	genericDownloadClient.writeFields(ctx, downloadClient.Fields)
+	genericDownloadClient.writeFields(ctx, downloadClient.GetFields())
 	d.fromDownloadClient(&genericDownloadClient)
 }
 

@@ -479,7 +479,7 @@ func (d *DownloadClient) write(ctx context.Context, downloadClient *prowlarr.Dow
 
 	tfsdk.ValueFrom(ctx, downloadClient.Categories, d.Categories.Type(ctx), &categories)
 	tfsdk.ValueFrom(ctx, downloadClient.Tags, d.Tags.Type(ctx), &d.Tags)
-	d.writeFields(ctx, downloadClient.Fields)
+	d.writeFields(ctx, downloadClient.GetFields())
 }
 
 func (c *ClientCategory) write(ctx context.Context, category *prowlarr.DownloadClientCategory) {
