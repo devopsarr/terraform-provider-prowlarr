@@ -156,6 +156,7 @@ func (p *ProwlarrProvider) DataSources(ctx context.Context) []func() datasource.
 		NewDownloadClientsDataSource,
 
 		// Indexer Proxies
+		NewIndexerProxyDataSource,
 		NewIndexerProxiesDataSource,
 
 		// Notifications
