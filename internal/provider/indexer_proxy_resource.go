@@ -241,64 +241,64 @@ func (r *IndexerProxyResource) ImportState(ctx context.Context, req resource.Imp
 	tflog.Trace(ctx, "imported "+indexerProxyResourceName+": "+req.ID)
 }
 
-func (d *IndexerProxy) write(ctx context.Context, indexerProxy *prowlarr.IndexerProxyResource) {
-	d.ID = types.Int64Value(int64(indexerProxy.GetId()))
-	d.ConfigContract = types.StringValue(indexerProxy.GetConfigContract())
-	d.Implementation = types.StringValue(indexerProxy.GetImplementation())
-	d.Name = types.StringValue(indexerProxy.GetName())
-	d.Tags = types.SetValueMust(types.Int64Type, nil)
+func (i *IndexerProxy) write(ctx context.Context, indexerProxy *prowlarr.IndexerProxyResource) {
+	i.ID = types.Int64Value(int64(indexerProxy.GetId()))
+	i.ConfigContract = types.StringValue(indexerProxy.GetConfigContract())
+	i.Implementation = types.StringValue(indexerProxy.GetImplementation())
+	i.Name = types.StringValue(indexerProxy.GetName())
+	i.Tags = types.SetValueMust(types.Int64Type, nil)
 
-	tfsdk.ValueFrom(ctx, indexerProxy.Tags, d.Tags.Type(ctx), &d.Tags)
-	d.writeFields(indexerProxy.GetFields())
+	tfsdk.ValueFrom(ctx, indexerProxy.Tags, i.Tags.Type(ctx), &i.Tags)
+	i.writeFields(indexerProxy.GetFields())
 }
 
-func (d *IndexerProxy) writeFields(fields []*prowlarr.Field) {
+func (i *IndexerProxy) writeFields(fields []*prowlarr.Field) {
 	for _, f := range fields {
 		if f.Value == nil {
 			continue
 		}
 
 		if slices.Contains(indexerProxyStringFields, f.GetName()) {
-			helpers.WriteStringField(f, d)
+			helpers.WriteStringField(f, i)
 
 			continue
 		}
 
 		if slices.Contains(indexerProxyIntFields, f.GetName()) {
-			helpers.WriteIntField(f, d)
+			helpers.WriteIntField(f, i)
 
 			continue
 		}
 	}
 }
 
-func (d *IndexerProxy) read(ctx context.Context) *prowlarr.IndexerProxyResource {
-	tags := make([]*int32, len(d.Tags.Elements()))
+func (i *IndexerProxy) read(ctx context.Context) *prowlarr.IndexerProxyResource {
+	tags := make([]*int32, len(i.Tags.Elements()))
 
-	tfsdk.ValueAs(ctx, d.Tags, &tags)
+	tfsdk.ValueAs(ctx, i.Tags, &tags)
 
 	proxy := prowlarr.NewIndexerProxyResource()
-	proxy.SetId(int32(d.ID.ValueInt64()))
-	proxy.SetConfigContract(d.ConfigContract.ValueString())
-	proxy.SetImplementation(d.Implementation.ValueString())
-	proxy.SetName(d.Name.ValueString())
+	proxy.SetId(int32(i.ID.ValueInt64()))
+	proxy.SetConfigContract(i.ConfigContract.ValueString())
+	proxy.SetImplementation(i.Implementation.ValueString())
+	proxy.SetName(i.Name.ValueString())
 	proxy.SetTags(tags)
-	proxy.SetFields(d.readFields())
+	proxy.SetFields(i.readFields())
 
 	return proxy
 }
 
-func (d *IndexerProxy) readFields() []*prowlarr.Field {
+func (i *IndexerProxy) readFields() []*prowlarr.Field {
 	var output []*prowlarr.Field
 
-	for _, i := range indexerProxyIntFields {
-		if field := helpers.ReadIntField(i, d); field != nil {
+	for _, j := range indexerProxyIntFields {
+		if field := helpers.ReadIntField(j, i); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, s := range indexerProxyStringFields {
-		if field := helpers.ReadStringField(s, d); field != nil {
+		if field := helpers.ReadStringField(s, i); field != nil {
 			output = append(output, field)
 		}
 	}

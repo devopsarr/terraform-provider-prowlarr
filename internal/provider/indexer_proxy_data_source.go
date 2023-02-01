@@ -27,11 +27,11 @@ type IndexerProxyDataSource struct {
 	client *prowlarr.APIClient
 }
 
-func (d *IndexerProxyDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (i *IndexerProxyDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + indexerProxyDataSourceName
 }
 
-func (d *IndexerProxyDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (i *IndexerProxyDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Indexer Proxies -->Single [Indexer Proxy](../resources/indexer_proxy).",
@@ -83,13 +83,13 @@ func (d *IndexerProxyDataSource) Schema(ctx context.Context, req datasource.Sche
 	}
 }
 
-func (d *IndexerProxyDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+func (i *IndexerProxyDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
 	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
-		d.client = client
+		i.client = client
 	}
 }
 
-func (d *IndexerProxyDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (i *IndexerProxyDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data *IndexerProxy
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
@@ -98,7 +98,7 @@ func (d *IndexerProxyDataSource) Read(ctx context.Context, req datasource.ReadRe
 		return
 	}
 	// Get indexerProxy current value
-	response, _, err := d.client.IndexerProxyApi.ListIndexerProxy(ctx).Execute()
+	response, _, err := i.client.IndexerProxyApi.ListIndexerProxy(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerProxyDataSourceName, err))
 

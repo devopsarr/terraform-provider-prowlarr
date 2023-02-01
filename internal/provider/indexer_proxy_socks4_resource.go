@@ -49,26 +49,26 @@ type IndexerProxySocks4 struct {
 	ID       types.Int64  `tfsdk:"id"`
 }
 
-func (d IndexerProxySocks4) toIndexerProxy() *IndexerProxy {
+func (i IndexerProxySocks4) toIndexerProxy() *IndexerProxy {
 	return &IndexerProxy{
-		Tags:     d.Tags,
-		Name:     d.Name,
-		Host:     d.Host,
-		Username: d.Username,
-		Password: d.Password,
-		Port:     d.Port,
-		ID:       d.ID,
+		Tags:     i.Tags,
+		Name:     i.Name,
+		Host:     i.Host,
+		Username: i.Username,
+		Password: i.Password,
+		Port:     i.Port,
+		ID:       i.ID,
 	}
 }
 
-func (d *IndexerProxySocks4) fromIndexerProxy(proxy *IndexerProxy) {
-	d.Tags = proxy.Tags
-	d.Name = proxy.Name
-	d.Host = proxy.Host
-	d.Username = proxy.Username
-	d.Password = proxy.Password
-	d.Port = proxy.Port
-	d.ID = proxy.ID
+func (i *IndexerProxySocks4) fromIndexerProxy(proxy *IndexerProxy) {
+	i.Tags = proxy.Tags
+	i.Name = proxy.Name
+	i.Host = proxy.Host
+	i.Username = proxy.Username
+	i.Password = proxy.Password
+	i.Port = proxy.Port
+	i.ID = proxy.ID
 }
 
 func (r *IndexerProxySocks4Resource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -226,7 +226,7 @@ func (r *IndexerProxySocks4Resource) ImportState(ctx context.Context, req resour
 	tflog.Trace(ctx, "imported "+indexerProxySocks4ResourceName+": "+req.ID)
 }
 
-func (d *IndexerProxySocks4) write(ctx context.Context, indexerProxy *prowlarr.IndexerProxyResource) {
+func (i *IndexerProxySocks4) write(ctx context.Context, indexerProxy *prowlarr.IndexerProxyResource) {
 	genericIndexerProxy := IndexerProxy{
 		ID:   types.Int64Value(int64(indexerProxy.GetId())),
 		Name: types.StringValue(indexerProxy.GetName()),
@@ -235,21 +235,21 @@ func (d *IndexerProxySocks4) write(ctx context.Context, indexerProxy *prowlarr.I
 
 	tfsdk.ValueFrom(ctx, indexerProxy.Tags, genericIndexerProxy.Tags.Type(ctx), &genericIndexerProxy.Tags)
 	genericIndexerProxy.writeFields(indexerProxy.GetFields())
-	d.fromIndexerProxy(&genericIndexerProxy)
+	i.fromIndexerProxy(&genericIndexerProxy)
 }
 
-func (d *IndexerProxySocks4) read(ctx context.Context) *prowlarr.IndexerProxyResource {
-	tags := make([]*int32, len(d.Tags.Elements()))
+func (i *IndexerProxySocks4) read(ctx context.Context) *prowlarr.IndexerProxyResource {
+	tags := make([]*int32, len(i.Tags.Elements()))
 
-	tfsdk.ValueAs(ctx, d.Tags, &tags)
+	tfsdk.ValueAs(ctx, i.Tags, &tags)
 
 	proxy := prowlarr.NewIndexerProxyResource()
-	proxy.SetId(int32(d.ID.ValueInt64()))
+	proxy.SetId(int32(i.ID.ValueInt64()))
 	proxy.SetConfigContract(indexerProxySocks4ConfigContract)
 	proxy.SetImplementation(indexerProxySocks4Implementation)
-	proxy.SetName(d.Name.ValueString())
+	proxy.SetName(i.Name.ValueString())
 	proxy.SetTags(tags)
-	proxy.SetFields(d.toIndexerProxy().readFields())
+	proxy.SetFields(i.toIndexerProxy().readFields())
 
 	return proxy
 }
