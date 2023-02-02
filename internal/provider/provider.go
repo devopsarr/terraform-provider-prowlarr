@@ -162,6 +162,7 @@ func (p *ProwlarrProvider) DataSources(ctx context.Context) []func() datasource.
 		// Applications
 		NewSyncProfileDataSource,
 		NewSyncProfilesDataSource,
+		NewApplicationDataSource,
 		NewApplicationsDataSource,
 
 		// Download Clients
