@@ -23,7 +23,7 @@ data "prowlarr_indexer_proxies" "example" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `indexer_proxies` (Attributes Set) Indexer Client list.. (see [below for nested schema](#nestedatt--indexer_proxies))
+- `indexer_proxies` (Attributes Set) Indexer Client list. (see [below for nested schema](#nestedatt--indexer_proxies))
 
 <a id="nestedatt--indexer_proxies"></a>
 ### Nested Schema for `indexer_proxies`

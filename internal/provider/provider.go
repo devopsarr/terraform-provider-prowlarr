@@ -158,6 +158,9 @@ func (p *ProwlarrProvider) Resources(ctx context.Context) []func() resource.Reso
 
 func (p *ProwlarrProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
+		// Applications
+		NewSyncProfilesDataSource,
+
 		// Download Clients
 		NewDownloadClientDataSource,
 		NewDownloadClientsDataSource,
