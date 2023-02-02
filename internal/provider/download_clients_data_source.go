@@ -48,7 +48,7 @@ func (d *DownloadClientsDataSource) Schema(ctx context.Context, req datasource.S
 				Computed: true,
 			},
 			"download_clients": schema.SetNestedAttribute{
-				MarkdownDescription: "Download Client list..",
+				MarkdownDescription: "Download Client list.",
 				Computed:            true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{

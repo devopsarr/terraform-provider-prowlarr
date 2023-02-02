@@ -22,7 +22,7 @@ data "prowlarr_download_clients" "example" {
 
 ### Read-Only
 
-- `download_clients` (Attributes Set) Download Client list.. (see [below for nested schema](#nestedatt--download_clients))
+- `download_clients` (Attributes Set) Download Client list. (see [below for nested schema](#nestedatt--download_clients))
 - `id` (String) The ID of this resource.
 
 <a id="nestedatt--download_clients"></a>

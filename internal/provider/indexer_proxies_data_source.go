@@ -48,7 +48,7 @@ func (d *IndexerProxiesDataSource) Schema(ctx context.Context, req datasource.Sc
 				Computed: true,
 			},
 			"indexer_proxies": schema.SetNestedAttribute{
-				MarkdownDescription: "Indexer Client list..",
+				MarkdownDescription: "Indexer Client list.",
 				Computed:            true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{

@@ -132,6 +132,17 @@ func (p *ProwlarrProvider) Configure(ctx context.Context, req provider.Configure
 
 func (p *ProwlarrProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
+		// Applications
+		NewSyncProfileResource,
+		NewApplicationResource,
+		NewApplicationLazyLibrarianResource,
+		NewApplicationLidarrResource,
+		NewApplicationMylarResource,
+		NewApplicationRadarrResource,
+		NewApplicationReadarrResource,
+		NewApplicationSonarrResource,
+		NewApplicationWhisparrResource,
+
 		// Download Clients
 		NewDownloadClientResource,
 		NewDownloadClientTransmissionResource,
@@ -155,6 +166,12 @@ func (p *ProwlarrProvider) Resources(ctx context.Context) []func() resource.Reso
 
 func (p *ProwlarrProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
+		// Applications
+		NewSyncProfileDataSource,
+		NewSyncProfilesDataSource,
+		NewApplicationDataSource,
+		NewApplicationsDataSource,
+
 		// Download Clients
 		NewDownloadClientDataSource,
 		NewDownloadClientsDataSource,
