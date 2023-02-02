@@ -1,0 +1,55 @@
+package provider
+
+import (
+	"fmt"
+	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+)
+
+func TestAccApplicationSonarrResource(t *testing.T) {
+	t.Parallel()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			// Create and Read testing
+			{
+				Config: testAccApplicationSonarrResourceConfig("resourceSonarrTest", "false"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("prowlarr_application_sonarr.test", "prowlarr_url", "false"),
+					resource.TestCheckResourceAttrSet("prowlarr_application_sonarr.test", "id"),
+				),
+			},
+			// Update and Read testing
+			{
+				Config: testAccApplicationSonarrResourceConfig("resourceSonarrTest", "true"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("prowlarr_application_sonarr.test", "prowlarr_url", "true"),
+				),
+			},
+			// ImportState testing
+			{
+				ResourceName:      "prowlarr_application_sonarr.test",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+			// Delete testing automatically occurs in TestCase
+		},
+	})
+}
+
+func testAccApplicationSonarrResourceConfig(name, prowlarr string) string {
+	return fmt.Sprintf(`
+	resource "prowlarr_application_sonarr" "test" {
+		name = "%s"
+		sync_level = "disabled"
+
+		base_url = "http://localhost:8989"
+		prowlarr_url = "%s"
+		api_key = "APIKey"
+		sync_categories = [5010, 5020]
+		anime_sync_categories = [5070]
+	}`, name, prowlarr)
+}

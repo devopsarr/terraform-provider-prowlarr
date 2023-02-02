@@ -135,6 +135,7 @@ func (p *ProwlarrProvider) Resources(ctx context.Context) []func() resource.Reso
 		// Applications
 		NewSyncProfileResource,
 		NewApplicationResource,
+		NewApplicationSonarrResource,
 
 		// Download Clients
 		NewDownloadClientResource,
