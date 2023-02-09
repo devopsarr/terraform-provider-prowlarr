@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -62,18 +61,20 @@ func (n ApplicationRadarr) toApplication() *Application {
 		BaseURL:        n.BaseURL,
 		APIKey:         n.APIKey,
 		ID:             n.ID,
+		ConfigContract: types.StringValue(applicationRadarrConfigContract),
+		Implementation: types.StringValue(applicationRadarrImplementation),
 	}
 }
 
-func (n *ApplicationRadarr) fromApplication(application *Application) {
-	n.Tags = application.Tags
-	n.Name = application.Name
-	n.ID = application.ID
-	n.SyncLevel = application.SyncLevel
-	n.SyncCategories = application.SyncCategories
-	n.BaseURL = application.BaseURL
-	n.ProwlarrURL = application.ProwlarrURL
-	n.APIKey = application.APIKey
+func (a *ApplicationRadarr) fromApplication(application *Application) {
+	a.Tags = application.Tags
+	a.Name = application.Name
+	a.ID = application.ID
+	a.SyncLevel = application.SyncLevel
+	a.SyncCategories = application.SyncCategories
+	a.BaseURL = application.BaseURL
+	a.ProwlarrURL = application.ProwlarrURL
+	a.APIKey = application.APIKey
 }
 
 func (r *ApplicationRadarrResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -240,30 +241,12 @@ func (r *ApplicationRadarrResource) ImportState(ctx context.Context, req resourc
 	tflog.Trace(ctx, "imported "+applicationRadarrResourceName+": "+req.ID)
 }
 
-func (n *ApplicationRadarr) write(ctx context.Context, application *prowlarr.ApplicationResource) {
-	genericApplication := Application{
-		SyncLevel: types.StringValue(string(application.GetSyncLevel())),
-		ID:        types.Int64Value(int64(application.GetId())),
-		Name:      types.StringValue(application.GetName()),
-		Tags:      types.SetValueMust(types.Int64Type, nil),
-	}
-	tfsdk.ValueFrom(ctx, application.Tags, genericApplication.Tags.Type(ctx), &genericApplication.Tags)
-	genericApplication.writeFields(ctx, application.GetFields())
-	n.fromApplication(&genericApplication)
+func (a *ApplicationRadarr) write(ctx context.Context, application *prowlarr.ApplicationResource) {
+	genericApplication := a.toApplication()
+	genericApplication.write(ctx, application)
+	a.fromApplication(genericApplication)
 }
 
-func (n *ApplicationRadarr) read(ctx context.Context) *prowlarr.ApplicationResource {
-	tags := make([]*int32, len(n.Tags.Elements()))
-	tfsdk.ValueAs(ctx, n.Tags, &tags)
-
-	application := prowlarr.NewApplicationResource()
-	application.SetSyncLevel(prowlarr.ApplicationSyncLevel(n.SyncLevel.ValueString()))
-	application.SetId(int32(n.ID.ValueInt64()))
-	application.SetName(n.Name.ValueString())
-	application.SetConfigContract(applicationRadarrConfigContract)
-	application.SetImplementation(applicationRadarrImplementation)
-	application.SetTags(tags)
-	application.SetFields(n.toApplication().readFields(ctx))
-
-	return application
+func (a *ApplicationRadarr) read(ctx context.Context) *prowlarr.ApplicationResource {
+	return a.toApplication().read(ctx)
 }

@@ -17,7 +17,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golang.org/x/exp/slices"
 )
 
 const applicationResourceName = "application"
@@ -28,10 +27,10 @@ var (
 	_ resource.ResourceWithImportState = &ApplicationResource{}
 )
 
-var (
-	applicationStringFields   = []string{"prowlarrUrl", "baseUrl", "apiKey"}
-	applicationIntSliceFields = []string{"syncCategories", "animeSyncCategories"}
-)
+var applicationFields = helpers.Fields{
+	Strings:   []string{"prowlarrUrl", "baseUrl", "apiKey"},
+	IntSlices: []string{"syncCategories", "animeSyncCategories"},
+}
 
 func NewApplicationResource() resource.Resource {
 	return &ApplicationResource{}
@@ -247,67 +246,31 @@ func (r *ApplicationResource) ImportState(ctx context.Context, req resource.Impo
 	tflog.Trace(ctx, "imported "+applicationResourceName+": "+req.ID)
 }
 
-func (n *Application) write(ctx context.Context, application *prowlarr.ApplicationResource) {
-	n.ID = types.Int64Value(int64(application.GetId()))
-	n.Name = types.StringValue(application.GetName())
-	n.SyncLevel = types.StringValue(string(application.GetSyncLevel()))
-	n.Implementation = types.StringValue(application.GetImplementation())
-	n.ConfigContract = types.StringValue(application.GetConfigContract())
-	n.Tags = types.SetValueMust(types.Int64Type, nil)
-	n.SyncCategories = types.SetValueMust(types.Int64Type, nil)
-	n.AnimeSyncCategories = types.SetValueMust(types.Int64Type, nil)
-	tfsdk.ValueFrom(ctx, application.Tags, n.Tags.Type(ctx), &n.Tags)
-	n.writeFields(ctx, application.GetFields())
+func (a *Application) write(ctx context.Context, application *prowlarr.ApplicationResource) {
+	a.ID = types.Int64Value(int64(application.GetId()))
+	a.Name = types.StringValue(application.GetName())
+	a.SyncLevel = types.StringValue(string(application.GetSyncLevel()))
+	a.Implementation = types.StringValue(application.GetImplementation())
+	a.ConfigContract = types.StringValue(application.GetConfigContract())
+	a.Tags = types.SetValueMust(types.Int64Type, nil)
+	a.SyncCategories = types.SetValueMust(types.Int64Type, nil)
+	a.AnimeSyncCategories = types.SetValueMust(types.Int64Type, nil)
+	tfsdk.ValueFrom(ctx, application.Tags, a.Tags.Type(ctx), &a.Tags)
+	helpers.WriteFields(ctx, a, application.GetFields(), applicationFields)
 }
 
-func (n *Application) writeFields(ctx context.Context, fields []*prowlarr.Field) {
-	for _, f := range fields {
-		if f.Value == nil {
-			continue
-		}
-
-		if slices.Contains(applicationStringFields, f.GetName()) {
-			helpers.WriteStringField(f, n)
-
-			continue
-		}
-
-		if slices.Contains(applicationIntSliceFields, f.GetName()) {
-			helpers.WriteIntSliceField(ctx, f, n)
-		}
-	}
-}
-
-func (n *Application) read(ctx context.Context) *prowlarr.ApplicationResource {
-	tags := make([]*int32, len(n.Tags.Elements()))
-	tfsdk.ValueAs(ctx, n.Tags, &tags)
+func (a *Application) read(ctx context.Context) *prowlarr.ApplicationResource {
+	tags := make([]*int32, len(a.Tags.Elements()))
+	tfsdk.ValueAs(ctx, a.Tags, &tags)
 
 	application := prowlarr.NewApplicationResource()
-	application.SetSyncLevel(prowlarr.ApplicationSyncLevel(n.SyncLevel.ValueString()))
-	application.SetId(int32(n.ID.ValueInt64()))
-	application.SetName(n.Name.ValueString())
-	application.SetImplementation(n.Implementation.ValueString())
-	application.SetConfigContract(n.ConfigContract.ValueString())
+	application.SetSyncLevel(prowlarr.ApplicationSyncLevel(a.SyncLevel.ValueString()))
+	application.SetId(int32(a.ID.ValueInt64()))
+	application.SetName(a.Name.ValueString())
+	application.SetImplementation(a.Implementation.ValueString())
+	application.SetConfigContract(a.ConfigContract.ValueString())
 	application.SetTags(tags)
-	application.SetFields(n.readFields(ctx))
+	application.SetFields(helpers.ReadFields(ctx, a, applicationFields))
 
 	return application
-}
-
-func (n *Application) readFields(ctx context.Context) []*prowlarr.Field {
-	var output []*prowlarr.Field
-
-	for _, s := range applicationStringFields {
-		if field := helpers.ReadStringField(s, n); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	for _, s := range applicationIntSliceFields {
-		if field := helpers.ReadIntSliceField(ctx, s, n); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	return output
 }

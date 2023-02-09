@@ -17,7 +17,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golang.org/x/exp/slices"
 )
 
 const notificationResourceName = "notification"
@@ -28,13 +27,13 @@ var (
 	_ resource.ResourceWithImportState = &NotificationResource{}
 )
 
-var (
-	notificationBoolFields        = []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "requireEncryption", "sendSilently", "useSsl", "updateLibrary", "useEuEndpoint"}
-	notificationStringFields      = []string{"accessToken", "accessTokenSecret", "apiKey", "aPIKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "cc", "bcc", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "displayTime", "expires", "from", "host", "icon", "instanceName", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "to", "token", "url", "userKey", "username", "webHookUrl", "serverUrl", "userName", "clickUrl", "mapFrom", "mapTo", "key", "event"}
-	notificationIntFields         = []string{"port", "grabFields", "importFields", "priority", "retry", "expire", "method"}
-	notificationStringSliceFields = []string{"recipients", "topics", "tags", "channelTags", "devices"}
-	notificationIntSliceFields    = []string{"deviceIds"}
-)
+var notificationFields = helpers.Fields{
+	Bools:        []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "requireEncryption", "sendSilently", "useSsl", "updateLibrary", "useEuEndpoint"},
+	Strings:      []string{"accessToken", "accessTokenSecret", "apiKey", "aPIKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "cc", "bcc", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "displayTime", "expires", "from", "host", "icon", "instanceName", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "to", "token", "url", "userKey", "username", "webHookUrl", "serverUrl", "userName", "clickUrl", "mapFrom", "mapTo", "key", "event"},
+	Ints:         []string{"port", "grabFields", "importFields", "priority", "retry", "expire", "method"},
+	StringSlices: []string{"recipients", "topics", "tags", "channelTags", "devices"},
+	IntSlices:    []string{"deviceIds"},
+}
 
 func NewNotificationResource() resource.Resource {
 	return &NotificationResource{}
@@ -654,41 +653,7 @@ func (n *Notification) write(ctx context.Context, notification *prowlarr.Notific
 	n.Recipients = types.SetValueMust(types.StringType, nil)
 	n.FieldTags = types.SetValueMust(types.StringType, nil)
 	tfsdk.ValueFrom(ctx, notification.Tags, n.Tags.Type(ctx), &n.Tags)
-	n.writeFields(ctx, notification.GetFields())
-}
-
-func (n *Notification) writeFields(ctx context.Context, fields []*prowlarr.Field) {
-	for _, f := range fields {
-		if f.Value == nil {
-			continue
-		}
-
-		if slices.Contains(notificationStringFields, f.GetName()) {
-			helpers.WriteStringField(f, n)
-
-			continue
-		}
-
-		if slices.Contains(notificationBoolFields, f.GetName()) {
-			helpers.WriteBoolField(f, n)
-
-			continue
-		}
-
-		if slices.Contains(notificationIntFields, f.GetName()) {
-			helpers.WriteIntField(f, n)
-
-			continue
-		}
-
-		if slices.Contains(notificationStringSliceFields, f.GetName()) {
-			helpers.WriteStringSliceField(ctx, f, n)
-		}
-
-		if slices.Contains(notificationIntSliceFields, f.GetName()) {
-			helpers.WriteIntSliceField(ctx, f, n)
-		}
-	}
+	helpers.WriteFields(ctx, n, notification.GetFields(), notificationFields)
 }
 
 func (n *Notification) read(ctx context.Context) *prowlarr.NotificationResource {
@@ -704,43 +669,7 @@ func (n *Notification) read(ctx context.Context) *prowlarr.NotificationResource 
 	notification.SetImplementation(n.Implementation.ValueString())
 	notification.SetConfigContract(n.ConfigContract.ValueString())
 	notification.SetTags(tags)
-	notification.SetFields(n.readFields(ctx))
+	notification.SetFields(helpers.ReadFields(ctx, n, notificationFields))
 
 	return notification
-}
-
-func (n *Notification) readFields(ctx context.Context) []*prowlarr.Field {
-	var output []*prowlarr.Field
-
-	for _, b := range notificationBoolFields {
-		if field := helpers.ReadBoolField(b, n); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	for _, i := range notificationIntFields {
-		if field := helpers.ReadIntField(i, n); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	for _, s := range notificationStringFields {
-		if field := helpers.ReadStringField(s, n); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	for _, s := range notificationStringSliceFields {
-		if field := helpers.ReadStringSliceField(ctx, s, n); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	for _, s := range notificationIntSliceFields {
-		if field := helpers.ReadIntSliceField(ctx, s, n); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	return output
 }

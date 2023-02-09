@@ -12,7 +12,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -54,6 +53,8 @@ func (i IndexerProxyFlaresolverr) toIndexerProxy() *IndexerProxy {
 		Host:           i.Host,
 		RequestTimeout: i.RequestTimeout,
 		ID:             i.ID,
+		ConfigContract: types.StringValue(indexerProxyFlaresolverrConfigContract),
+		Implementation: types.StringValue(indexerProxyFlaresolverrImplementation),
 	}
 }
 
@@ -212,29 +213,11 @@ func (r *IndexerProxyFlaresolverrResource) ImportState(ctx context.Context, req 
 }
 
 func (i *IndexerProxyFlaresolverr) write(ctx context.Context, indexerProxy *prowlarr.IndexerProxyResource) {
-	genericIndexerProxy := IndexerProxy{
-		ID:   types.Int64Value(int64(indexerProxy.GetId())),
-		Name: types.StringValue(indexerProxy.GetName()),
-		Tags: types.SetValueMust(types.Int64Type, nil),
-	}
-
-	tfsdk.ValueFrom(ctx, indexerProxy.Tags, genericIndexerProxy.Tags.Type(ctx), &genericIndexerProxy.Tags)
-	genericIndexerProxy.writeFields(indexerProxy.GetFields())
-	i.fromIndexerProxy(&genericIndexerProxy)
+	genericIndexerProxy := i.toIndexerProxy()
+	genericIndexerProxy.write(ctx, indexerProxy)
+	i.fromIndexerProxy(genericIndexerProxy)
 }
 
 func (i *IndexerProxyFlaresolverr) read(ctx context.Context) *prowlarr.IndexerProxyResource {
-	tags := make([]*int32, len(i.Tags.Elements()))
-
-	tfsdk.ValueAs(ctx, i.Tags, &tags)
-
-	proxy := prowlarr.NewIndexerProxyResource()
-	proxy.SetId(int32(i.ID.ValueInt64()))
-	proxy.SetConfigContract(indexerProxyFlaresolverrConfigContract)
-	proxy.SetImplementation(indexerProxyFlaresolverrImplementation)
-	proxy.SetName(i.Name.ValueString())
-	proxy.SetTags(tags)
-	proxy.SetFields(i.toIndexerProxy().readFields())
-
-	return proxy
+	return i.toIndexerProxy().read(ctx)
 }

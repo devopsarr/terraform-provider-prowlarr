@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golang.org/x/exp/slices"
 )
 
 const indexerProxyResourceName = "indexer_proxy"
@@ -26,10 +25,10 @@ var (
 	_ resource.ResourceWithImportState = &IndexerProxyResource{}
 )
 
-var (
-	indexerProxyIntFields    = []string{"port", "requestTimeout"}
-	indexerProxyStringFields = []string{"host", "password", "username"}
-)
+var indexerProxyFields = helpers.Fields{
+	Ints:    []string{"port", "requestTimeout"},
+	Strings: []string{"host", "password", "username"},
+}
 
 func NewIndexerProxyResource() resource.Resource {
 	return &IndexerProxyResource{}
@@ -249,27 +248,7 @@ func (i *IndexerProxy) write(ctx context.Context, indexerProxy *prowlarr.Indexer
 	i.Tags = types.SetValueMust(types.Int64Type, nil)
 
 	tfsdk.ValueFrom(ctx, indexerProxy.Tags, i.Tags.Type(ctx), &i.Tags)
-	i.writeFields(indexerProxy.GetFields())
-}
-
-func (i *IndexerProxy) writeFields(fields []*prowlarr.Field) {
-	for _, f := range fields {
-		if f.Value == nil {
-			continue
-		}
-
-		if slices.Contains(indexerProxyStringFields, f.GetName()) {
-			helpers.WriteStringField(f, i)
-
-			continue
-		}
-
-		if slices.Contains(indexerProxyIntFields, f.GetName()) {
-			helpers.WriteIntField(f, i)
-
-			continue
-		}
-	}
+	helpers.WriteFields(ctx, i, indexerProxy.GetFields(), indexerProxyFields)
 }
 
 func (i *IndexerProxy) read(ctx context.Context) *prowlarr.IndexerProxyResource {
@@ -283,25 +262,7 @@ func (i *IndexerProxy) read(ctx context.Context) *prowlarr.IndexerProxyResource 
 	proxy.SetImplementation(i.Implementation.ValueString())
 	proxy.SetName(i.Name.ValueString())
 	proxy.SetTags(tags)
-	proxy.SetFields(i.readFields())
+	proxy.SetFields(helpers.ReadFields(ctx, i, indexerProxyFields))
 
 	return proxy
-}
-
-func (i *IndexerProxy) readFields() []*prowlarr.Field {
-	var output []*prowlarr.Field
-
-	for _, j := range indexerProxyIntFields {
-		if field := helpers.ReadIntField(j, i); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	for _, s := range indexerProxyStringFields {
-		if field := helpers.ReadStringField(s, i); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	return output
 }
