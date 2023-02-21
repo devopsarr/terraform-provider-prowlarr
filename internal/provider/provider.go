@@ -151,6 +151,7 @@ func (p *ProwlarrProvider) Resources(ctx context.Context) []func() resource.Reso
 		NewDownloadClientFreeboxResource,
 		NewDownloadClientHadoukenResource,
 		NewDownloadClientNzbgetResource,
+		NewDownloadClientNzbvortexResource,
 		NewDownloadClientTransmissionResource,
 
 		// Indexer Proxies
