@@ -146,6 +146,7 @@ func (p *ProwlarrProvider) Resources(ctx context.Context) []func() resource.Reso
 		// Download Clients
 		NewDownloadClientResource,
 		NewDownloadClientAria2Resource,
+		NewDownloadClientDelugeResource,
 		NewDownloadClientTransmissionResource,
 
 		// Indexer Proxies
