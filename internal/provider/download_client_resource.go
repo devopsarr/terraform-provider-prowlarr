@@ -29,11 +29,13 @@ var (
 )
 
 var downloadClientFields = helpers.Fields{
-	Bools:        []string{"addPaused", "useSsl", "startOnAdd", "sequentialOrder", "firstAndLast", "addStopped", "saveMagnetFiles", "readOnly", "watchFolder"},
-	Ints:         []string{"port", "priority", "initialState", "intialState"},
-	Strings:      []string{"host", "apiKey", "urlBase", "rpcPath", "secretToken", "password", "username", "tvImportedCategory", "directory", "destination", "category", "nzbFolder", "strmFolder", "torrentFolder", "magnetFileExtension"},
-	StringSlices: []string{"fieldTags", "postImTags"},
-	IntSlices:    []string{"additionalTags"},
+	Bools:                  []string{"addPaused", "useSsl", "startOnAdd", "sequentialOrder", "firstAndLast", "addStopped", "saveMagnetFiles", "readOnly", "watchFolder"},
+	Ints:                   []string{"port", "itemPriority", "initialState", "intialState"},
+	IntsExceptions:         []string{"priority"},
+	Strings:                []string{"host", "apiKey", "urlBase", "rpcPath", "secretToken", "password", "username", "tvImportedCategory", "directory", "destination", "category", "nzbFolder", "strmFolder", "torrentFolder", "magnetFileExtension"},
+	StringSlices:           []string{"fieldTags", "postImTags"},
+	StringSlicesExceptions: []string{"tags"},
+	IntSlices:              []string{"additionalTags"},
 }
 
 func NewDownloadClientResource() resource.Resource {

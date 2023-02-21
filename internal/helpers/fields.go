@@ -20,6 +20,10 @@ type fieldException struct {
 func getFieldExceptions() []fieldException {
 	return []fieldException{
 		{
+			apiName: "priority",
+			tfName:  "itemPriority",
+		},
+		{
 			apiName: "tags",
 			tfName:  "fieldTags",
 		},
