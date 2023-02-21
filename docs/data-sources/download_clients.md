@@ -45,7 +45,6 @@ Read-Only:
 - `directory` (String) Directory.
 - `enable` (Boolean) Enable flag.
 - `field_tags` (Set of String) Field tags.
-- `first_and_last` (Boolean) First and last flag.
 - `host` (String) host.
 - `id` (Number) Download Client ID.
 - `implementation` (String) DownloadClient implementation name.

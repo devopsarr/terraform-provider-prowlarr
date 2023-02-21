@@ -29,7 +29,7 @@ var (
 )
 
 var downloadClientFields = helpers.Fields{
-	Bools:                  []string{"addPaused", "useSsl", "startOnAdd", "sequentialOrder", "firstAndLast", "addStopped", "saveMagnetFiles", "readOnly", "watchFolder"},
+	Bools:                  []string{"addPaused", "useSsl", "startOnAdd", "sequentialOrder", "addStopped", "saveMagnetFiles", "readOnly", "watchFolder"},
 	Ints:                   []string{"port", "itemPriority", "initialState", "intialState"},
 	IntsExceptions:         []string{"priority"},
 	Strings:                []string{"host", "apiKey", "urlBase", "rpcPath", "secretToken", "password", "username", "tvImportedCategory", "directory", "destinationDirectory", "destination", "category", "nzbFolder", "strmFolder", "torrentFolder", "magnetFileExtension", "apiUrl", "appId", "appToken"},
@@ -86,7 +86,6 @@ type DownloadClient struct {
 	AddStopped           types.Bool   `tfsdk:"add_stopped"`
 	SaveMagnetFiles      types.Bool   `tfsdk:"save_magnet_files"`
 	ReadOnly             types.Bool   `tfsdk:"read_only"`
-	FirstAndLast         types.Bool   `tfsdk:"first_and_last"`
 	SequentialOrder      types.Bool   `tfsdk:"sequential_order"`
 	StartOnAdd           types.Bool   `tfsdk:"start_on_add"`
 	UseSsl               types.Bool   `tfsdk:"use_ssl"`
@@ -177,11 +176,6 @@ func (r *DownloadClientResource) Schema(ctx context.Context, req resource.Schema
 			},
 			"sequential_order": schema.BoolAttribute{
 				MarkdownDescription: "Sequential order flag.",
-				Optional:            true,
-				Computed:            true,
-			},
-			"first_and_last": schema.BoolAttribute{
-				MarkdownDescription: "First and last flag.",
 				Optional:            true,
 				Computed:            true,
 			},

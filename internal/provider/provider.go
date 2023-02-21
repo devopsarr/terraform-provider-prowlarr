@@ -153,6 +153,7 @@ func (p *ProwlarrProvider) Resources(ctx context.Context) []func() resource.Reso
 		NewDownloadClientNzbgetResource,
 		NewDownloadClientNzbvortexResource,
 		NewDownloadClientPneumaticResource,
+		NewDownloadClientQbittorrentResource,
 		NewDownloadClientTransmissionResource,
 
 		// Indexer Proxies

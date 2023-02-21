@@ -54,7 +54,6 @@ resource "prowlarr_download_client" "example" {
 - `directory` (String) Directory.
 - `enable` (Boolean) Enable flag.
 - `field_tags` (Set of String) Field tags.
-- `first_and_last` (Boolean) First and last flag.
 - `host` (String) host.
 - `initial_state` (Number) Initial state. `0` Start, `1` ForceStart, `2` Pause.
 - `intial_state` (Number) Initial state, with Stop support. `0` Start, `1` ForceStart, `2` Pause, `3` Stop.

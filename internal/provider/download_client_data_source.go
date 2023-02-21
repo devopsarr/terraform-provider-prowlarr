@@ -103,10 +103,6 @@ func (d *DownloadClientDataSource) Schema(ctx context.Context, req datasource.Sc
 				MarkdownDescription: "Sequential order flag.",
 				Computed:            true,
 			},
-			"first_and_last": schema.BoolAttribute{
-				MarkdownDescription: "First and last flag.",
-				Computed:            true,
-			},
 			"add_stopped": schema.BoolAttribute{
 				MarkdownDescription: "Add stopped flag.",
 				Computed:            true,
