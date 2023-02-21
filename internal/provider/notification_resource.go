@@ -30,7 +30,7 @@ var (
 var notificationFields = helpers.Fields{
 	Bools:        []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "requireEncryption", "sendSilently", "useSsl", "updateLibrary", "useEuEndpoint"},
 	Strings:      []string{"accessToken", "accessTokenSecret", "apiKey", "aPIKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expires", "from", "host", "icon", "instanceName", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "webHookUrl", "serverUrl", "userName", "clickUrl", "mapFrom", "mapTo", "key", "event"},
-	Ints:         []string{"displayTime", "port", "grabFields", "importFields", "priority", "retry", "expire", "method"},
+	Ints:         []string{"displayTime", "port", "priority", "retry", "expire", "method"},
 	StringSlices: []string{"recipients", "to", "cc", "bcc", "topics", "tags", "channelTags", "deviceIds", "devices"},
 	IntSlices:    []string{"grabFields", "importFields"},
 }
