@@ -77,7 +77,6 @@ resource "prowlarr_download_client" "example" {
 - `url_base` (String) Base URL.
 - `use_ssl` (Boolean) Use SSL flag.
 - `username` (String) Username.
-- `watch_folder` (Boolean) Watch folder flag.
 
 ### Read-Only
 

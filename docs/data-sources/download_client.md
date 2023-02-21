@@ -68,7 +68,6 @@ data "prowlarr_download_client" "test" {
 - `url_base` (String) Base URL.
 - `use_ssl` (Boolean) Use SSL flag.
 - `username` (String) Username.
-- `watch_folder` (Boolean) Watch folder flag.
 
 <a id="nestedatt--categories"></a>
 ### Nested Schema for `categories`

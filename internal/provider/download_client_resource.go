@@ -29,7 +29,7 @@ var (
 )
 
 var downloadClientFields = helpers.Fields{
-	Bools:                  []string{"addPaused", "useSsl", "startOnAdd", "sequentialOrder", "addStopped", "saveMagnetFiles", "readOnly", "watchFolder"},
+	Bools:                  []string{"addPaused", "useSsl", "startOnAdd", "sequentialOrder", "addStopped", "saveMagnetFiles", "readOnly"},
 	Ints:                   []string{"port", "itemPriority", "initialState", "intialState"},
 	IntsExceptions:         []string{"priority"},
 	Strings:                []string{"host", "apiKey", "urlBase", "rpcPath", "secretToken", "password", "username", "tvImportedCategory", "directory", "destinationDirectory", "destination", "category", "nzbFolder", "strmFolder", "torrentFolder", "magnetFileExtension", "apiUrl", "appId", "appToken"},
@@ -90,7 +90,6 @@ type DownloadClient struct {
 	StartOnAdd           types.Bool   `tfsdk:"start_on_add"`
 	UseSsl               types.Bool   `tfsdk:"use_ssl"`
 	AddPaused            types.Bool   `tfsdk:"add_paused"`
-	WatchFolder          types.Bool   `tfsdk:"watch_folder"`
 	Enable               types.Bool   `tfsdk:"enable"`
 }
 
@@ -191,11 +190,6 @@ func (r *DownloadClientResource) Schema(ctx context.Context, req resource.Schema
 			},
 			"read_only": schema.BoolAttribute{
 				MarkdownDescription: "Read only flag.",
-				Optional:            true,
-				Computed:            true,
-			},
-			"watch_folder": schema.BoolAttribute{
-				MarkdownDescription: "Watch folder flag.",
 				Optional:            true,
 				Computed:            true,
 			},

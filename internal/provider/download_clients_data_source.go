@@ -131,10 +131,6 @@ func (d *DownloadClientsDataSource) Schema(ctx context.Context, req datasource.S
 							MarkdownDescription: "Read only flag.",
 							Computed:            true,
 						},
-						"watch_folder": schema.BoolAttribute{
-							MarkdownDescription: "Watch folder flag.",
-							Computed:            true,
-						},
 						"port": schema.Int64Attribute{
 							MarkdownDescription: "Port.",
 							Computed:            true,

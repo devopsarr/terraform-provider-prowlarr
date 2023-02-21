@@ -159,6 +159,7 @@ func (p *ProwlarrProvider) Resources(ctx context.Context) []func() resource.Reso
 		NewDownloadClientTorrentBlackholeResource,
 		NewDownloadClientTorrentDownloadStationResource,
 		NewDownloadClientTransmissionResource,
+		NewDownloadClientUsenetBlackholeResource,
 
 		// Indexer Proxies
 		NewIndexerProxyResource,

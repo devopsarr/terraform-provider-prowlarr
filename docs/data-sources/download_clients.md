@@ -72,7 +72,6 @@ Read-Only:
 - `url_base` (String) Base URL.
 - `use_ssl` (Boolean) Use SSL flag.
 - `username` (String) Username.
-- `watch_folder` (Boolean) Watch folder flag.
 
 <a id="nestedatt--download_clients--categories"></a>
 ### Nested Schema for `download_clients.categories`
