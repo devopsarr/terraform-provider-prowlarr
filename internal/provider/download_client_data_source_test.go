@@ -1,6 +1,8 @@
 package provider
 
 import (
+	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -13,9 +15,19 @@ func TestAccDownloadClientDataSource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized
+			{
+				Config:      testAccDownloadClientDataSourceConfig("\"error\"") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
+			// Not found testing
+			{
+				Config:      testAccDownloadClientDataSourceConfig("\"error\""),
+				ExpectError: regexp.MustCompile("Unable to find download_client"),
+			},
 			// Read testing
 			{
-				Config: testAccDownloadClientDataSourceConfig,
+				Config: testAccDownloadClientResourceConfig("dataTest", "false") + testAccDownloadClientDataSourceConfig("prowlarr_download_client.test.name"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.prowlarr_download_client.test", "id"),
 					resource.TestCheckResourceAttr("data.prowlarr_download_client.test", "protocol", "torrent")),
@@ -24,20 +36,10 @@ func TestAccDownloadClientDataSource(t *testing.T) {
 	})
 }
 
-const testAccDownloadClientDataSourceConfig = `
-resource "prowlarr_download_client" "test" {
-	enable = false
-	priority = 1
-	name = "dataTest"
-	implementation = "Transmission"
-	protocol = "torrent"
-	config_contract = "TransmissionSettings"
-	host = "transmission"
-	url_base = "/transmission/"
-	port = 9091
+func testAccDownloadClientDataSourceConfig(name string) string {
+	return fmt.Sprintf(`
+	data "prowlarr_download_client" "test" {
+		name = %s
+	}
+	`, name)
 }
-
-data "prowlarr_download_client" "test" {
-	name = prowlarr_download_client.test.name
-}
-`

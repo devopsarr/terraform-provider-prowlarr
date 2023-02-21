@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccApplicationMylarResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccApplicationMylarResourceConfig("resourceMylarTest", "false") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccApplicationMylarResourceConfig("resourceMylarTest", "false"),
@@ -21,6 +27,12 @@ func TestAccApplicationMylarResource(t *testing.T) {
 					resource.TestCheckResourceAttr("prowlarr_application_mylar.test", "prowlarr_url", "false"),
 					resource.TestCheckResourceAttrSet("prowlarr_application_mylar.test", "id"),
 				),
+			},
+
+			// Unauthorized Read
+			{
+				Config:      testAccApplicationMylarResourceConfig("resourceMylarTest", "false") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{

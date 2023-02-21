@@ -27,3 +27,10 @@ func testAccPreCheck(t *testing.T) {
 		t.Skip("PROWLARR_API_KEY must be set for acceptance tests")
 	}
 }
+
+const testUnauthorizedProvider = `
+provider "prowlarr" {
+	url = "http://localhost:9696"
+	api_key = "ErrorAPIKey"
+  }
+`

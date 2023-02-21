@@ -52,17 +52,17 @@ type ApplicationSonarr struct {
 	ID                  types.Int64  `tfsdk:"id"`
 }
 
-func (n ApplicationSonarr) toApplication() *Application {
+func (a ApplicationSonarr) toApplication() *Application {
 	return &Application{
-		SyncCategories:      n.SyncCategories,
-		AnimeSyncCategories: n.AnimeSyncCategories,
-		Tags:                n.Tags,
-		Name:                n.Name,
-		SyncLevel:           n.SyncLevel,
-		ProwlarrURL:         n.ProwlarrURL,
-		BaseURL:             n.BaseURL,
-		APIKey:              n.APIKey,
-		ID:                  n.ID,
+		SyncCategories:      a.SyncCategories,
+		AnimeSyncCategories: a.AnimeSyncCategories,
+		Tags:                a.Tags,
+		Name:                a.Name,
+		SyncLevel:           a.SyncLevel,
+		ProwlarrURL:         a.ProwlarrURL,
+		BaseURL:             a.BaseURL,
+		APIKey:              a.APIKey,
+		ID:                  a.ID,
 		ConfigContract:      types.StringValue(applicationSonarrConfigContract),
 		Implementation:      types.StringValue(applicationSonarrImplementation),
 	}

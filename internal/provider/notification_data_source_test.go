@@ -1,6 +1,8 @@
 package provider
 
 import (
+	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -13,9 +15,19 @@ func TestAccNotificationDataSource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized
+			{
+				Config:      testAccNotificationDataSourceConfig("\"error\"") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
+			// Not found testing
+			{
+				Config:      testAccNotificationDataSourceConfig("\"error\""),
+				ExpectError: regexp.MustCompile("Unable to find notification"),
+			},
 			// Read testing
 			{
-				Config: testAccNotificationDataSourceConfig,
+				Config: testAccNotificationResourceConfig("notificationData", "false") + testAccNotificationDataSourceConfig("prowlarr_notification.test.name"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.prowlarr_notification.test", "id"),
 					resource.TestCheckResourceAttr("data.prowlarr_notification.test", "path", "/scripts/test.sh")),
@@ -24,21 +36,10 @@ func TestAccNotificationDataSource(t *testing.T) {
 	})
 }
 
-const testAccNotificationDataSourceConfig = `
-resource "prowlarr_notification" "test" {
-	on_health_issue                    = false
-	on_application_update              = false
-  
-	include_health_warnings = false
-	name                    = "notificationData"
-  
-	implementation  = "CustomScript"
-	config_contract = "CustomScriptSettings"
-  
-	path = "/scripts/test.sh"
+func testAccNotificationDataSourceConfig(name string) string {
+	return fmt.Sprintf(`
+	data "prowlarr_notification" "test" {
+		name = %s
+	}
+	`, name)
 }
-
-data "prowlarr_notification" "test" {
-	name = prowlarr_notification.test.name
-}
-`

@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccDownloadClientTransmissionResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccDownloadClientTransmissionResourceConfig("resourceTransmissionTest", "false") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccDownloadClientTransmissionResourceConfig("resourceTransmissionTest", "false"),
@@ -22,6 +28,11 @@ func TestAccDownloadClientTransmissionResource(t *testing.T) {
 					resource.TestCheckResourceAttr("prowlarr_download_client_transmission.test", "url_base", "/transmission/"),
 					resource.TestCheckResourceAttrSet("prowlarr_download_client_transmission.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccDownloadClientTransmissionResourceConfig("resourceTransmissionTest", "false") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{
@@ -45,10 +56,11 @@ func testAccDownloadClientTransmissionResourceConfig(name, enable string) string
 	return fmt.Sprintf(`
 	resource "prowlarr_download_client_transmission" "test" {
 		enable = %s
-		priority = 1
+		priority = 10
 		name = "%s"
 		host = "transmission"
 		url_base = "/transmission/"
 		port = 9091
+		item_priority = 1
 	}`, enable, name)
 }

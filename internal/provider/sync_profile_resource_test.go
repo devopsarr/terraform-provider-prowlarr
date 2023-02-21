@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccSyncProfileResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccSyncProfileResourceConfig("error", "false") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccSyncProfileResourceConfig("ResourceTest", "true"),
@@ -21,6 +27,11 @@ func TestAccSyncProfileResource(t *testing.T) {
 					resource.TestCheckResourceAttr("prowlarr_sync_profile.test", "enable_rss", "true"),
 					resource.TestCheckResourceAttrSet("prowlarr_sync_profile.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccSyncProfileResourceConfig("error", "false") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{

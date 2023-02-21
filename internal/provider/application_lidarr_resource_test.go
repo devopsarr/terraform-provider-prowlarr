@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccApplicationLidarrResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccApplicationLidarrResourceConfig("resourceLidarrTest", "false") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccApplicationLidarrResourceConfig("resourceLidarrTest", "false"),
@@ -21,6 +27,11 @@ func TestAccApplicationLidarrResource(t *testing.T) {
 					resource.TestCheckResourceAttr("prowlarr_application_lidarr.test", "prowlarr_url", "false"),
 					resource.TestCheckResourceAttrSet("prowlarr_application_lidarr.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccApplicationLidarrResourceConfig("resourceLidarrTest", "false") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{

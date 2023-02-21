@@ -51,16 +51,16 @@ type ApplicationReadarr struct {
 	ID             types.Int64  `tfsdk:"id"`
 }
 
-func (n ApplicationReadarr) toApplication() *Application {
+func (a ApplicationReadarr) toApplication() *Application {
 	return &Application{
-		SyncCategories: n.SyncCategories,
-		Tags:           n.Tags,
-		Name:           n.Name,
-		SyncLevel:      n.SyncLevel,
-		ProwlarrURL:    n.ProwlarrURL,
-		BaseURL:        n.BaseURL,
-		APIKey:         n.APIKey,
-		ID:             n.ID,
+		SyncCategories: a.SyncCategories,
+		Tags:           a.Tags,
+		Name:           a.Name,
+		SyncLevel:      a.SyncLevel,
+		ProwlarrURL:    a.ProwlarrURL,
+		BaseURL:        a.BaseURL,
+		APIKey:         a.APIKey,
+		ID:             a.ID,
 		ConfigContract: types.StringValue(applicationReadarrConfigContract),
 		Implementation: types.StringValue(applicationReadarrImplementation),
 	}

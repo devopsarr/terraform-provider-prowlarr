@@ -484,6 +484,8 @@ func TestReadIntSliceField(t *testing.T) {
 }
 
 func TestReadFields(t *testing.T) {
+	t.Parallel()
+
 	tests := map[string]struct {
 		fieldLists Fields
 		name       string
@@ -549,6 +551,8 @@ func TestReadFields(t *testing.T) {
 }
 
 func TestWriteFields(t *testing.T) {
+	t.Parallel()
+
 	tests := map[string]struct {
 		fieldLists     Fields
 		name           string
@@ -610,6 +614,7 @@ func TestWriteFields(t *testing.T) {
 			fieldContainer: Test{Str: types.StringValue("String")},
 		},
 	}
+
 	for name, test := range tests {
 		test := test
 

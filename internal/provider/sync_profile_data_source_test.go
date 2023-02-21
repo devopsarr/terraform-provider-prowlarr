@@ -1,6 +1,8 @@
 package provider
 
 import (
+	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -13,27 +15,31 @@ func TestAccSyncProfileDataSource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized
+			{
+				Config:      testAccSyncProfileDataSourceConfig("\"error\"") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
+			// Not found testing
+			{
+				Config:      testAccSyncProfileDataSourceConfig("\"error\""),
+				ExpectError: regexp.MustCompile("Unable to find sync_profile"),
+			},
 			// Read testing
 			{
-				Config: testAccSyncProfileDataSourceConfig,
+				Config: testAccSyncProfileResourceConfig("dataTest", "false") + testAccSyncProfileDataSourceConfig("prowlarr_sync_profile.test.name"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.prowlarr_sync_profile.test", "id"),
-					resource.TestCheckResourceAttr("data.prowlarr_sync_profile.test", "minimum_seeders", "10")),
+					resource.TestCheckResourceAttr("data.prowlarr_sync_profile.test", "minimum_seeders", "1")),
 			},
 		},
 	})
 }
 
-const testAccSyncProfileDataSourceConfig = `
-resource "prowlarr_sync_profile" "test" {
-	name = "dataTest"
-  	minimum_seeders = 10
-  	enable_rss = true
-  	enable_automatic_search = true
-  	enable_interactive_search = true
+func testAccSyncProfileDataSourceConfig(name string) string {
+	return fmt.Sprintf(`
+	data "prowlarr_sync_profile" "test" {
+		name = %s
+	}
+	`, name)
 }
-
-data "prowlarr_sync_profile" "test" {
-	name = prowlarr_sync_profile.test.name
-}
-`

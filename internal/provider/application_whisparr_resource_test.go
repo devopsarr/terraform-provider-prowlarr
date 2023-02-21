@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccApplicationWhisparrResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccApplicationWhisparrResourceConfig("resourceWhisparrTest", "false") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccApplicationWhisparrResourceConfig("resourceWhisparrTest", "false"),
@@ -21,6 +27,11 @@ func TestAccApplicationWhisparrResource(t *testing.T) {
 					resource.TestCheckResourceAttr("prowlarr_application_whisparr.test", "prowlarr_url", "false"),
 					resource.TestCheckResourceAttrSet("prowlarr_application_whisparr.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccApplicationWhisparrResourceConfig("resourceWhisparrTest", "false") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{
