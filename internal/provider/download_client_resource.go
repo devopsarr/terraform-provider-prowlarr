@@ -506,7 +506,7 @@ func (d *DownloadClient) write(ctx context.Context, downloadClient *prowlarr.Dow
 		categories[i].write(ctx, c)
 	}
 
-	tfsdk.ValueFrom(ctx, downloadClient.Categories, d.Categories.Type(ctx), &categories)
+	tfsdk.ValueFrom(ctx, categories, d.Categories.Type(ctx), &d.Categories)
 	tfsdk.ValueFrom(ctx, downloadClient.Tags, d.Tags.Type(ctx), &d.Tags)
 	helpers.WriteFields(ctx, d, downloadClient.GetFields(), downloadClientFields)
 }
@@ -521,7 +521,7 @@ func (d *DownloadClient) read(ctx context.Context) *prowlarr.DownloadClientResou
 	tags := make([]*int32, len(d.Tags.Elements()))
 	tfsdk.ValueAs(ctx, d.Tags, &tags)
 
-	categories := make([]ClientCategory, len(d.Categories.Elements()))
+	categories := make([]*ClientCategory, len(d.Categories.Elements()))
 	tfsdk.ValueAs(ctx, d.Categories, &categories)
 
 	clientCategories := make([]*prowlarr.DownloadClientCategory, len(d.Categories.Elements()))
