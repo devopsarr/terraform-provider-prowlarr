@@ -3,7 +3,7 @@ module github.com/devopsarr/terraform-provider-prowlarr
 go 1.19
 
 require (
-	github.com/devopsarr/prowlarr-go v0.1.0
+	github.com/devopsarr/prowlarr-go v0.2.0
 	github.com/hashicorp/terraform-plugin-docs v0.13.0
 	github.com/hashicorp/terraform-plugin-framework v1.1.1
 	github.com/hashicorp/terraform-plugin-framework-validators v0.10.0
