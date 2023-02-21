@@ -29,10 +29,10 @@ var (
 )
 
 var downloadClientFields = helpers.Fields{
-	Bools:                  []string{"addPaused", "useSsl", "startOnAdd", "sequentialOrder", "firstAndLast", "addStopped", "saveMagnetFiles", "readOnly", "watchFolder"},
+	Bools:                  []string{"addPaused", "useSsl", "startOnAdd", "sequentialOrder", "addStopped", "saveMagnetFiles", "readOnly"},
 	Ints:                   []string{"port", "itemPriority", "initialState", "intialState"},
 	IntsExceptions:         []string{"priority"},
-	Strings:                []string{"host", "apiKey", "urlBase", "rpcPath", "secretToken", "password", "username", "tvImportedCategory", "directory", "destination", "category", "nzbFolder", "strmFolder", "torrentFolder", "magnetFileExtension"},
+	Strings:                []string{"host", "apiKey", "urlBase", "rpcPath", "secretToken", "password", "username", "tvImportedCategory", "directory", "destinationDirectory", "destination", "category", "nzbFolder", "strmFolder", "torrentFolder", "magnetFileExtension", "apiUrl", "appId", "appToken"},
 	StringSlices:           []string{"fieldTags", "postImTags"},
 	StringSlicesExceptions: []string{"tags"},
 	IntSlices:              []string{"additionalTags"},
@@ -49,46 +49,48 @@ type DownloadClientResource struct {
 
 // DownloadClient describes the download client data model.
 type DownloadClient struct {
-	Tags                types.Set    `tfsdk:"tags"`
-	PostImTags          types.Set    `tfsdk:"post_im_tags"`
-	FieldTags           types.Set    `tfsdk:"field_tags"`
-	AdditionalTags      types.Set    `tfsdk:"additional_tags"`
-	Categories          types.Set    `tfsdk:"categories"`
-	NzbFolder           types.String `tfsdk:"nzb_folder"`
-	Category            types.String `tfsdk:"category"`
-	Implementation      types.String `tfsdk:"implementation"`
-	Name                types.String `tfsdk:"name"`
-	Protocol            types.String `tfsdk:"protocol"`
-	MagnetFileExtension types.String `tfsdk:"magnet_file_extension"`
-	TorrentFolder       types.String `tfsdk:"torrent_folder"`
-	StrmFolder          types.String `tfsdk:"strm_folder"`
-	Host                types.String `tfsdk:"host"`
-	ConfigContract      types.String `tfsdk:"config_contract"`
-	Destination         types.String `tfsdk:"destination"`
-	Directory           types.String `tfsdk:"directory"`
-	Username            types.String `tfsdk:"username"`
-	TvImportedCategory  types.String `tfsdk:"tv_imported_category"`
-	Password            types.String `tfsdk:"password"`
-	SecretToken         types.String `tfsdk:"secret_token"`
-	RPCPath             types.String `tfsdk:"rpc_path"`
-	URLBase             types.String `tfsdk:"url_base"`
-	APIKey              types.String `tfsdk:"api_key"`
-	ItemPriority        types.Int64  `tfsdk:"item_priority"`
-	IntialState         types.Int64  `tfsdk:"intial_state"`
-	InitialState        types.Int64  `tfsdk:"initial_state"`
-	Priority            types.Int64  `tfsdk:"priority"`
-	Port                types.Int64  `tfsdk:"port"`
-	ID                  types.Int64  `tfsdk:"id"`
-	AddStopped          types.Bool   `tfsdk:"add_stopped"`
-	SaveMagnetFiles     types.Bool   `tfsdk:"save_magnet_files"`
-	ReadOnly            types.Bool   `tfsdk:"read_only"`
-	FirstAndLast        types.Bool   `tfsdk:"first_and_last"`
-	SequentialOrder     types.Bool   `tfsdk:"sequential_order"`
-	StartOnAdd          types.Bool   `tfsdk:"start_on_add"`
-	UseSsl              types.Bool   `tfsdk:"use_ssl"`
-	AddPaused           types.Bool   `tfsdk:"add_paused"`
-	WatchFolder         types.Bool   `tfsdk:"watch_folder"`
-	Enable              types.Bool   `tfsdk:"enable"`
+	Tags                 types.Set    `tfsdk:"tags"`
+	PostImTags           types.Set    `tfsdk:"post_im_tags"`
+	FieldTags            types.Set    `tfsdk:"field_tags"`
+	AdditionalTags       types.Set    `tfsdk:"additional_tags"`
+	Categories           types.Set    `tfsdk:"categories"`
+	NzbFolder            types.String `tfsdk:"nzb_folder"`
+	Category             types.String `tfsdk:"category"`
+	Implementation       types.String `tfsdk:"implementation"`
+	Name                 types.String `tfsdk:"name"`
+	Protocol             types.String `tfsdk:"protocol"`
+	MagnetFileExtension  types.String `tfsdk:"magnet_file_extension"`
+	TorrentFolder        types.String `tfsdk:"torrent_folder"`
+	StrmFolder           types.String `tfsdk:"strm_folder"`
+	Host                 types.String `tfsdk:"host"`
+	ConfigContract       types.String `tfsdk:"config_contract"`
+	Destination          types.String `tfsdk:"destination"`
+	Directory            types.String `tfsdk:"directory"`
+	Username             types.String `tfsdk:"username"`
+	TvImportedCategory   types.String `tfsdk:"tv_imported_category"`
+	Password             types.String `tfsdk:"password"`
+	SecretToken          types.String `tfsdk:"secret_token"`
+	RPCPath              types.String `tfsdk:"rpc_path"`
+	URLBase              types.String `tfsdk:"url_base"`
+	APIKey               types.String `tfsdk:"api_key"`
+	APIURL               types.String `tfsdk:"api_url"`
+	AppID                types.String `tfsdk:"app_id"`
+	AppToken             types.String `tfsdk:"app_token"`
+	DestinationDirectory types.String `tfsdk:"destination_directory"`
+	ItemPriority         types.Int64  `tfsdk:"item_priority"`
+	IntialState          types.Int64  `tfsdk:"intial_state"`
+	InitialState         types.Int64  `tfsdk:"initial_state"`
+	Priority             types.Int64  `tfsdk:"priority"`
+	Port                 types.Int64  `tfsdk:"port"`
+	ID                   types.Int64  `tfsdk:"id"`
+	AddStopped           types.Bool   `tfsdk:"add_stopped"`
+	SaveMagnetFiles      types.Bool   `tfsdk:"save_magnet_files"`
+	ReadOnly             types.Bool   `tfsdk:"read_only"`
+	SequentialOrder      types.Bool   `tfsdk:"sequential_order"`
+	StartOnAdd           types.Bool   `tfsdk:"start_on_add"`
+	UseSsl               types.Bool   `tfsdk:"use_ssl"`
+	AddPaused            types.Bool   `tfsdk:"add_paused"`
+	Enable               types.Bool   `tfsdk:"enable"`
 }
 
 // ClientCategory is part of DownloadClient.
@@ -176,11 +178,6 @@ func (r *DownloadClientResource) Schema(ctx context.Context, req resource.Schema
 				Optional:            true,
 				Computed:            true,
 			},
-			"first_and_last": schema.BoolAttribute{
-				MarkdownDescription: "First and last flag.",
-				Optional:            true,
-				Computed:            true,
-			},
 			"add_stopped": schema.BoolAttribute{
 				MarkdownDescription: "Add stopped flag.",
 				Optional:            true,
@@ -193,11 +190,6 @@ func (r *DownloadClientResource) Schema(ctx context.Context, req resource.Schema
 			},
 			"read_only": schema.BoolAttribute{
 				MarkdownDescription: "Read only flag.",
-				Optional:            true,
-				Computed:            true,
-			},
-			"watch_folder": schema.BoolAttribute{
-				MarkdownDescription: "Watch folder flag.",
 				Optional:            true,
 				Computed:            true,
 			},
@@ -235,6 +227,7 @@ func (r *DownloadClientResource) Schema(ctx context.Context, req resource.Schema
 			"api_key": schema.StringAttribute{
 				MarkdownDescription: "API key.",
 				Optional:            true,
+				Sensitive:           true,
 				Computed:            true,
 			},
 			"rpc_path": schema.StringAttribute{
@@ -247,10 +240,27 @@ func (r *DownloadClientResource) Schema(ctx context.Context, req resource.Schema
 				Optional:            true,
 				Computed:            true,
 			},
+			"api_url": schema.StringAttribute{
+				MarkdownDescription: "API URL.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"app_id": schema.StringAttribute{
+				MarkdownDescription: "App ID.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"app_token": schema.StringAttribute{
+				MarkdownDescription: "App Token.",
+				Optional:            true,
+				Computed:            true,
+				Sensitive:           true,
+			},
 			"secret_token": schema.StringAttribute{
 				MarkdownDescription: "Secret token.",
 				Optional:            true,
 				Computed:            true,
+				Sensitive:           true,
 			},
 			"username": schema.StringAttribute{
 				MarkdownDescription: "Username.",
@@ -261,6 +271,7 @@ func (r *DownloadClientResource) Schema(ctx context.Context, req resource.Schema
 				MarkdownDescription: "Password.",
 				Optional:            true,
 				Computed:            true,
+				Sensitive:           true,
 			},
 			"tv_imported_category": schema.StringAttribute{
 				MarkdownDescription: "TV imported category.",
@@ -269,6 +280,11 @@ func (r *DownloadClientResource) Schema(ctx context.Context, req resource.Schema
 			},
 			"directory": schema.StringAttribute{
 				MarkdownDescription: "Directory.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"destination_directory": schema.StringAttribute{
+				MarkdownDescription: "Movie directory.",
 				Optional:            true,
 				Computed:            true,
 			},
@@ -478,22 +494,28 @@ func (d *DownloadClient) write(ctx context.Context, downloadClient *prowlarr.Dow
 		categories[i].write(ctx, c)
 	}
 
-	tfsdk.ValueFrom(ctx, downloadClient.Categories, d.Categories.Type(ctx), &categories)
+	tfsdk.ValueFrom(ctx, categories, d.Categories.Type(ctx), &d.Categories)
 	tfsdk.ValueFrom(ctx, downloadClient.Tags, d.Tags.Type(ctx), &d.Tags)
 	helpers.WriteFields(ctx, d, downloadClient.GetFields(), downloadClientFields)
 }
 
 func (c *ClientCategory) write(ctx context.Context, category *prowlarr.DownloadClientCategory) {
-	tfsdk.ValueFrom(ctx, category.Categories, c.Categories.Type(ctx), &c.Categories)
 	c.Name = types.StringValue(category.GetClientCategory())
+	c.Categories = types.SetValueMust(types.Int64Type, nil)
+	tfsdk.ValueFrom(ctx, category.Categories, c.Categories.Type(ctx), &c.Categories)
 }
 
 func (d *DownloadClient) read(ctx context.Context) *prowlarr.DownloadClientResource {
 	tags := make([]*int32, len(d.Tags.Elements()))
-	categories := make([]*prowlarr.DownloadClientCategory, len(d.Categories.Elements()))
-
-	tfsdk.ValueAs(ctx, d.Categories, &categories)
 	tfsdk.ValueAs(ctx, d.Tags, &tags)
+
+	categories := make([]*ClientCategory, len(d.Categories.Elements()))
+	tfsdk.ValueAs(ctx, d.Categories, &categories)
+
+	clientCategories := make([]*prowlarr.DownloadClientCategory, len(d.Categories.Elements()))
+	for n, c := range categories {
+		clientCategories[n] = c.read(ctx)
+	}
 
 	client := prowlarr.NewDownloadClientResource()
 	client.SetEnable(d.Enable.ValueBool())
@@ -505,7 +527,18 @@ func (d *DownloadClient) read(ctx context.Context) *prowlarr.DownloadClientResou
 	client.SetProtocol(prowlarr.DownloadProtocol(d.Protocol.ValueString()))
 	client.SetTags(tags)
 	client.SetFields(helpers.ReadFields(ctx, d, downloadClientFields))
-	client.SetCategories(categories)
+	client.SetCategories(clientCategories)
 
 	return client
+}
+
+func (c *ClientCategory) read(ctx context.Context) *prowlarr.DownloadClientCategory {
+	categories := make([]*int32, len(c.Categories.Elements()))
+	tfsdk.ValueAs(ctx, c.Categories, &categories)
+
+	category := prowlarr.NewDownloadClientCategory()
+	category.SetCategories(categories)
+	category.SetClientCategory(c.Name.ValueString())
+
+	return category
 }
