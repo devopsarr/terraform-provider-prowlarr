@@ -40,9 +40,9 @@ Read-Only:
 - `auth_user` (String) Auth user.
 - `author` (String) Author.
 - `avatar` (String) Avatar.
-- `bcc` (String) Bcc.
+- `bcc` (Set of String) Bcc.
 - `bot_token` (String) Bot token.
-- `cc` (String) Cc.
+- `cc` (Set of String) Cc.
 - `channel` (String) Channel.
 - `channel_tags` (Set of String) Channel tags.
 - `chat_id` (String) Chat ID.
@@ -55,18 +55,18 @@ Read-Only:
 - `device_names` (String) Device names.
 - `devices` (Set of String) Devices.
 - `direct_message` (Boolean) Direct message flag.
-- `display_time` (String) Display time.
+- `display_time` (Number) Display time.
 - `event` (String) Event.
 - `expire` (Number) Expire.
 - `expires` (String) Expires.
 - `field_tags` (Set of String) Devices.
 - `from` (String) From.
-- `grab_fields` (Number) Grab fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Group, `5` Size, `6` Links, `7` Release, `8` Poster, `9` Fanart, `10` CustomFormats, `11` CustomFormatScore.
+- `grab_fields` (Set of Number) Grab fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Group, `5` Size, `6` Links, `7` Release, `8` Poster, `9` Fanart, `10` CustomFormats, `11` CustomFormatScore.
 - `host` (String) Host.
 - `icon` (String) Icon.
 - `id` (Number) Notification ID.
 - `implementation` (String) Notification implementation name.
-- `import_fields` (Number) Import fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Codecs, `5` Group, `6` Size, `7` Languages, `8` Subtitles, `9` Links, `10` Release, `11` Poster, `12` Fanart.
+- `import_fields` (Set of Number) Import fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Codecs, `5` Group, `6` Size, `7` Languages, `8` Subtitles, `9` Links, `10` Release, `11` Poster, `12` Fanart.
 - `include_health_warnings` (Boolean) Include health warnings.
 - `instance_name` (String) Instance name.
 - `key` (String) Key.
@@ -94,7 +94,7 @@ Read-Only:
 - `sign_in` (String) Sign in.
 - `sound` (String) Sound.
 - `tags` (Set of Number) List of associated tags.
-- `to` (String) To.
+- `to` (Set of String) To.
 - `token` (String) Token.
 - `topics` (Set of String) Devices.
 - `update_library` (Boolean) Update library flag.

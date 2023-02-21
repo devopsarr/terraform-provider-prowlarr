@@ -58,7 +58,7 @@ func (d *NotificationDataSource) Schema(ctx context.Context, req datasource.Sche
 			},
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Notification name.",
-				Required:            true,
+				Computed:            true,
 			},
 			"tags": schema.SetAttribute{
 				MarkdownDescription: "List of associated tags.",
@@ -106,16 +106,12 @@ func (d *NotificationDataSource) Schema(ctx context.Context, req datasource.Sche
 				MarkdownDescription: "Use SSL flag.",
 				Computed:            true,
 			},
+			"display_time": schema.Int64Attribute{
+				MarkdownDescription: "Display time.",
+				Computed:            true,
+			},
 			"port": schema.Int64Attribute{
 				MarkdownDescription: "Port.",
-				Computed:            true,
-			},
-			"grab_fields": schema.Int64Attribute{
-				MarkdownDescription: "Grab fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Group, `5` Size, `6` Links, `7` Release, `8` Poster, `9` Fanart, `10` CustomFormats, `11` CustomFormatScore.",
-				Computed:            true,
-			},
-			"import_fields": schema.Int64Attribute{
-				MarkdownDescription: "Import fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Codecs, `5` Group, `6` Size, `7` Languages, `8` Subtitles, `9` Links, `10` Release, `11` Poster, `12` Fanart.",
 				Computed:            true,
 			},
 			"method": schema.Int64Attribute{
@@ -174,16 +170,8 @@ func (d *NotificationDataSource) Schema(ctx context.Context, req datasource.Sche
 				MarkdownDescription: "Instance name.",
 				Computed:            true,
 			},
-			"bcc": schema.StringAttribute{
-				MarkdownDescription: "Bcc.",
-				Computed:            true,
-			},
 			"bot_token": schema.StringAttribute{
 				MarkdownDescription: "Bot token.",
-				Computed:            true,
-			},
-			"cc": schema.StringAttribute{
-				MarkdownDescription: "Cc.",
 				Computed:            true,
 			},
 			"channel": schema.StringAttribute{
@@ -204,10 +192,6 @@ func (d *NotificationDataSource) Schema(ctx context.Context, req datasource.Sche
 			},
 			"device_names": schema.StringAttribute{
 				MarkdownDescription: "Device names.",
-				Computed:            true,
-			},
-			"display_time": schema.StringAttribute{
-				MarkdownDescription: "Display time.",
 				Computed:            true,
 			},
 			"expires": schema.StringAttribute{
@@ -260,10 +244,6 @@ func (d *NotificationDataSource) Schema(ctx context.Context, req datasource.Sche
 			},
 			"sound": schema.StringAttribute{
 				MarkdownDescription: "Sound.",
-				Computed:            true,
-			},
-			"to": schema.StringAttribute{
-				MarkdownDescription: "To.",
 				Computed:            true,
 			},
 			"token": schema.StringAttribute{
@@ -330,6 +310,16 @@ func (d *NotificationDataSource) Schema(ctx context.Context, req datasource.Sche
 				Computed:            true,
 				ElementType:         types.StringType,
 			},
+			"grab_fields": schema.SetAttribute{
+				MarkdownDescription: "Grab fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Group, `5` Size, `6` Links, `7` Release, `8` Poster, `9` Fanart, `10` CustomFormats, `11` CustomFormatScore.",
+				Computed:            true,
+				ElementType:         types.Int64Type,
+			},
+			"import_fields": schema.SetAttribute{
+				MarkdownDescription: "Import fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Codecs, `5` Group, `6` Size, `7` Languages, `8` Subtitles, `9` Links, `10` Release, `11` Poster, `12` Fanart.",
+				Computed:            true,
+				ElementType:         types.Int64Type,
+			},
 			"field_tags": schema.SetAttribute{
 				MarkdownDescription: "Devices.",
 				Computed:            true,
@@ -337,6 +327,21 @@ func (d *NotificationDataSource) Schema(ctx context.Context, req datasource.Sche
 			},
 			"recipients": schema.SetAttribute{
 				MarkdownDescription: "Recipients.",
+				Computed:            true,
+				ElementType:         types.StringType,
+			},
+			"to": schema.SetAttribute{
+				MarkdownDescription: "To.",
+				Computed:            true,
+				ElementType:         types.StringType,
+			},
+			"cc": schema.SetAttribute{
+				MarkdownDescription: "Cc.",
+				Computed:            true,
+				ElementType:         types.StringType,
+			},
+			"bcc": schema.SetAttribute{
+				MarkdownDescription: "Bcc.",
 				Computed:            true,
 				ElementType:         types.StringType,
 			},
