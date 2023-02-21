@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccIndexerProxySocks4Resource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccIndexerProxySocks4ResourceConfig("resourceSocks4Test", "UserName") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccIndexerProxySocks4ResourceConfig("resourceSocks4Test", "UserName"),
@@ -21,6 +27,11 @@ func TestAccIndexerProxySocks4Resource(t *testing.T) {
 					resource.TestCheckResourceAttr("prowlarr_indexer_proxy_socks4.test", "username", "UserName"),
 					resource.TestCheckResourceAttrSet("prowlarr_indexer_proxy_socks4.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccIndexerProxySocks4ResourceConfig("resourceSocks4Test", "UserName") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{

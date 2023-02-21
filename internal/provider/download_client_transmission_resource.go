@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -63,22 +62,25 @@ type DownloadClientTransmission struct {
 
 func (d DownloadClientTransmission) toDownloadClient() *DownloadClient {
 	return &DownloadClient{
-		Tags:         d.Tags,
-		Categories:   d.Categories,
-		Name:         d.Name,
-		Host:         d.Host,
-		URLBase:      d.URLBase,
-		Username:     d.Username,
-		Password:     d.Password,
-		Category:     d.Category,
-		Directory:    d.Directory,
-		ItemPriority: d.ItemPriority,
-		Priority:     d.Priority,
-		Port:         d.Port,
-		ID:           d.ID,
-		AddPaused:    d.AddPaused,
-		UseSsl:       d.UseSsl,
-		Enable:       d.Enable,
+		Tags:           d.Tags,
+		Categories:     d.Categories,
+		Name:           d.Name,
+		Host:           d.Host,
+		URLBase:        d.URLBase,
+		Username:       d.Username,
+		Password:       d.Password,
+		Category:       d.Category,
+		Directory:      d.Directory,
+		ItemPriority:   d.ItemPriority,
+		Priority:       d.Priority,
+		Port:           d.Port,
+		ID:             d.ID,
+		AddPaused:      d.AddPaused,
+		UseSsl:         d.UseSsl,
+		Enable:         d.Enable,
+		Implementation: types.StringValue(downloadClientTransmissionImplementation),
+		ConfigContract: types.StringValue(downloadClientTransmissionConfigContract),
+		Protocol:       types.StringValue(downloadClientTransmissionProtocol),
 	}
 }
 
@@ -311,38 +313,11 @@ func (r *DownloadClientTransmissionResource) ImportState(ctx context.Context, re
 }
 
 func (d *DownloadClientTransmission) write(ctx context.Context, downloadClient *prowlarr.DownloadClientResource) {
-	genericDownloadClient := DownloadClient{
-		Enable:     types.BoolValue(downloadClient.GetEnable()),
-		Priority:   types.Int64Value(int64(downloadClient.GetPriority())),
-		ID:         types.Int64Value(int64(downloadClient.GetId())),
-		Name:       types.StringValue(downloadClient.GetName()),
-		Tags:       types.SetValueMust(types.Int64Type, nil),
-		Categories: types.SetValueMust(DownloadClientResource{}.getClientCategorySchema().Type(), nil),
-	}
-
-	tfsdk.ValueFrom(ctx, downloadClient.Tags, genericDownloadClient.Tags.Type(ctx), &genericDownloadClient.Tags)
-	genericDownloadClient.writeFields(ctx, downloadClient.GetFields())
-	d.fromDownloadClient(&genericDownloadClient)
+	genericDownloadClient := d.toDownloadClient()
+	genericDownloadClient.write(ctx, downloadClient)
+	d.fromDownloadClient(genericDownloadClient)
 }
 
 func (d *DownloadClientTransmission) read(ctx context.Context) *prowlarr.DownloadClientResource {
-	tags := make([]*int32, len(d.Tags.Elements()))
-	categories := make([]*prowlarr.DownloadClientCategory, 0)
-
-	tfsdk.ValueAs(ctx, d.Categories, &categories)
-	tfsdk.ValueAs(ctx, d.Tags, &tags)
-
-	client := prowlarr.NewDownloadClientResource()
-	client.SetEnable(d.Enable.ValueBool())
-	client.SetPriority(int32(d.Priority.ValueInt64()))
-	client.SetId(int32(d.ID.ValueInt64()))
-	client.SetConfigContract(downloadClientTransmissionConfigContract)
-	client.SetImplementation(downloadClientTransmissionImplementation)
-	client.SetName(d.Name.ValueString())
-	client.SetProtocol(downloadClientTransmissionProtocol)
-	client.SetTags(tags)
-	client.SetCategories(categories)
-	client.SetFields(d.toDownloadClient().readFields(ctx))
-
-	return client
+	return d.toDownloadClient().read(ctx)
 }

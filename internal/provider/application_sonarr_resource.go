@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -53,30 +52,32 @@ type ApplicationSonarr struct {
 	ID                  types.Int64  `tfsdk:"id"`
 }
 
-func (n ApplicationSonarr) toApplication() *Application {
+func (a ApplicationSonarr) toApplication() *Application {
 	return &Application{
-		SyncCategories:      n.SyncCategories,
-		AnimeSyncCategories: n.AnimeSyncCategories,
-		Tags:                n.Tags,
-		Name:                n.Name,
-		SyncLevel:           n.SyncLevel,
-		ProwlarrURL:         n.ProwlarrURL,
-		BaseURL:             n.BaseURL,
-		APIKey:              n.APIKey,
-		ID:                  n.ID,
+		SyncCategories:      a.SyncCategories,
+		AnimeSyncCategories: a.AnimeSyncCategories,
+		Tags:                a.Tags,
+		Name:                a.Name,
+		SyncLevel:           a.SyncLevel,
+		ProwlarrURL:         a.ProwlarrURL,
+		BaseURL:             a.BaseURL,
+		APIKey:              a.APIKey,
+		ID:                  a.ID,
+		ConfigContract:      types.StringValue(applicationSonarrConfigContract),
+		Implementation:      types.StringValue(applicationSonarrImplementation),
 	}
 }
 
-func (n *ApplicationSonarr) fromApplication(application *Application) {
-	n.Tags = application.Tags
-	n.Name = application.Name
-	n.ID = application.ID
-	n.SyncLevel = application.SyncLevel
-	n.SyncCategories = application.SyncCategories
-	n.AnimeSyncCategories = application.AnimeSyncCategories
-	n.BaseURL = application.BaseURL
-	n.ProwlarrURL = application.ProwlarrURL
-	n.APIKey = application.APIKey
+func (a *ApplicationSonarr) fromApplication(application *Application) {
+	a.Tags = application.Tags
+	a.Name = application.Name
+	a.ID = application.ID
+	a.SyncLevel = application.SyncLevel
+	a.SyncCategories = application.SyncCategories
+	a.AnimeSyncCategories = application.AnimeSyncCategories
+	a.BaseURL = application.BaseURL
+	a.ProwlarrURL = application.ProwlarrURL
+	a.APIKey = application.APIKey
 }
 
 func (r *ApplicationSonarrResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -249,30 +250,12 @@ func (r *ApplicationSonarrResource) ImportState(ctx context.Context, req resourc
 	tflog.Trace(ctx, "imported "+applicationSonarrResourceName+": "+req.ID)
 }
 
-func (n *ApplicationSonarr) write(ctx context.Context, application *prowlarr.ApplicationResource) {
-	genericApplication := Application{
-		SyncLevel: types.StringValue(string(application.GetSyncLevel())),
-		ID:        types.Int64Value(int64(application.GetId())),
-		Name:      types.StringValue(application.GetName()),
-		Tags:      types.SetValueMust(types.Int64Type, nil),
-	}
-	tfsdk.ValueFrom(ctx, application.Tags, genericApplication.Tags.Type(ctx), &genericApplication.Tags)
-	genericApplication.writeFields(ctx, application.GetFields())
-	n.fromApplication(&genericApplication)
+func (a *ApplicationSonarr) write(ctx context.Context, application *prowlarr.ApplicationResource) {
+	genericApplication := a.toApplication()
+	genericApplication.write(ctx, application)
+	a.fromApplication(genericApplication)
 }
 
-func (n *ApplicationSonarr) read(ctx context.Context) *prowlarr.ApplicationResource {
-	tags := make([]*int32, len(n.Tags.Elements()))
-	tfsdk.ValueAs(ctx, n.Tags, &tags)
-
-	application := prowlarr.NewApplicationResource()
-	application.SetSyncLevel(prowlarr.ApplicationSyncLevel(n.SyncLevel.ValueString()))
-	application.SetId(int32(n.ID.ValueInt64()))
-	application.SetName(n.Name.ValueString())
-	application.SetConfigContract(applicationSonarrConfigContract)
-	application.SetImplementation(applicationSonarrImplementation)
-	application.SetTags(tags)
-	application.SetFields(n.toApplication().readFields(ctx))
-
-	return application
+func (a *ApplicationSonarr) read(ctx context.Context) *prowlarr.ApplicationResource {
+	return a.toApplication().read(ctx)
 }

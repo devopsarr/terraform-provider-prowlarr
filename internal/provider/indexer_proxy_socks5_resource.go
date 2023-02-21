@@ -12,7 +12,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -51,13 +50,15 @@ type IndexerProxySocks5 struct {
 
 func (i IndexerProxySocks5) toIndexerProxy() *IndexerProxy {
 	return &IndexerProxy{
-		Tags:     i.Tags,
-		Name:     i.Name,
-		Host:     i.Host,
-		Username: i.Username,
-		Password: i.Password,
-		Port:     i.Port,
-		ID:       i.ID,
+		Tags:           i.Tags,
+		Name:           i.Name,
+		Host:           i.Host,
+		Username:       i.Username,
+		Password:       i.Password,
+		Port:           i.Port,
+		ID:             i.ID,
+		ConfigContract: types.StringValue(indexerProxySocks5ConfigContract),
+		Implementation: types.StringValue(indexerProxySocks5Implementation),
 	}
 }
 
@@ -227,29 +228,11 @@ func (r *IndexerProxySocks5Resource) ImportState(ctx context.Context, req resour
 }
 
 func (i *IndexerProxySocks5) write(ctx context.Context, indexerProxy *prowlarr.IndexerProxyResource) {
-	genericIndexerProxy := IndexerProxy{
-		ID:   types.Int64Value(int64(indexerProxy.GetId())),
-		Name: types.StringValue(indexerProxy.GetName()),
-		Tags: types.SetValueMust(types.Int64Type, nil),
-	}
-
-	tfsdk.ValueFrom(ctx, indexerProxy.Tags, genericIndexerProxy.Tags.Type(ctx), &genericIndexerProxy.Tags)
-	genericIndexerProxy.writeFields(indexerProxy.GetFields())
-	i.fromIndexerProxy(&genericIndexerProxy)
+	genericIndexerProxy := i.toIndexerProxy()
+	genericIndexerProxy.write(ctx, indexerProxy)
+	i.fromIndexerProxy(genericIndexerProxy)
 }
 
 func (i *IndexerProxySocks5) read(ctx context.Context) *prowlarr.IndexerProxyResource {
-	tags := make([]*int32, len(i.Tags.Elements()))
-
-	tfsdk.ValueAs(ctx, i.Tags, &tags)
-
-	proxy := prowlarr.NewIndexerProxyResource()
-	proxy.SetId(int32(i.ID.ValueInt64()))
-	proxy.SetConfigContract(indexerProxySocks5ConfigContract)
-	proxy.SetImplementation(indexerProxySocks5Implementation)
-	proxy.SetName(i.Name.ValueString())
-	proxy.SetTags(tags)
-	proxy.SetFields(i.toIndexerProxy().readFields())
-
-	return proxy
+	return i.toIndexerProxy().read(ctx)
 }

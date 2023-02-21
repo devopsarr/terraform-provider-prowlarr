@@ -18,7 +18,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golang.org/x/exp/slices"
 )
 
 const downloadClientResourceName = "download_client"
@@ -29,13 +28,15 @@ var (
 	_ resource.ResourceWithImportState = &DownloadClientResource{}
 )
 
-var (
-	downloadClientBoolFields        = []string{"addPaused", "useSsl", "startOnAdd", "sequentialOrder", "firstAndLast", "addStopped", "saveMagnetFiles", "readOnly", "watchFolder"}
-	downloadClientIntFields         = []string{"port", "priority", "initialState", "intialState"}
-	downloadClientStringFields      = []string{"host", "apiKey", "urlBase", "rpcPath", "secretToken", "password", "username", "tvImportedCategory", "directory", "destination", "category", "nzbFolder", "strmFolder", "torrentFolder", "magnetFileExtension"}
-	downloadClientStringSliceFields = []string{"fieldTags", "postImTags"}
-	downloadClientIntSliceFields    = []string{"additionalTags"}
-)
+var downloadClientFields = helpers.Fields{
+	Bools:                  []string{"addPaused", "useSsl", "startOnAdd", "sequentialOrder", "firstAndLast", "addStopped", "saveMagnetFiles", "readOnly", "watchFolder"},
+	Ints:                   []string{"port", "itemPriority", "initialState", "intialState"},
+	IntsExceptions:         []string{"priority"},
+	Strings:                []string{"host", "apiKey", "urlBase", "rpcPath", "secretToken", "password", "username", "tvImportedCategory", "directory", "destination", "category", "nzbFolder", "strmFolder", "torrentFolder", "magnetFileExtension"},
+	StringSlices:           []string{"fieldTags", "postImTags"},
+	StringSlicesExceptions: []string{"tags"},
+	IntSlices:              []string{"additionalTags"},
+}
 
 func NewDownloadClientResource() resource.Resource {
 	return &DownloadClientResource{}
@@ -479,48 +480,12 @@ func (d *DownloadClient) write(ctx context.Context, downloadClient *prowlarr.Dow
 
 	tfsdk.ValueFrom(ctx, downloadClient.Categories, d.Categories.Type(ctx), &categories)
 	tfsdk.ValueFrom(ctx, downloadClient.Tags, d.Tags.Type(ctx), &d.Tags)
-	d.writeFields(ctx, downloadClient.GetFields())
+	helpers.WriteFields(ctx, d, downloadClient.GetFields(), downloadClientFields)
 }
 
 func (c *ClientCategory) write(ctx context.Context, category *prowlarr.DownloadClientCategory) {
 	tfsdk.ValueFrom(ctx, category.Categories, c.Categories.Type(ctx), &c.Categories)
 	c.Name = types.StringValue(category.GetClientCategory())
-}
-
-func (d *DownloadClient) writeFields(ctx context.Context, fields []*prowlarr.Field) {
-	for _, f := range fields {
-		if f.Value == nil {
-			continue
-		}
-
-		if slices.Contains(downloadClientStringFields, f.GetName()) {
-			helpers.WriteStringField(f, d)
-
-			continue
-		}
-
-		if slices.Contains(downloadClientBoolFields, f.GetName()) {
-			helpers.WriteBoolField(f, d)
-
-			continue
-		}
-
-		if slices.Contains(downloadClientIntFields, f.GetName()) {
-			helpers.WriteIntField(f, d)
-
-			continue
-		}
-
-		if slices.Contains(downloadClientIntSliceFields, f.GetName()) {
-			helpers.WriteIntSliceField(ctx, f, d)
-
-			continue
-		}
-
-		if slices.Contains(downloadClientStringSliceFields, f.GetName()) {
-			helpers.WriteStringSliceField(ctx, f, d)
-		}
-	}
 }
 
 func (d *DownloadClient) read(ctx context.Context) *prowlarr.DownloadClientResource {
@@ -539,44 +504,8 @@ func (d *DownloadClient) read(ctx context.Context) *prowlarr.DownloadClientResou
 	client.SetName(d.Name.ValueString())
 	client.SetProtocol(prowlarr.DownloadProtocol(d.Protocol.ValueString()))
 	client.SetTags(tags)
-	client.SetFields(d.readFields(ctx))
+	client.SetFields(helpers.ReadFields(ctx, d, downloadClientFields))
 	client.SetCategories(categories)
 
 	return client
-}
-
-func (d *DownloadClient) readFields(ctx context.Context) []*prowlarr.Field {
-	var output []*prowlarr.Field
-
-	for _, b := range downloadClientBoolFields {
-		if field := helpers.ReadBoolField(b, d); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	for _, i := range downloadClientIntFields {
-		if field := helpers.ReadIntField(i, d); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	for _, s := range downloadClientStringFields {
-		if field := helpers.ReadStringField(s, d); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	for _, s := range downloadClientStringSliceFields {
-		if field := helpers.ReadStringSliceField(ctx, s, d); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	for _, s := range downloadClientIntSliceFields {
-		if field := helpers.ReadIntSliceField(ctx, s, d); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	return output
 }

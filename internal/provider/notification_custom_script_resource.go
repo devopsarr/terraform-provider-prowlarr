@@ -12,7 +12,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -60,6 +59,8 @@ func (n NotificationCustomScript) toNotification() *Notification {
 		IncludeHealthWarnings: n.IncludeHealthWarnings,
 		OnApplicationUpdate:   n.OnApplicationUpdate,
 		OnHealthIssue:         n.OnHealthIssue,
+		ConfigContract:        types.StringValue(notificationCustomScriptConfigContract),
+		Implementation:        types.StringValue(notificationCustomScriptImplementation),
 	}
 }
 
@@ -234,33 +235,11 @@ func (r *NotificationCustomScriptResource) ImportState(ctx context.Context, req 
 }
 
 func (n *NotificationCustomScript) write(ctx context.Context, notification *prowlarr.NotificationResource) {
-	genericNotification := Notification{
-		OnHealthIssue:         types.BoolValue(notification.GetOnHealthIssue()),
-		OnApplicationUpdate:   types.BoolValue(notification.GetOnApplicationUpdate()),
-		IncludeHealthWarnings: types.BoolValue(notification.GetIncludeHealthWarnings()),
-		ID:                    types.Int64Value(int64(notification.GetId())),
-		Name:                  types.StringValue(notification.GetName()),
-		Tags:                  types.SetValueMust(types.Int64Type, nil),
-	}
-	tfsdk.ValueFrom(ctx, notification.Tags, genericNotification.Tags.Type(ctx), &genericNotification.Tags)
-	genericNotification.writeFields(ctx, notification.GetFields())
-	n.fromNotification(&genericNotification)
+	genericNotification := n.toNotification()
+	genericNotification.write(ctx, notification)
+	n.fromNotification(genericNotification)
 }
 
 func (n *NotificationCustomScript) read(ctx context.Context) *prowlarr.NotificationResource {
-	tags := make([]*int32, len(n.Tags.Elements()))
-	tfsdk.ValueAs(ctx, n.Tags, &tags)
-
-	notification := prowlarr.NewNotificationResource()
-	notification.SetOnHealthIssue(n.OnHealthIssue.ValueBool())
-	notification.SetOnApplicationUpdate(n.OnApplicationUpdate.ValueBool())
-	notification.SetIncludeHealthWarnings(n.IncludeHealthWarnings.ValueBool())
-	notification.SetId(int32(n.ID.ValueInt64()))
-	notification.SetName(n.Name.ValueString())
-	notification.SetConfigContract(notificationCustomScriptConfigContract)
-	notification.SetImplementation(notificationCustomScriptImplementation)
-	notification.SetTags(tags)
-	notification.SetFields(n.toNotification().readFields(ctx))
-
-	return notification
+	return n.toNotification().read(ctx)
 }
