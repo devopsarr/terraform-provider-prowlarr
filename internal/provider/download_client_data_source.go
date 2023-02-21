@@ -146,6 +146,7 @@ func (d *DownloadClientDataSource) Schema(ctx context.Context, req datasource.Sc
 			"api_key": schema.StringAttribute{
 				MarkdownDescription: "API key.",
 				Computed:            true,
+				Sensitive:           true,
 			},
 			"rpc_path": schema.StringAttribute{
 				MarkdownDescription: "RPC path.",
@@ -155,9 +156,23 @@ func (d *DownloadClientDataSource) Schema(ctx context.Context, req datasource.Sc
 				MarkdownDescription: "Base URL.",
 				Computed:            true,
 			},
+			"api_url": schema.StringAttribute{
+				MarkdownDescription: "API URL.",
+				Computed:            true,
+			},
+			"app_id": schema.StringAttribute{
+				MarkdownDescription: "App ID.",
+				Computed:            true,
+			},
+			"app_token": schema.StringAttribute{
+				MarkdownDescription: "App Token.",
+				Computed:            true,
+				Sensitive:           true,
+			},
 			"secret_token": schema.StringAttribute{
 				MarkdownDescription: "Secret token.",
 				Computed:            true,
+				Sensitive:           true,
 			},
 			"username": schema.StringAttribute{
 				MarkdownDescription: "Username.",
@@ -166,9 +181,14 @@ func (d *DownloadClientDataSource) Schema(ctx context.Context, req datasource.Sc
 			"password": schema.StringAttribute{
 				MarkdownDescription: "Password.",
 				Computed:            true,
+				Sensitive:           true,
 			},
 			"tv_imported_category": schema.StringAttribute{
 				MarkdownDescription: "TV imported category.",
+				Computed:            true,
+			},
+			"destination_directory": schema.StringAttribute{
+				MarkdownDescription: "Movie directory.",
 				Computed:            true,
 			},
 			"directory": schema.StringAttribute{
