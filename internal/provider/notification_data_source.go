@@ -58,7 +58,7 @@ func (d *NotificationDataSource) Schema(ctx context.Context, req datasource.Sche
 			},
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Notification name.",
-				Computed:            true,
+				Required:            true,
 			},
 			"tags": schema.SetAttribute{
 				MarkdownDescription: "List of associated tags.",
@@ -165,6 +165,28 @@ func (d *NotificationDataSource) Schema(ctx context.Context, req datasource.Sche
 			"avatar": schema.StringAttribute{
 				MarkdownDescription: "Avatar.",
 				Computed:            true,
+			},
+			"base_url": schema.StringAttribute{
+				MarkdownDescription: "Base URL.",
+				Computed:            true,
+			},
+			"stateless_urls": schema.StringAttribute{
+				MarkdownDescription: "Comma separated stateless URLs.",
+				Computed:            true,
+			},
+			"auth_username": schema.StringAttribute{
+				MarkdownDescription: "Auth username.",
+				Computed:            true,
+			},
+			"auth_password": schema.StringAttribute{
+				MarkdownDescription: "Auth password.",
+				Computed:            true,
+				Sensitive:           true,
+			},
+			"configuration_key": schema.StringAttribute{
+				MarkdownDescription: "Configuration key.",
+				Computed:            true,
+				Sensitive:           true,
 			},
 			"instance_name": schema.StringAttribute{
 				MarkdownDescription: "Instance name.",

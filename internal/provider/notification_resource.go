@@ -29,7 +29,7 @@ var (
 
 var notificationFields = helpers.Fields{
 	Bools:                  []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "requireEncryption", "sendSilently", "useSsl", "updateLibrary", "useEuEndpoint"},
-	Strings:                []string{"accessToken", "accessTokenSecret", "apiKey", "aPIKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expires", "from", "host", "icon", "instanceName", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "webHookUrl", "serverUrl", "userName", "clickUrl", "mapFrom", "mapTo", "key", "event"},
+	Strings:                []string{"authPassword", "authUsername", "statelessUrls", "configurationKey", "baseUrl", "accessToken", "accessTokenSecret", "apiKey", "aPIKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expires", "from", "host", "icon", "instanceName", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "webHookUrl", "serverUrl", "userName", "clickUrl", "mapFrom", "mapTo", "key", "event"},
 	Ints:                   []string{"displayTime", "port", "itemPriority", "retry", "expire", "method"},
 	IntsExceptions:         []string{"priority"},
 	StringSlices:           []string{"recipients", "to", "cC", "bcc", "topics", "fieldTags", "channelTags", "deviceIds", "devices"},
@@ -103,6 +103,11 @@ type Notification struct {
 	Author                types.String `tfsdk:"author"`
 	AuthToken             types.String `tfsdk:"auth_token"`
 	AuthUser              types.String `tfsdk:"auth_user"`
+	ConfigurationKey      types.String `tfsdk:"configuration_key"`
+	StatelessURLs         types.String `tfsdk:"stateless_urls"`
+	BaseURL               types.String `tfsdk:"base_url"`
+	AuthUsername          types.String `tfsdk:"auth_username"`
+	AuthPassword          types.String `tfsdk:"auth_password"`
 	DisplayTime           types.Int64  `tfsdk:"display_time"`
 	ItemPriority          types.Int64  `tfsdk:"priority"`
 	Port                  types.Int64  `tfsdk:"port"`
@@ -295,6 +300,33 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 				MarkdownDescription: "Avatar.",
 				Optional:            true,
 				Computed:            true,
+			},
+			"base_url": schema.StringAttribute{
+				MarkdownDescription: "Base URL.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"stateless_urls": schema.StringAttribute{
+				MarkdownDescription: "Comma separated stateless URLs.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"auth_username": schema.StringAttribute{
+				MarkdownDescription: "Auth username.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"auth_password": schema.StringAttribute{
+				MarkdownDescription: "Auth password.",
+				Optional:            true,
+				Computed:            true,
+				Sensitive:           true,
+			},
+			"configuration_key": schema.StringAttribute{
+				MarkdownDescription: "Configuration key.",
+				Optional:            true,
+				Computed:            true,
+				Sensitive:           true,
 			},
 			"instance_name": schema.StringAttribute{
 				MarkdownDescription: "Instance name.",
@@ -647,12 +679,17 @@ func (n *Notification) write(ctx context.Context, notification *prowlarr.Notific
 	n.Implementation = types.StringValue(notification.GetImplementation())
 	n.ConfigContract = types.StringValue(notification.GetConfigContract())
 	n.Tags = types.SetValueMust(types.Int64Type, nil)
+	n.GrabFields = types.SetValueMust(types.Int64Type, nil)
+	n.ImportFields = types.SetValueMust(types.Int64Type, nil)
 	n.ChannelTags = types.SetValueMust(types.StringType, nil)
 	n.DeviceIds = types.SetValueMust(types.Int64Type, nil)
 	n.Topics = types.SetValueMust(types.StringType, nil)
 	n.Devices = types.SetValueMust(types.StringType, nil)
 	n.Recipients = types.SetValueMust(types.StringType, nil)
 	n.FieldTags = types.SetValueMust(types.StringType, nil)
+	n.To = types.SetValueMust(types.StringType, nil)
+	n.Cc = types.SetValueMust(types.StringType, nil)
+	n.Bcc = types.SetValueMust(types.StringType, nil)
 	tfsdk.ValueFrom(ctx, notification.Tags, n.Tags.Type(ctx), &n.Tags)
 	helpers.WriteFields(ctx, n, notification.GetFields(), notificationFields)
 }

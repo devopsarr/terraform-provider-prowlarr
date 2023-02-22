@@ -49,10 +49,13 @@ resource "prowlarr_notification" "example" {
 - `api_key` (String) API key.
 - `app_token` (String) App token.
 - `arguments` (String) Arguments.
+- `auth_password` (String, Sensitive) Auth password.
 - `auth_token` (String) Auth token.
 - `auth_user` (String) Auth user.
+- `auth_username` (String) Auth username.
 - `author` (String) Author.
 - `avatar` (String) Avatar.
+- `base_url` (String) Base URL.
 - `bcc` (Set of String) Bcc.
 - `bot_token` (String) Bot token.
 - `cc` (Set of String) Cc.
@@ -61,6 +64,7 @@ resource "prowlarr_notification" "example" {
 - `chat_id` (String) Chat ID.
 - `clean_library` (Boolean) Clean library flag.
 - `click_url` (String) Click URL.
+- `configuration_key` (String, Sensitive) Configuration key.
 - `consumer_key` (String) Consumer key.
 - `consumer_secret` (String) Consumer secret.
 - `device_ids` (Set of Number) Device IDs.
@@ -99,6 +103,7 @@ resource "prowlarr_notification" "example" {
 - `server_url` (String) Server url.
 - `sign_in` (String) Sign in.
 - `sound` (String) Sound.
+- `stateless_urls` (String) Comma separated stateless URLs.
 - `tags` (Set of Number) List of associated tags.
 - `to` (Set of String) To.
 - `token` (String) Token.
