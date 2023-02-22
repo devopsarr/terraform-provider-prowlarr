@@ -28,11 +28,12 @@ var (
 )
 
 var notificationFields = helpers.Fields{
-	Bools:        []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "requireEncryption", "sendSilently", "useSsl", "updateLibrary", "useEuEndpoint"},
-	Strings:      []string{"accessToken", "accessTokenSecret", "apiKey", "aPIKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expires", "from", "host", "icon", "instanceName", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "webHookUrl", "serverUrl", "userName", "clickUrl", "mapFrom", "mapTo", "key", "event"},
-	Ints:         []string{"displayTime", "port", "priority", "retry", "expire", "method"},
-	StringSlices: []string{"recipients", "to", "cC", "bcc", "topics", "tags", "channelTags", "deviceIds", "devices"},
-	IntSlices:    []string{"grabFields", "importFields"},
+	Bools:          []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "requireEncryption", "sendSilently", "useSsl", "updateLibrary", "useEuEndpoint"},
+	Strings:        []string{"accessToken", "accessTokenSecret", "apiKey", "aPIKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expires", "from", "host", "icon", "instanceName", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "webHookUrl", "serverUrl", "userName", "clickUrl", "mapFrom", "mapTo", "key", "event"},
+	Ints:           []string{"displayTime", "port", "itemPriority", "retry", "expire", "method"},
+	IntsExceptions: []string{"priority"},
+	StringSlices:   []string{"recipients", "to", "cC", "bcc", "topics", "tags", "channelTags", "deviceIds", "devices"},
+	IntSlices:      []string{"grabFields", "importFields"},
 }
 
 func NewNotificationResource() resource.Resource {
@@ -102,7 +103,7 @@ type Notification struct {
 	AuthToken             types.String `tfsdk:"auth_token"`
 	AuthUser              types.String `tfsdk:"auth_user"`
 	DisplayTime           types.Int64  `tfsdk:"display_time"`
-	Priority              types.Int64  `tfsdk:"priority"`
+	ItemPriority          types.Int64  `tfsdk:"priority"`
 	Port                  types.Int64  `tfsdk:"port"`
 	Method                types.Int64  `tfsdk:"method"`
 	Retry                 types.Int64  `tfsdk:"retry"`
