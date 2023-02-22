@@ -28,11 +28,13 @@ var (
 )
 
 var notificationFields = helpers.Fields{
-	Bools:        []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "requireEncryption", "sendSilently", "useSsl", "updateLibrary", "useEuEndpoint"},
-	Strings:      []string{"accessToken", "accessTokenSecret", "apiKey", "aPIKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "cc", "bcc", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "displayTime", "expires", "from", "host", "icon", "instanceName", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "to", "token", "url", "userKey", "username", "webHookUrl", "serverUrl", "userName", "clickUrl", "mapFrom", "mapTo", "key", "event"},
-	Ints:         []string{"port", "grabFields", "importFields", "priority", "retry", "expire", "method"},
-	StringSlices: []string{"recipients", "topics", "tags", "channelTags", "devices"},
-	IntSlices:    []string{"deviceIds"},
+	Bools:                  []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "requireEncryption", "sendSilently", "useSsl", "updateLibrary", "useEuEndpoint"},
+	Strings:                []string{"authPassword", "authUsername", "statelessUrls", "configurationKey", "baseUrl", "accessToken", "accessTokenSecret", "apiKey", "aPIKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expires", "from", "host", "icon", "instanceName", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "webHookUrl", "serverUrl", "userName", "clickUrl", "mapFrom", "mapTo", "key", "event"},
+	Ints:                   []string{"displayTime", "port", "itemPriority", "retry", "expire", "method"},
+	IntsExceptions:         []string{"priority"},
+	StringSlices:           []string{"recipients", "to", "cC", "bcc", "topics", "fieldTags", "channelTags", "deviceIds", "devices"},
+	StringSlicesExceptions: []string{"tags"},
+	IntSlices:              []string{"grabFields", "importFields"},
 }
 
 func NewNotificationResource() resource.Resource {
@@ -50,8 +52,13 @@ type Notification struct {
 	FieldTags             types.Set    `tfsdk:"field_tags"`
 	ChannelTags           types.Set    `tfsdk:"channel_tags"`
 	Topics                types.Set    `tfsdk:"topics"`
+	ImportFields          types.Set    `tfsdk:"import_fields"`
+	GrabFields            types.Set    `tfsdk:"grab_fields"`
 	DeviceIds             types.Set    `tfsdk:"device_ids"`
 	Devices               types.Set    `tfsdk:"devices"`
+	To                    types.Set    `tfsdk:"to"`
+	Cc                    types.Set    `tfsdk:"cc"`
+	Bcc                   types.Set    `tfsdk:"bcc"`
 	Recipients            types.Set    `tfsdk:"recipients"`
 	DeviceNames           types.String `tfsdk:"device_names"`
 	AccessToken           types.String `tfsdk:"access_token"`
@@ -67,12 +74,10 @@ type Notification struct {
 	ConsumerKey           types.String `tfsdk:"consumer_key"`
 	ChatID                types.String `tfsdk:"chat_id"`
 	From                  types.String `tfsdk:"from"`
-	Cc                    types.String `tfsdk:"cc"`
 	Icon                  types.String `tfsdk:"icon"`
 	Password              types.String `tfsdk:"password"`
 	Event                 types.String `tfsdk:"event"`
 	Key                   types.String `tfsdk:"key"`
-	DisplayTime           types.String `tfsdk:"display_time"`
 	RefreshToken          types.String `tfsdk:"refresh_token"`
 	WebHookURL            types.String `tfsdk:"web_hook_url"`
 	Username              types.String `tfsdk:"username"`
@@ -81,9 +86,7 @@ type Notification struct {
 	Avatar                types.String `tfsdk:"avatar"`
 	URL                   types.String `tfsdk:"url"`
 	Token                 types.String `tfsdk:"token"`
-	To                    types.String `tfsdk:"to"`
 	Sound                 types.String `tfsdk:"sound"`
-	Bcc                   types.String `tfsdk:"bcc"`
 	SignIn                types.String `tfsdk:"sign_in"`
 	Server                types.String `tfsdk:"server"`
 	SenderID              types.String `tfsdk:"sender_id"`
@@ -100,14 +103,18 @@ type Notification struct {
 	Author                types.String `tfsdk:"author"`
 	AuthToken             types.String `tfsdk:"auth_token"`
 	AuthUser              types.String `tfsdk:"auth_user"`
-	Priority              types.Int64  `tfsdk:"priority"`
+	ConfigurationKey      types.String `tfsdk:"configuration_key"`
+	StatelessURLs         types.String `tfsdk:"stateless_urls"`
+	BaseURL               types.String `tfsdk:"base_url"`
+	AuthUsername          types.String `tfsdk:"auth_username"`
+	AuthPassword          types.String `tfsdk:"auth_password"`
+	DisplayTime           types.Int64  `tfsdk:"display_time"`
+	ItemPriority          types.Int64  `tfsdk:"priority"`
 	Port                  types.Int64  `tfsdk:"port"`
 	Method                types.Int64  `tfsdk:"method"`
 	Retry                 types.Int64  `tfsdk:"retry"`
 	Expire                types.Int64  `tfsdk:"expire"`
 	ID                    types.Int64  `tfsdk:"id"`
-	ImportFields          types.Int64  `tfsdk:"import_fields"`
-	GrabFields            types.Int64  `tfsdk:"grab_fields"`
 	CleanLibrary          types.Bool   `tfsdk:"clean_library"`
 	SendSilently          types.Bool   `tfsdk:"send_silently"`
 	AlwaysUpdate          types.Bool   `tfsdk:"always_update"`
@@ -218,21 +225,10 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 				Optional:            true,
 				Computed:            true,
 			},
-			"grab_fields": schema.Int64Attribute{
-				MarkdownDescription: "Grab fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Group, `5` Size, `6` Links, `7` Release, `8` Poster, `9` Fanart, `10` CustomFormats, `11` CustomFormatScore.",
+			"display_time": schema.Int64Attribute{
+				MarkdownDescription: "Display time.",
 				Optional:            true,
 				Computed:            true,
-				Validators: []validator.Int64{
-					int64validator.OneOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
-				},
-			},
-			"import_fields": schema.Int64Attribute{
-				MarkdownDescription: "Import fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Codecs, `5` Group, `6` Size, `7` Languages, `8` Subtitles, `9` Links, `10` Release, `11` Poster, `12` Fanart.",
-				Optional:            true,
-				Computed:            true,
-				Validators: []validator.Int64{
-					int64validator.OneOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
-				},
 			},
 			"method": schema.Int64Attribute{
 				MarkdownDescription: "Method. `1` POST, `2` PUT.",
@@ -305,23 +301,40 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 				Optional:            true,
 				Computed:            true,
 			},
+			"base_url": schema.StringAttribute{
+				MarkdownDescription: "Base URL.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"stateless_urls": schema.StringAttribute{
+				MarkdownDescription: "Comma separated stateless URLs.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"auth_username": schema.StringAttribute{
+				MarkdownDescription: "Auth username.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"auth_password": schema.StringAttribute{
+				MarkdownDescription: "Auth password.",
+				Optional:            true,
+				Computed:            true,
+				Sensitive:           true,
+			},
+			"configuration_key": schema.StringAttribute{
+				MarkdownDescription: "Configuration key.",
+				Optional:            true,
+				Computed:            true,
+				Sensitive:           true,
+			},
 			"instance_name": schema.StringAttribute{
 				MarkdownDescription: "Instance name.",
 				Optional:            true,
 				Computed:            true,
 			},
-			"bcc": schema.StringAttribute{
-				MarkdownDescription: "Bcc.",
-				Optional:            true,
-				Computed:            true,
-			},
 			"bot_token": schema.StringAttribute{
 				MarkdownDescription: "Bot token.",
-				Optional:            true,
-				Computed:            true,
-			},
-			"cc": schema.StringAttribute{
-				MarkdownDescription: "Cc.",
 				Optional:            true,
 				Computed:            true,
 			},
@@ -347,11 +360,6 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 			},
 			"device_names": schema.StringAttribute{
 				MarkdownDescription: "Device names.",
-				Optional:            true,
-				Computed:            true,
-			},
-			"display_time": schema.StringAttribute{
-				MarkdownDescription: "Display time.",
 				Optional:            true,
 				Computed:            true,
 			},
@@ -417,11 +425,6 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 			},
 			"sound": schema.StringAttribute{
 				MarkdownDescription: "Sound.",
-				Optional:            true,
-				Computed:            true,
-			},
-			"to": schema.StringAttribute{
-				MarkdownDescription: "To.",
 				Optional:            true,
 				Computed:            true,
 			},
@@ -504,6 +507,18 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 				Computed:            true,
 				ElementType:         types.StringType,
 			},
+			"grab_fields": schema.SetAttribute{
+				MarkdownDescription: "Grab fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Group, `5` Size, `6` Links, `7` Release, `8` Poster, `9` Fanart.",
+				Optional:            true,
+				Computed:            true,
+				ElementType:         types.Int64Type,
+			},
+			"import_fields": schema.SetAttribute{
+				MarkdownDescription: "Import fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Codecs, `5` Group, `6` Size, `7` Languages, `8` Subtitles, `9` Links, `10` Release, `11` Poster, `12` Fanart.",
+				Optional:            true,
+				Computed:            true,
+				ElementType:         types.Int64Type,
+			},
 			"field_tags": schema.SetAttribute{
 				MarkdownDescription: "Devices.",
 				Optional:            true,
@@ -512,6 +527,24 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 			},
 			"recipients": schema.SetAttribute{
 				MarkdownDescription: "Recipients.",
+				Optional:            true,
+				Computed:            true,
+				ElementType:         types.StringType,
+			},
+			"to": schema.SetAttribute{
+				MarkdownDescription: "To.",
+				Optional:            true,
+				Computed:            true,
+				ElementType:         types.StringType,
+			},
+			"cc": schema.SetAttribute{
+				MarkdownDescription: "Cc.",
+				Optional:            true,
+				Computed:            true,
+				ElementType:         types.StringType,
+			},
+			"bcc": schema.SetAttribute{
+				MarkdownDescription: "Bcc.",
 				Optional:            true,
 				Computed:            true,
 				ElementType:         types.StringType,
@@ -646,12 +679,17 @@ func (n *Notification) write(ctx context.Context, notification *prowlarr.Notific
 	n.Implementation = types.StringValue(notification.GetImplementation())
 	n.ConfigContract = types.StringValue(notification.GetConfigContract())
 	n.Tags = types.SetValueMust(types.Int64Type, nil)
+	n.GrabFields = types.SetValueMust(types.Int64Type, nil)
+	n.ImportFields = types.SetValueMust(types.Int64Type, nil)
 	n.ChannelTags = types.SetValueMust(types.StringType, nil)
 	n.DeviceIds = types.SetValueMust(types.Int64Type, nil)
 	n.Topics = types.SetValueMust(types.StringType, nil)
 	n.Devices = types.SetValueMust(types.StringType, nil)
 	n.Recipients = types.SetValueMust(types.StringType, nil)
 	n.FieldTags = types.SetValueMust(types.StringType, nil)
+	n.To = types.SetValueMust(types.StringType, nil)
+	n.Cc = types.SetValueMust(types.StringType, nil)
+	n.Bcc = types.SetValueMust(types.StringType, nil)
 	tfsdk.ValueFrom(ctx, notification.Tags, n.Tags.Type(ctx), &n.Tags)
 	helpers.WriteFields(ctx, n, notification.GetFields(), notificationFields)
 }
