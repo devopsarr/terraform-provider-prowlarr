@@ -182,6 +182,7 @@ func (p *ProwlarrProvider) Resources(ctx context.Context) []func() resource.Reso
 		NewNotificationMailgunResource,
 		NewNotificationNotifiarrResource,
 		NewNotificationNtfyResource,
+		NewNotificationProwlResource,
 		NewNotificationPushbulletResource,
 		NewNotificationSendgridResource,
 		NewNotificationSimplepushResource,
