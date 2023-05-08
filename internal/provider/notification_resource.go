@@ -34,7 +34,7 @@ var notificationFields = helpers.Fields{
 	IntsExceptions:         []string{"priority"},
 	StringSlices:           []string{"recipients", "to", "cC", "bcc", "topics", "fieldTags", "channelTags", "deviceIds", "devices"},
 	StringSlicesExceptions: []string{"tags"},
-	IntSlices:              []string{"grabFields", "importFields"},
+	IntSlices:              []string{"grabFields"},
 }
 
 func NewNotificationResource() resource.Resource {
@@ -52,7 +52,6 @@ type Notification struct {
 	FieldTags             types.Set    `tfsdk:"field_tags"`
 	ChannelTags           types.Set    `tfsdk:"channel_tags"`
 	Topics                types.Set    `tfsdk:"topics"`
-	ImportFields          types.Set    `tfsdk:"import_fields"`
 	GrabFields            types.Set    `tfsdk:"grab_fields"`
 	DeviceIds             types.Set    `tfsdk:"device_ids"`
 	Devices               types.Set    `tfsdk:"devices"`
@@ -513,12 +512,6 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 				Computed:            true,
 				ElementType:         types.Int64Type,
 			},
-			"import_fields": schema.SetAttribute{
-				MarkdownDescription: "Import fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Codecs, `5` Group, `6` Size, `7` Languages, `8` Subtitles, `9` Links, `10` Release, `11` Poster, `12` Fanart.",
-				Optional:            true,
-				Computed:            true,
-				ElementType:         types.Int64Type,
-			},
 			"field_tags": schema.SetAttribute{
 				MarkdownDescription: "Devices.",
 				Optional:            true,
@@ -680,7 +673,6 @@ func (n *Notification) write(ctx context.Context, notification *prowlarr.Notific
 	n.ConfigContract = types.StringValue(notification.GetConfigContract())
 	n.Tags = types.SetValueMust(types.Int64Type, nil)
 	n.GrabFields = types.SetValueMust(types.Int64Type, nil)
-	n.ImportFields = types.SetValueMust(types.Int64Type, nil)
 	n.ChannelTags = types.SetValueMust(types.StringType, nil)
 	n.DeviceIds = types.SetValueMust(types.Int64Type, nil)
 	n.Topics = types.SetValueMust(types.StringType, nil)

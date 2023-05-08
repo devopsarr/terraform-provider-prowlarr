@@ -67,7 +67,6 @@ data "prowlarr_notification" "example" {
 - `icon` (String) Icon.
 - `id` (Number) Notification ID.
 - `implementation` (String) Notification implementation name.
-- `import_fields` (Set of Number) Import fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Codecs, `5` Group, `6` Size, `7` Languages, `8` Subtitles, `9` Links, `10` Release, `11` Poster, `12` Fanart.
 - `include_health_warnings` (Boolean) Include health warnings.
 - `instance_name` (String) Instance name.
 - `key` (String) Key.

@@ -39,7 +39,6 @@ type NotificationDiscordResource struct {
 // NotificationDiscord describes the notification data model.
 type NotificationDiscord struct {
 	Tags                  types.Set    `tfsdk:"tags"`
-	ImportFields          types.Set    `tfsdk:"import_fields"`
 	GrabFields            types.Set    `tfsdk:"grab_fields"`
 	WebHookURL            types.String `tfsdk:"web_hook_url"`
 	Name                  types.String `tfsdk:"name"`
@@ -55,7 +54,6 @@ type NotificationDiscord struct {
 func (n NotificationDiscord) toNotification() *Notification {
 	return &Notification{
 		Tags:                  n.Tags,
-		ImportFields:          n.ImportFields,
 		GrabFields:            n.GrabFields,
 		WebHookURL:            n.WebHookURL,
 		Avatar:                n.Avatar,
@@ -74,7 +72,6 @@ func (n NotificationDiscord) toNotification() *Notification {
 func (n *NotificationDiscord) fromNotification(notification *Notification) {
 	n.Tags = notification.Tags
 	n.GrabFields = notification.GrabFields
-	n.ImportFields = notification.ImportFields
 	n.WebHookURL = notification.WebHookURL
 	n.Avatar = notification.Avatar
 	n.Username = notification.Username
@@ -148,12 +145,6 @@ func (r *NotificationDiscordResource) Schema(ctx context.Context, req resource.S
 			},
 			"grab_fields": schema.SetAttribute{
 				MarkdownDescription: "Grab fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Group, `5` Size, `6` Links, `7` Release, `8` Poster, `9` Fanart.",
-				Optional:            true,
-				Computed:            true,
-				ElementType:         types.Int64Type,
-			},
-			"import_fields": schema.SetAttribute{
-				MarkdownDescription: "Import fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Codecs, `5` Group, `6` Size, `7` Languages, `8` Subtitles, `9` Links, `10` Release, `11` Poster, `12` Fanart.",
 				Optional:            true,
 				Computed:            true,
 				ElementType:         types.Int64Type,
