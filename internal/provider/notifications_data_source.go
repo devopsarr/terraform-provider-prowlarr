@@ -353,11 +353,6 @@ func (d *NotificationsDataSource) Schema(ctx context.Context, req datasource.Sch
 							Computed:            true,
 							ElementType:         types.Int64Type,
 						},
-						"import_fields": schema.SetAttribute{
-							MarkdownDescription: "Import fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Codecs, `5` Group, `6` Size, `7` Languages, `8` Subtitles, `9` Links, `10` Release, `11` Poster, `12` Fanart.",
-							Computed:            true,
-							ElementType:         types.Int64Type,
-						},
 						"field_tags": schema.SetAttribute{
 							MarkdownDescription: "Devices.",
 							Computed:            true,
