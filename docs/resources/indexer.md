@@ -66,7 +66,7 @@ resource "prowlarr_indexer" "example" {
 ### Optional
 
 - `app_profile_id` (Number) Application profile ID.
-- `enable` (Boolean) Enable RSS flag.
+- `enable` (Boolean) Enable flag.
 - `priority` (Number) Priority.
 - `tags` (Set of Number) List of associated tags.
 

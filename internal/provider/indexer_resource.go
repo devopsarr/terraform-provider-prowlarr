@@ -130,40 +130,46 @@ func (r *IndexerResource) Schema(ctx context.Context, req resource.SchemaRequest
 				Required:            true,
 				MarkdownDescription: "Set of configuration fields.",
 				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"name": schema.StringAttribute{
-							MarkdownDescription: "Field name.",
-							Required:            true,
-						},
-						"text_value": schema.StringAttribute{
-							MarkdownDescription: "Text value. Only one value must be filled out.",
-							Optional:            true,
-							Computed:            true,
-						},
-						"sensitive_value": schema.StringAttribute{
-							MarkdownDescription: "Sensitive string value. Only one value must be filled out.",
-							Optional:            true,
-							Computed:            true,
-							Sensitive:           true,
-						},
-						"number_value": schema.NumberAttribute{
-							MarkdownDescription: "Number value. Only one value must be filled out.",
-							Optional:            true,
-							Computed:            true,
-						},
-						"bool_value": schema.BoolAttribute{
-							MarkdownDescription: "Bool value. Only one value must be filled out.",
-							Optional:            true,
-							Computed:            true,
-						},
-						"set_value": schema.SetAttribute{
-							MarkdownDescription: "Set value. Only one value must be filled out.",
-							Optional:            true,
-							Computed:            true,
-							ElementType:         types.Int64Type,
-						},
-					},
+					Attributes: r.getFieldSchema().Attributes,
 				},
+			},
+		},
+	}
+}
+
+func (r IndexerResource) getFieldSchema() schema.Schema {
+	return schema.Schema{
+		Attributes: map[string]schema.Attribute{
+			"name": schema.StringAttribute{
+				MarkdownDescription: "Field name.",
+				Required:            true,
+			},
+			"text_value": schema.StringAttribute{
+				MarkdownDescription: "Text value. Only one value must be filled out.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"sensitive_value": schema.StringAttribute{
+				MarkdownDescription: "Sensitive string value. Only one value must be filled out.",
+				Optional:            true,
+				Computed:            true,
+				Sensitive:           true,
+			},
+			"number_value": schema.NumberAttribute{
+				MarkdownDescription: "Number value. Only one value must be filled out.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"bool_value": schema.BoolAttribute{
+				MarkdownDescription: "Bool value. Only one value must be filled out.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"set_value": schema.SetAttribute{
+				MarkdownDescription: "Set value. Only one value must be filled out.",
+				Optional:            true,
+				Computed:            true,
+				ElementType:         types.Int64Type,
 			},
 		},
 	}
@@ -301,7 +307,7 @@ func (i *Indexer) write(ctx context.Context, indexer *prowlarr.IndexerResource) 
 		}
 	}
 
-	i.Fields, _ = types.SetValueFrom(ctx, i.Fields.ElementType(ctx), fields)
+	i.Fields, _ = types.SetValueFrom(ctx, IndexerResource{}.getFieldSchema().Type(), fields)
 }
 
 func (f *Field) write(ctx context.Context, field *prowlarr.Field) {

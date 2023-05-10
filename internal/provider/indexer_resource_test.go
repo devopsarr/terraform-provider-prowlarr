@@ -84,7 +84,7 @@ func testAccIndexerResourceConfig(name, url string) string {
 
 	resource "prowlarr_indexer" "test2" {
 		enable = false
-		name = "HDits"
+		name = "%sSet"
 		implementation = "HDBits"
     	config_contract = "HDBitsSettings"
 		protocol = "torrent"
@@ -117,5 +117,5 @@ func testAccIndexerResourceConfig(name, url string) string {
 			},
 		]
 	}
-	`, name, url)
+	`, name, url, name)
 }
