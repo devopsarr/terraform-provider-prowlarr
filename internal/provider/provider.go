@@ -171,6 +171,9 @@ func (p *ProwlarrProvider) Resources(ctx context.Context) []func() resource.Reso
 		NewIndexerProxySocks4Resource,
 		NewIndexerProxySocks5Resource,
 
+		// Indexer
+		NewIndexerResource,
+
 		// Notifications
 		NewNotificationResource,
 		NewNotificationAppriseResource,
