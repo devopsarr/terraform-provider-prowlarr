@@ -72,7 +72,7 @@ func (r *IndexerResource) Schema(ctx context.Context, req resource.SchemaRequest
 		MarkdownDescription: "<!-- subcategory:Indexers -->Generic Indexer resource. When possible use a specific resource instead.\nFor more information refer to [Indexer](https://wiki.servarr.com/prowlarr/indexers) documentation.",
 		Attributes: map[string]schema.Attribute{
 			"enable": schema.BoolAttribute{
-				MarkdownDescription: "Enable RSS flag.",
+				MarkdownDescription: "Enable flag.",
 				Optional:            true,
 				Computed:            true,
 			},
