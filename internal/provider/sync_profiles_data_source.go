@@ -112,7 +112,7 @@ func (d *SyncProfilesDataSource) Read(ctx context.Context, req datasource.ReadRe
 		profiles[i].write(p)
 	}
 
-	tfsdk.ValueFrom(ctx, profiles, data.SyncProfiles.Type(context.Background()), &data.SyncProfiles)
+	tfsdk.ValueFrom(ctx, profiles, data.SyncProfiles.Type(ctx), &data.SyncProfiles)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.StringValue(strconv.Itoa(len(response)))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

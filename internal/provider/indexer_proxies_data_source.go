@@ -131,7 +131,7 @@ func (d *IndexerProxiesDataSource) Read(ctx context.Context, req datasource.Read
 		proxies[i].write(ctx, p)
 	}
 
-	tfsdk.ValueFrom(ctx, proxies, data.IndexerProxies.Type(context.Background()), &data.IndexerProxies)
+	tfsdk.ValueFrom(ctx, proxies, data.IndexerProxies.Type(ctx), &data.IndexerProxies)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.StringValue(strconv.Itoa(len(response)))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
