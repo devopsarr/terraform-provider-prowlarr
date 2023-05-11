@@ -247,15 +247,14 @@ func (r *ApplicationResource) ImportState(ctx context.Context, req resource.Impo
 }
 
 func (a *Application) write(ctx context.Context, application *prowlarr.ApplicationResource) {
+	a.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, application.GetTags())
 	a.ID = types.Int64Value(int64(application.GetId()))
 	a.Name = types.StringValue(application.GetName())
 	a.SyncLevel = types.StringValue(string(application.GetSyncLevel()))
 	a.Implementation = types.StringValue(application.GetImplementation())
 	a.ConfigContract = types.StringValue(application.GetConfigContract())
-	a.Tags = types.SetValueMust(types.Int64Type, nil)
 	a.SyncCategories = types.SetValueMust(types.Int64Type, nil)
 	a.AnimeSyncCategories = types.SetValueMust(types.Int64Type, nil)
-	tfsdk.ValueFrom(ctx, application.Tags, a.Tags.Type(ctx), &a.Tags)
 	helpers.WriteFields(ctx, a, application.GetFields(), applicationFields)
 }
 

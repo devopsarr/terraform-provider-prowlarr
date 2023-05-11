@@ -284,7 +284,7 @@ func (r *IndexerResource) ImportState(ctx context.Context, req resource.ImportSt
 }
 
 func (i *Indexer) write(ctx context.Context, indexer *prowlarr.IndexerResource) {
-	i.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.Tags)
+	i.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.GetTags())
 	i.Enable = types.BoolValue(indexer.GetEnable())
 	i.Priority = types.Int64Value(int64(indexer.GetPriority()))
 	i.AppProfileID = types.Int64Value(int64(indexer.GetAppProfileId()))
@@ -298,7 +298,7 @@ func (i *Indexer) write(ctx context.Context, indexer *prowlarr.IndexerResource) 
 
 	var fields []Field
 
-	for _, f := range indexer.Fields {
+	for _, f := range indexer.GetFields() {
 		if _, ok := f.GetValueOk(); ok {
 			var field Field
 
