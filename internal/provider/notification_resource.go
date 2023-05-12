@@ -664,6 +664,7 @@ func (r *NotificationResource) ImportState(ctx context.Context, req resource.Imp
 }
 
 func (n *Notification) write(ctx context.Context, notification *prowlarr.NotificationResource) {
+	n.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, notification.GetTags())
 	n.OnHealthIssue = types.BoolValue(notification.GetOnHealthIssue())
 	n.OnApplicationUpdate = types.BoolValue(notification.GetOnApplicationUpdate())
 	n.IncludeHealthWarnings = types.BoolValue(notification.GetIncludeHealthWarnings())
@@ -671,7 +672,6 @@ func (n *Notification) write(ctx context.Context, notification *prowlarr.Notific
 	n.Name = types.StringValue(notification.GetName())
 	n.Implementation = types.StringValue(notification.GetImplementation())
 	n.ConfigContract = types.StringValue(notification.GetConfigContract())
-	n.Tags = types.SetValueMust(types.Int64Type, nil)
 	n.GrabFields = types.SetValueMust(types.Int64Type, nil)
 	n.ChannelTags = types.SetValueMust(types.StringType, nil)
 	n.DeviceIds = types.SetValueMust(types.Int64Type, nil)
@@ -682,7 +682,6 @@ func (n *Notification) write(ctx context.Context, notification *prowlarr.Notific
 	n.To = types.SetValueMust(types.StringType, nil)
 	n.Cc = types.SetValueMust(types.StringType, nil)
 	n.Bcc = types.SetValueMust(types.StringType, nil)
-	tfsdk.ValueFrom(ctx, notification.Tags, n.Tags.Type(ctx), &n.Tags)
 	helpers.WriteFields(ctx, n, notification.GetFields(), notificationFields)
 }
 

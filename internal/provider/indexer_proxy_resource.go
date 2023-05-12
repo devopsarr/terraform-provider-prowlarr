@@ -241,13 +241,12 @@ func (r *IndexerProxyResource) ImportState(ctx context.Context, req resource.Imp
 }
 
 func (i *IndexerProxy) write(ctx context.Context, indexerProxy *prowlarr.IndexerProxyResource) {
+	i.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexerProxy.GetTags())
 	i.ID = types.Int64Value(int64(indexerProxy.GetId()))
 	i.ConfigContract = types.StringValue(indexerProxy.GetConfigContract())
 	i.Implementation = types.StringValue(indexerProxy.GetImplementation())
 	i.Name = types.StringValue(indexerProxy.GetName())
-	i.Tags = types.SetValueMust(types.Int64Type, nil)
 
-	tfsdk.ValueFrom(ctx, indexerProxy.Tags, i.Tags.Type(ctx), &i.Tags)
 	helpers.WriteFields(ctx, i, indexerProxy.GetFields(), indexerProxyFields)
 }
 

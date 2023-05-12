@@ -19,7 +19,7 @@ func TestAccApplicationsDataSource(t *testing.T) {
 				Config:      testAccApplicationsDataSourceConfig + testUnauthorizedProvider,
 				ExpectError: regexp.MustCompile("Client Error"),
 			},
-			// Create a delay profile to have a value to check
+			// Create a resource to have a value to check
 			{
 				Config: testAccApplicationResourceConfig("datasourceTest", "http://localhost:9696"),
 			},

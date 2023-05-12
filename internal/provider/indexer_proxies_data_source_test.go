@@ -19,7 +19,7 @@ func TestAccIndexerProxiesDataSource(t *testing.T) {
 				Config:      testAccIndexerProxiesDataSourceConfig + testUnauthorizedProvider,
 				ExpectError: regexp.MustCompile("Client Error"),
 			},
-			// Create a delay profile to have a value to check
+			// Create a resource to have a value to check
 			{
 				Config: testAccIndexerProxyResourceConfig("datasourceTest", 50),
 			},

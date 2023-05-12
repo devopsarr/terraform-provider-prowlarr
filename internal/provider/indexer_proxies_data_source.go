@@ -126,12 +126,12 @@ func (d *IndexerProxiesDataSource) Read(ctx context.Context, req datasource.Read
 
 	tflog.Trace(ctx, "read "+indexerProxiesDataSourceName)
 	// Map response body to resource schema attribute
-	profiles := make([]IndexerProxy, len(response))
+	proxies := make([]IndexerProxy, len(response))
 	for i, p := range response {
-		profiles[i].write(ctx, p)
+		proxies[i].write(ctx, p)
 	}
 
-	tfsdk.ValueFrom(ctx, profiles, data.IndexerProxies.Type(context.Background()), &data.IndexerProxies)
+	tfsdk.ValueFrom(ctx, proxies, data.IndexerProxies.Type(ctx), &data.IndexerProxies)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.StringValue(strconv.Itoa(len(response)))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

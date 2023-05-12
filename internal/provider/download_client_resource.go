@@ -476,6 +476,7 @@ func (r *DownloadClientResource) ImportState(ctx context.Context, req resource.I
 }
 
 func (d *DownloadClient) write(ctx context.Context, downloadClient *prowlarr.DownloadClientResource) {
+	d.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.GetTags())
 	d.Enable = types.BoolValue(downloadClient.GetEnable())
 	d.Priority = types.Int64Value(int64(downloadClient.GetPriority()))
 	d.ID = types.Int64Value(int64(downloadClient.GetId()))
@@ -483,7 +484,6 @@ func (d *DownloadClient) write(ctx context.Context, downloadClient *prowlarr.Dow
 	d.Implementation = types.StringValue(downloadClient.GetImplementation())
 	d.Name = types.StringValue(downloadClient.GetName())
 	d.Protocol = types.StringValue(string(downloadClient.GetProtocol()))
-	d.Tags = types.SetValueMust(types.Int64Type, nil)
 	d.AdditionalTags = types.SetValueMust(types.Int64Type, nil)
 	d.FieldTags = types.SetValueMust(types.StringType, nil)
 	d.PostImTags = types.SetValueMust(types.StringType, nil)
@@ -495,7 +495,6 @@ func (d *DownloadClient) write(ctx context.Context, downloadClient *prowlarr.Dow
 	}
 
 	tfsdk.ValueFrom(ctx, categories, d.Categories.Type(ctx), &d.Categories)
-	tfsdk.ValueFrom(ctx, downloadClient.Tags, d.Tags.Type(ctx), &d.Tags)
 	helpers.WriteFields(ctx, d, downloadClient.GetFields(), downloadClientFields)
 }
 
