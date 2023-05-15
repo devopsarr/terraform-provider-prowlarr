@@ -86,6 +86,7 @@ resource "prowlarr_notification" "example" {
 - `map_to` (String) Map To.
 - `mention` (String) Mention.
 - `method` (Number) Method. `1` POST, `2` PUT.
+- `notification_type` (Number) Notification type. `0` Info, `1` Success, `2` Warning, `3` Failure.
 - `notify` (Boolean) Notify flag.
 - `password` (String) password.
 - `path` (String) Path.
@@ -106,6 +107,7 @@ resource "prowlarr_notification" "example" {
 - `tags` (Set of Number) List of associated tags.
 - `to` (Set of String) To.
 - `token` (String) Token.
+- `topic_id` (String) Topic ID.
 - `topics` (Set of String) Devices.
 - `update_library` (Boolean) Update library flag.
 - `url` (String) URL.

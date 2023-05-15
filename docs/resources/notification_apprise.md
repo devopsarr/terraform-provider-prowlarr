@@ -22,7 +22,7 @@ resource "prowlarr_notification_apprise" "example" {
   include_health_warnings = false
   name                    = "Example"
 
-  base_url          = "http://localhost:8000"
+  server_url        = "http://localhost:8000"
   configuration_key = "ConfigKey"
   auth_username     = "User"
   auth_password     = "Pass"
@@ -41,12 +41,13 @@ resource "prowlarr_notification_apprise" "example" {
 
 - `auth_password` (String, Sensitive) AuthPassword.
 - `auth_username` (String) AuthUsername.
-- `base_url` (String) Base URL.
 - `configuration_key` (String, Sensitive) ConfigurationKey.
 - `field_tags` (Set of String) Tags and emojis.
 - `include_health_warnings` (Boolean) Include health warnings.
+- `notification_type` (Number) Notification type. `0` Info, `1` Success, `2` Warning, `3` Failure.
 - `on_application_update` (Boolean) On application update flag.
 - `on_health_issue` (Boolean) On health issue flag.
+- `server_url` (String) Server URL.
 - `stateless_urls` (String) Comma separated stateless URLs.
 - `tags` (Set of Number) List of associated tags.
 

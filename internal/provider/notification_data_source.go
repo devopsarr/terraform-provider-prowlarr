@@ -122,6 +122,10 @@ func (d *NotificationDataSource) Schema(ctx context.Context, req datasource.Sche
 				MarkdownDescription: "Priority.", // TODO: add values in description
 				Computed:            true,
 			},
+			"notification_type": schema.Int64Attribute{
+				MarkdownDescription: "Notification type. `0` Info, `1` Success, `2` Warning, `3` Failure.",
+				Computed:            true,
+			},
 			"retry": schema.Int64Attribute{
 				MarkdownDescription: "Retry.",
 				Computed:            true,
@@ -202,6 +206,10 @@ func (d *NotificationDataSource) Schema(ctx context.Context, req datasource.Sche
 			},
 			"chat_id": schema.StringAttribute{
 				MarkdownDescription: "Chat ID.",
+				Computed:            true,
+			},
+			"topic_id": schema.StringAttribute{
+				MarkdownDescription: "Topic ID.",
 				Computed:            true,
 			},
 			"consumer_key": schema.StringAttribute{

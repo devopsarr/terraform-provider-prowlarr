@@ -60,7 +60,7 @@ func testAccNotificationAppriseResourceConfig(name, key string) string {
 		include_health_warnings = false
 		name                    = "%s"
 
-		base_url = "http://localhost:8000"
+		server_url = "http://localhost:8000"
 		configuration_key = "ConfigKey"
 		auth_username = "User"
 		auth_password = "%s"

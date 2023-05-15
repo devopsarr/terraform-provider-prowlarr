@@ -5,7 +5,7 @@ resource "prowlarr_notification_apprise" "example" {
   include_health_warnings = false
   name                    = "Example"
 
-  base_url          = "http://localhost:8000"
+  server_url        = "http://localhost:8000"
   configuration_key = "ConfigKey"
   auth_username     = "User"
   auth_password     = "Pass"

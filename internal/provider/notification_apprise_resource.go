@@ -6,11 +6,13 @@ import (
 
 	"github.com/devopsarr/prowlarr-go/prowlarr"
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -42,10 +44,11 @@ type NotificationApprise struct {
 	FieldTags             types.Set    `tfsdk:"field_tags"`
 	ConfigurationKey      types.String `tfsdk:"configuration_key"`
 	StatelessURLs         types.String `tfsdk:"stateless_urls"`
-	BaseURL               types.String `tfsdk:"base_url"`
+	ServerURL             types.String `tfsdk:"server_url"`
 	AuthUsername          types.String `tfsdk:"auth_username"`
 	AuthPassword          types.String `tfsdk:"auth_password"`
 	Name                  types.String `tfsdk:"name"`
+	NotificationType      types.Int64  `tfsdk:"notification_type"`
 	ID                    types.Int64  `tfsdk:"id"`
 	IncludeHealthWarnings types.Bool   `tfsdk:"include_health_warnings"`
 	OnApplicationUpdate   types.Bool   `tfsdk:"on_application_update"`
@@ -57,11 +60,12 @@ func (n NotificationApprise) toNotification() *Notification {
 		Tags:                  n.Tags,
 		FieldTags:             n.FieldTags,
 		ConfigurationKey:      n.ConfigurationKey,
-		BaseURL:               n.BaseURL,
+		ServerURL:             n.ServerURL,
 		StatelessURLs:         n.StatelessURLs,
 		AuthUsername:          n.AuthUsername,
 		AuthPassword:          n.AuthPassword,
 		Name:                  n.Name,
+		NotificationType:      n.NotificationType,
 		ID:                    n.ID,
 		IncludeHealthWarnings: n.IncludeHealthWarnings,
 		OnApplicationUpdate:   n.OnApplicationUpdate,
@@ -75,11 +79,12 @@ func (n *NotificationApprise) fromNotification(notification *Notification) {
 	n.Tags = notification.Tags
 	n.FieldTags = notification.FieldTags
 	n.ConfigurationKey = notification.ConfigurationKey
-	n.BaseURL = notification.BaseURL
+	n.ServerURL = notification.ServerURL
 	n.StatelessURLs = notification.StatelessURLs
 	n.AuthUsername = notification.AuthUsername
 	n.AuthPassword = notification.AuthPassword
 	n.Name = notification.Name
+	n.NotificationType = notification.NotificationType
 	n.ID = notification.ID
 	n.IncludeHealthWarnings = notification.IncludeHealthWarnings
 	n.OnApplicationUpdate = notification.OnApplicationUpdate
@@ -127,8 +132,16 @@ func (r *NotificationAppriseResource) Schema(ctx context.Context, req resource.S
 				},
 			},
 			// Field values
-			"base_url": schema.StringAttribute{
-				MarkdownDescription: "Base URL.",
+			"notification_type": schema.Int64Attribute{
+				MarkdownDescription: "Notification type. `0` Info, `1` Success, `2` Warning, `3` Failure.",
+				Optional:            true,
+				Computed:            true,
+				Validators: []validator.Int64{
+					int64validator.OneOf(0, 1, 2, 3),
+				},
+			},
+			"server_url": schema.StringAttribute{
+				MarkdownDescription: "Server URL.",
 				Optional:            true,
 				Computed:            true,
 			},
