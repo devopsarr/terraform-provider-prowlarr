@@ -101,6 +101,7 @@ Read-Only:
 - `tags` (Set of Number) List of associated tags.
 - `to` (Set of String) To.
 - `token` (String) Token.
+- `topic_id` (String) Topic ID.
 - `topics` (Set of String) Devices.
 - `update_library` (Boolean) Update library flag.
 - `url` (String) URL.

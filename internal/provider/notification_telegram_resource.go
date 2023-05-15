@@ -40,6 +40,7 @@ type NotificationTelegramResource struct {
 type NotificationTelegram struct {
 	Tags                  types.Set    `tfsdk:"tags"`
 	ChatID                types.String `tfsdk:"chat_id"`
+	TopicID               types.String `tfsdk:"topic_id"`
 	Name                  types.String `tfsdk:"name"`
 	BotToken              types.String `tfsdk:"bot_token"`
 	ID                    types.Int64  `tfsdk:"id"`
@@ -53,6 +54,7 @@ func (n NotificationTelegram) toNotification() *Notification {
 	return &Notification{
 		Tags:                  n.Tags,
 		ChatID:                n.ChatID,
+		TopicID:               n.TopicID,
 		BotToken:              n.BotToken,
 		SendSilently:          n.SendSilently,
 		Name:                  n.Name,
@@ -68,6 +70,7 @@ func (n NotificationTelegram) toNotification() *Notification {
 func (n *NotificationTelegram) fromNotification(notification *Notification) {
 	n.Tags = notification.Tags
 	n.ChatID = notification.ChatID
+	n.TopicID = notification.TopicID
 	n.BotToken = notification.BotToken
 	n.SendSilently = notification.SendSilently
 	n.Name = notification.Name
@@ -126,6 +129,11 @@ func (r *NotificationTelegramResource) Schema(ctx context.Context, req resource.
 			"chat_id": schema.StringAttribute{
 				MarkdownDescription: "Chat ID.",
 				Required:            true,
+			},
+			"topic_id": schema.StringAttribute{
+				MarkdownDescription: "Topic ID.",
+				Optional:            true,
+				Computed:            true,
 			},
 			"bot_token": schema.StringAttribute{
 				MarkdownDescription: "Bot token.",

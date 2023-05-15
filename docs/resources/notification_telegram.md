@@ -43,6 +43,7 @@ resource "prowlarr_notification_telegram" "example" {
 - `on_health_issue` (Boolean) On health issue flag.
 - `send_silently` (Boolean) Send silently flag.
 - `tags` (Set of Number) List of associated tags.
+- `topic_id` (String) Topic ID.
 
 ### Read-Only
 
