@@ -74,6 +74,7 @@ data "prowlarr_notification" "example" {
 - `map_to` (String) Map To.
 - `mention` (String) Mention.
 - `method` (Number) Method. `1` POST, `2` PUT.
+- `notification_type` (Number) Notification type. `0` Info, `1` Success, `2` Warning, `3` Failure.
 - `notify` (Boolean) Notify flag.
 - `on_application_update` (Boolean) On application update flag.
 - `on_health_issue` (Boolean) On health issue flag.

@@ -138,6 +138,10 @@ func (d *NotificationsDataSource) Schema(ctx context.Context, req datasource.Sch
 							MarkdownDescription: "Priority.", // TODO: add values in description
 							Computed:            true,
 						},
+						"notification_type": schema.Int64Attribute{
+							MarkdownDescription: "Notification type. `0` Info, `1` Success, `2` Warning, `3` Failure.",
+							Computed:            true,
+						},
 						"retry": schema.Int64Attribute{
 							MarkdownDescription: "Retry.",
 							Computed:            true,

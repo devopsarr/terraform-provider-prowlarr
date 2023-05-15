@@ -30,7 +30,7 @@ var (
 var notificationFields = helpers.Fields{
 	Bools:                  []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "requireEncryption", "sendSilently", "useSsl", "updateLibrary", "useEuEndpoint"},
 	Strings:                []string{"authPassword", "authUsername", "statelessUrls", "configurationKey", "baseUrl", "accessToken", "accessTokenSecret", "apiKey", "aPIKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expires", "from", "host", "icon", "instanceName", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "webHookUrl", "serverUrl", "userName", "clickUrl", "mapFrom", "mapTo", "key", "event"},
-	Ints:                   []string{"displayTime", "port", "itemPriority", "retry", "expire", "method"},
+	Ints:                   []string{"displayTime", "port", "itemPriority", "retry", "expire", "method", "notificationType"},
 	IntsExceptions:         []string{"priority"},
 	StringSlices:           []string{"recipients", "to", "cC", "bcc", "topics", "fieldTags", "channelTags", "deviceIds", "devices"},
 	StringSlicesExceptions: []string{"tags"},
@@ -113,6 +113,7 @@ type Notification struct {
 	Method                types.Int64  `tfsdk:"method"`
 	Retry                 types.Int64  `tfsdk:"retry"`
 	Expire                types.Int64  `tfsdk:"expire"`
+	NotificationType      types.Int64  `tfsdk:"notification_type"`
 	ID                    types.Int64  `tfsdk:"id"`
 	CleanLibrary          types.Bool   `tfsdk:"clean_library"`
 	SendSilently          types.Bool   `tfsdk:"send_silently"`
@@ -243,6 +244,14 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 				Computed:            true,
 				Validators: []validator.Int64{
 					int64validator.OneOf(-2, -1, 0, 1, 2, 3, 4, 5, 7, 8),
+				},
+			},
+			"notification_type": schema.Int64Attribute{
+				MarkdownDescription: "Notification type. `0` Info, `1` Success, `2` Warning, `3` Failure.",
+				Optional:            true,
+				Computed:            true,
+				Validators: []validator.Int64{
+					int64validator.OneOf(0, 1, 2, 3),
 				},
 			},
 			"retry": schema.Int64Attribute{
