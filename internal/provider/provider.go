@@ -235,6 +235,7 @@ func (p *ProwlarrProvider) DataSources(ctx context.Context) []func() datasource.
 		NewTagDataSource,
 		NewTagsDataSource,
 		NewTagDetailsDataSource,
+		NewTagsDetailsDataSource,
 	}
 }
 
