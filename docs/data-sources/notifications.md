@@ -97,7 +97,7 @@ Read-Only:
 - `send_silently` (Boolean) Add silently flag.
 - `sender_domain` (String) Sender domain.
 - `sender_id` (String) Sender ID.
-- `sender_number` (String) Sender Number.
+- `sender_number` (String, Sensitive) Sender Number.
 - `server` (String) server.
 - `server_url` (String) Server url.
 - `sign_in` (String) Sign in.

@@ -453,6 +453,7 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 				MarkdownDescription: "Sender Number.",
 				Optional:            true,
 				Computed:            true,
+				Sensitive:           true,
 			},
 			"receiver_id": schema.StringAttribute{
 				MarkdownDescription: "Receiver ID.",

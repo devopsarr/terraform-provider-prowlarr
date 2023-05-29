@@ -171,6 +171,7 @@ func (r *NotificationSignalResource) Schema(ctx context.Context, req resource.Sc
 			"sender_number": schema.StringAttribute{
 				MarkdownDescription: "Sender Number.",
 				Required:            true,
+				Sensitive:           true,
 			},
 			"receiver_id": schema.StringAttribute{
 				MarkdownDescription: "Receiver ID.",
