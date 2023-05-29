@@ -37,12 +37,15 @@ resource "prowlarr_notification_webhook" "example" {
 - `include_health_warnings` (Boolean) Include health warnings.
 - `method` (Number) Method. `1` POST, `2` PUT.
 - `name` (String) NotificationWebhook name.
-- `on_application_update` (Boolean) On application update flag.
-- `on_health_issue` (Boolean) On health issue flag.
 - `url` (String) URL.
 
 ### Optional
 
+- `include_manual_grabs` (Boolean) Include manual grab flag.
+- `on_application_update` (Boolean) On application update flag.
+- `on_grab` (Boolean) On release grab flag.
+- `on_health_issue` (Boolean) On health issue flag.
+- `on_health_restored` (Boolean) On health restored flag.
 - `password` (String, Sensitive) password.
 - `tags` (Set of Number) List of associated tags.
 - `username` (String) Username.

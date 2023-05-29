@@ -44,8 +44,11 @@ resource "prowlarr_notification_email" "example" {
 - `bcc` (Set of String) Bcc.
 - `cc` (Set of String) Cc.
 - `include_health_warnings` (Boolean) Include health warnings.
+- `include_manual_grabs` (Boolean) Include manual grab flag.
 - `on_application_update` (Boolean) On application update flag.
+- `on_grab` (Boolean) On release grab flag.
 - `on_health_issue` (Boolean) On health issue flag.
+- `on_health_restored` (Boolean) On health restored flag.
 - `password` (String, Sensitive) Password.
 - `port` (Number) Port.
 - `require_encryption` (Boolean) Require encryption flag.

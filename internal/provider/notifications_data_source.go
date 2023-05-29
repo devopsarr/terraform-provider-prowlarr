@@ -56,8 +56,20 @@ func (d *NotificationsDataSource) Schema(ctx context.Context, req datasource.Sch
 							MarkdownDescription: "On health issue flag.",
 							Computed:            true,
 						},
+						"on_health_restored": schema.BoolAttribute{
+							MarkdownDescription: "On health restored flag.",
+							Computed:            true,
+						},
 						"on_application_update": schema.BoolAttribute{
 							MarkdownDescription: "On application update flag.",
+							Computed:            true,
+						},
+						"on_grab": schema.BoolAttribute{
+							MarkdownDescription: "On release grab flag.",
+							Computed:            true,
+						},
+						"include_manual_grabs": schema.BoolAttribute{
+							MarkdownDescription: "Include manual grab flag.",
 							Computed:            true,
 						},
 						"include_health_warnings": schema.BoolAttribute{
@@ -278,6 +290,14 @@ func (d *NotificationsDataSource) Schema(ctx context.Context, req datasource.Sch
 						},
 						"sender_id": schema.StringAttribute{
 							MarkdownDescription: "Sender ID.",
+							Computed:            true,
+						},
+						"sender_number": schema.StringAttribute{
+							MarkdownDescription: "Sender Number.",
+							Computed:            true,
+						},
+						"receiver_id": schema.StringAttribute{
+							MarkdownDescription: "Receiver ID.",
 							Computed:            true,
 						},
 						"server": schema.StringAttribute{

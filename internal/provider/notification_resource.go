@@ -29,7 +29,7 @@ var (
 
 var notificationFields = helpers.Fields{
 	Bools:                  []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "requireEncryption", "sendSilently", "useSsl", "updateLibrary", "useEuEndpoint"},
-	Strings:                []string{"authPassword", "authUsername", "statelessUrls", "configurationKey", "baseUrl", "accessToken", "accessTokenSecret", "apiKey", "aPIKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expires", "from", "host", "icon", "instanceName", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "webHookUrl", "serverUrl", "userName", "clickUrl", "mapFrom", "mapTo", "key", "event", "topicId"},
+	Strings:                []string{"authPassword", "authUsername", "statelessUrls", "configurationKey", "baseUrl", "accessToken", "accessTokenSecret", "apiKey", "aPIKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expires", "from", "host", "icon", "instanceName", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "webHookUrl", "serverUrl", "userName", "clickUrl", "mapFrom", "mapTo", "key", "event", "topicId", "senderNumber", "receiverId"},
 	Ints:                   []string{"displayTime", "port", "itemPriority", "retry", "expire", "method", "notificationType"},
 	IntsExceptions:         []string{"priority"},
 	StringSlices:           []string{"recipients", "to", "cC", "bcc", "topics", "fieldTags", "channelTags", "deviceIds", "devices"},
@@ -90,6 +90,8 @@ type Notification struct {
 	SignIn                types.String `tfsdk:"sign_in"`
 	Server                types.String `tfsdk:"server"`
 	SenderID              types.String `tfsdk:"sender_id"`
+	SenderNumber          types.String `tfsdk:"sender_number"`
+	ReceiverID            types.String `tfsdk:"receiver_id"`
 	BotToken              types.String `tfsdk:"bot_token"`
 	SenderDomain          types.String `tfsdk:"sender_domain"`
 	MapTo                 types.String `tfsdk:"map_to"`
@@ -120,6 +122,7 @@ type Notification struct {
 	SendSilently          types.Bool   `tfsdk:"send_silently"`
 	AlwaysUpdate          types.Bool   `tfsdk:"always_update"`
 	OnHealthIssue         types.Bool   `tfsdk:"on_health_issue"`
+	OnHealthRestored      types.Bool   `tfsdk:"on_health_restored"`
 	DirectMessage         types.Bool   `tfsdk:"direct_message"`
 	RequireEncryption     types.Bool   `tfsdk:"require_encryption"`
 	UseSSL                types.Bool   `tfsdk:"use_ssl"`
@@ -128,6 +131,8 @@ type Notification struct {
 	UpdateLibrary         types.Bool   `tfsdk:"update_library"`
 	IncludeHealthWarnings types.Bool   `tfsdk:"include_health_warnings"`
 	OnApplicationUpdate   types.Bool   `tfsdk:"on_application_update"`
+	OnGrab                types.Bool   `tfsdk:"on_grab"`
+	IncludeManualGrabs    types.Bool   `tfsdk:"include_manual_grabs"`
 }
 
 func (r *NotificationResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -140,11 +145,28 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 		Attributes: map[string]schema.Attribute{
 			"on_health_issue": schema.BoolAttribute{
 				MarkdownDescription: "On health issue flag.",
-				Required:            true,
+				Optional:            true,
+				Computed:            true,
+			},
+			"on_health_restored": schema.BoolAttribute{
+				MarkdownDescription: "On health restored flag.",
+				Optional:            true,
+				Computed:            true,
 			},
 			"on_application_update": schema.BoolAttribute{
 				MarkdownDescription: "On application update flag.",
-				Required:            true,
+				Optional:            true,
+				Computed:            true,
+			},
+			"on_grab": schema.BoolAttribute{
+				MarkdownDescription: "On release grab flag.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"include_manual_grabs": schema.BoolAttribute{
+				MarkdownDescription: "Include manual grab flag.",
+				Optional:            true,
+				Computed:            true,
 			},
 			"include_health_warnings": schema.BoolAttribute{
 				MarkdownDescription: "Include health warnings.",
@@ -427,6 +449,16 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 				Optional:            true,
 				Computed:            true,
 			},
+			"sender_number": schema.StringAttribute{
+				MarkdownDescription: "Sender Number.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"receiver_id": schema.StringAttribute{
+				MarkdownDescription: "Receiver ID.",
+				Optional:            true,
+				Computed:            true,
+			},
 			"server": schema.StringAttribute{
 				MarkdownDescription: "server.",
 				Optional:            true,
@@ -681,7 +713,10 @@ func (r *NotificationResource) ImportState(ctx context.Context, req resource.Imp
 func (n *Notification) write(ctx context.Context, notification *prowlarr.NotificationResource) {
 	n.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, notification.GetTags())
 	n.OnHealthIssue = types.BoolValue(notification.GetOnHealthIssue())
+	n.OnHealthRestored = types.BoolValue(notification.GetOnHealthRestored())
 	n.OnApplicationUpdate = types.BoolValue(notification.GetOnApplicationUpdate())
+	n.OnGrab = types.BoolValue(notification.GetOnGrab())
+	n.IncludeManualGrabs = types.BoolValue(notification.GetIncludeManualGrabs())
 	n.IncludeHealthWarnings = types.BoolValue(notification.GetIncludeHealthWarnings())
 	n.ID = types.Int64Value(int64(notification.GetId()))
 	n.Name = types.StringValue(notification.GetName())
@@ -706,7 +741,10 @@ func (n *Notification) read(ctx context.Context) *prowlarr.NotificationResource 
 
 	notification := prowlarr.NewNotificationResource()
 	notification.SetOnHealthIssue(n.OnHealthIssue.ValueBool())
+	notification.SetOnHealthRestored(n.OnHealthRestored.ValueBool())
 	notification.SetOnApplicationUpdate(n.OnApplicationUpdate.ValueBool())
+	notification.SetOnGrab(n.OnGrab.ValueBool())
+	notification.SetIncludeManualGrabs(n.IncludeManualGrabs.ValueBool())
 	notification.SetIncludeHealthWarnings(n.IncludeHealthWarnings.ValueBool())
 	notification.SetId(int32(n.ID.ValueInt64()))
 	notification.SetName(n.Name.ValueString())

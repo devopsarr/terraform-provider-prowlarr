@@ -48,11 +48,15 @@ type NotificationNtfy struct {
 	Username              types.String `tfsdk:"username"`
 	Name                  types.String `tfsdk:"name"`
 	Password              types.String `tfsdk:"password"`
+	AccessToken           types.String `tfsdk:"access_token"`
 	Priority              types.Int64  `tfsdk:"priority"`
 	ID                    types.Int64  `tfsdk:"id"`
 	IncludeHealthWarnings types.Bool   `tfsdk:"include_health_warnings"`
 	OnApplicationUpdate   types.Bool   `tfsdk:"on_application_update"`
+	OnGrab                types.Bool   `tfsdk:"on_grab"`
+	IncludeManualGrabs    types.Bool   `tfsdk:"include_manual_grabs"`
 	OnHealthIssue         types.Bool   `tfsdk:"on_health_issue"`
+	OnHealthRestored      types.Bool   `tfsdk:"on_health_restored"`
 }
 
 func (n NotificationNtfy) toNotification() *Notification {
@@ -64,12 +68,16 @@ func (n NotificationNtfy) toNotification() *Notification {
 		ClickURL:              n.ClickURL,
 		Username:              n.Username,
 		Password:              n.Password,
+		AccessToken:           n.AccessToken,
 		Name:                  n.Name,
 		ItemPriority:          n.Priority,
 		ID:                    n.ID,
 		IncludeHealthWarnings: n.IncludeHealthWarnings,
+		IncludeManualGrabs:    n.IncludeManualGrabs,
+		OnGrab:                n.OnGrab,
 		OnApplicationUpdate:   n.OnApplicationUpdate,
 		OnHealthIssue:         n.OnHealthIssue,
+		OnHealthRestored:      n.OnHealthRestored,
 		ConfigContract:        types.StringValue(notificationNtfyConfigContract),
 		Implementation:        types.StringValue(notificationNtfyImplementation),
 	}
@@ -83,12 +91,16 @@ func (n *NotificationNtfy) fromNotification(notification *Notification) {
 	n.ClickURL = notification.ClickURL
 	n.Username = notification.Username
 	n.Password = notification.Password
+	n.AccessToken = notification.AccessToken
 	n.Name = notification.Name
 	n.Priority = notification.ItemPriority
 	n.ID = notification.ID
+	n.IncludeManualGrabs = notification.IncludeManualGrabs
+	n.OnGrab = notification.OnGrab
 	n.IncludeHealthWarnings = notification.IncludeHealthWarnings
 	n.OnApplicationUpdate = notification.OnApplicationUpdate
 	n.OnHealthIssue = notification.OnHealthIssue
+	n.OnHealthRestored = notification.OnHealthRestored
 }
 
 func (r *NotificationNtfyResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -104,8 +116,23 @@ func (r *NotificationNtfyResource) Schema(ctx context.Context, req resource.Sche
 				Optional:            true,
 				Computed:            true,
 			},
+			"on_health_restored": schema.BoolAttribute{
+				MarkdownDescription: "On health restored flag.",
+				Optional:            true,
+				Computed:            true,
+			},
 			"on_application_update": schema.BoolAttribute{
 				MarkdownDescription: "On application update flag.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"on_grab": schema.BoolAttribute{
+				MarkdownDescription: "On release grab flag.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"include_manual_grabs": schema.BoolAttribute{
+				MarkdownDescription: "Include manual grab flag.",
 				Optional:            true,
 				Computed:            true,
 			},
@@ -157,6 +184,12 @@ func (r *NotificationNtfyResource) Schema(ctx context.Context, req resource.Sche
 			},
 			"password": schema.StringAttribute{
 				MarkdownDescription: "Password.",
+				Optional:            true,
+				Computed:            true,
+				Sensitive:           true,
+			},
+			"access_token": schema.StringAttribute{
+				MarkdownDescription: "Access token.",
 				Optional:            true,
 				Computed:            true,
 				Sensitive:           true,
