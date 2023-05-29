@@ -41,6 +41,7 @@ resource "prowlarr_notification_ntfy" "example" {
 
 ### Optional
 
+- `access_token` (String, Sensitive) Access token.
 - `click_url` (String) Click URL.
 - `field_tags` (Set of String) Tags and emojis.
 - `include_health_warnings` (Boolean) Include health warnings.

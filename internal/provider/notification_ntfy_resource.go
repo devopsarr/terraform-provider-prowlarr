@@ -48,6 +48,7 @@ type NotificationNtfy struct {
 	Username              types.String `tfsdk:"username"`
 	Name                  types.String `tfsdk:"name"`
 	Password              types.String `tfsdk:"password"`
+	AccessToken           types.String `tfsdk:"access_token"`
 	Priority              types.Int64  `tfsdk:"priority"`
 	ID                    types.Int64  `tfsdk:"id"`
 	IncludeHealthWarnings types.Bool   `tfsdk:"include_health_warnings"`
@@ -66,6 +67,7 @@ func (n NotificationNtfy) toNotification() *Notification {
 		ClickURL:              n.ClickURL,
 		Username:              n.Username,
 		Password:              n.Password,
+		AccessToken:           n.AccessToken,
 		Name:                  n.Name,
 		ItemPriority:          n.Priority,
 		ID:                    n.ID,
@@ -87,6 +89,7 @@ func (n *NotificationNtfy) fromNotification(notification *Notification) {
 	n.ClickURL = notification.ClickURL
 	n.Username = notification.Username
 	n.Password = notification.Password
+	n.AccessToken = notification.AccessToken
 	n.Name = notification.Name
 	n.Priority = notification.ItemPriority
 	n.ID = notification.ID
@@ -173,6 +176,12 @@ func (r *NotificationNtfyResource) Schema(ctx context.Context, req resource.Sche
 			},
 			"password": schema.StringAttribute{
 				MarkdownDescription: "Password.",
+				Optional:            true,
+				Computed:            true,
+				Sensitive:           true,
+			},
+			"access_token": schema.StringAttribute{
+				MarkdownDescription: "Access token.",
 				Optional:            true,
 				Computed:            true,
 				Sensitive:           true,
