@@ -49,6 +49,7 @@ resource "prowlarr_notification_ntfy" "example" {
 - `on_application_update` (Boolean) On application update flag.
 - `on_grab` (Boolean) On release grab flag.
 - `on_health_issue` (Boolean) On health issue flag.
+- `on_health_restored` (Boolean) On health restored flag.
 - `password` (String, Sensitive) Password.
 - `priority` (Number) Priority. `1` Min, `2` Low, `3` Default, `4` High, `5` Max.
 - `server_url` (String) Server URL.

@@ -56,6 +56,10 @@ func (d *NotificationsDataSource) Schema(ctx context.Context, req datasource.Sch
 							MarkdownDescription: "On health issue flag.",
 							Computed:            true,
 						},
+						"on_health_restored": schema.BoolAttribute{
+							MarkdownDescription: "On health restored flag.",
+							Computed:            true,
+						},
 						"on_application_update": schema.BoolAttribute{
 							MarkdownDescription: "On application update flag.",
 							Computed:            true,

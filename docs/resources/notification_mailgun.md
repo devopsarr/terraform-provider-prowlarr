@@ -43,6 +43,7 @@ resource "prowlarr_notification_mailgun" "example" {
 - `include_health_warnings` (Boolean) Include health warnings.
 - `on_application_update` (Boolean) On application update flag.
 - `on_health_issue` (Boolean) On health issue flag.
+- `on_health_restored` (Boolean) On health restored flag.
 - `sender_domain` (String) Sender domain.
 - `tags` (Set of Number) List of associated tags.
 - `use_eu_endpoint` (Boolean) Use EU endpoint flag.

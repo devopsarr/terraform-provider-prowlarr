@@ -45,6 +45,7 @@ type NotificationCustomScript struct {
 	Name                  types.String `tfsdk:"name"`
 	ID                    types.Int64  `tfsdk:"id"`
 	OnHealthIssue         types.Bool   `tfsdk:"on_health_issue"`
+	OnHealthRestored      types.Bool   `tfsdk:"on_health_restored"`
 	OnApplicationUpdate   types.Bool   `tfsdk:"on_application_update"`
 	IncludeHealthWarnings types.Bool   `tfsdk:"include_health_warnings"`
 }
@@ -59,6 +60,7 @@ func (n NotificationCustomScript) toNotification() *Notification {
 		IncludeHealthWarnings: n.IncludeHealthWarnings,
 		OnApplicationUpdate:   n.OnApplicationUpdate,
 		OnHealthIssue:         n.OnHealthIssue,
+		OnHealthRestored:      n.OnHealthRestored,
 		ConfigContract:        types.StringValue(notificationCustomScriptConfigContract),
 		Implementation:        types.StringValue(notificationCustomScriptImplementation),
 	}
@@ -73,6 +75,7 @@ func (n *NotificationCustomScript) fromNotification(notification *Notification) 
 	n.IncludeHealthWarnings = notification.IncludeHealthWarnings
 	n.OnApplicationUpdate = notification.OnApplicationUpdate
 	n.OnHealthIssue = notification.OnHealthIssue
+	n.OnHealthRestored = notification.OnHealthRestored
 }
 
 func (r *NotificationCustomScriptResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -85,6 +88,11 @@ func (r *NotificationCustomScriptResource) Schema(ctx context.Context, req resou
 		Attributes: map[string]schema.Attribute{
 			"on_health_issue": schema.BoolAttribute{
 				MarkdownDescription: "On health issue flag.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"on_health_restored": schema.BoolAttribute{
+				MarkdownDescription: "On health restored flag.",
 				Optional:            true,
 				Computed:            true,
 			},

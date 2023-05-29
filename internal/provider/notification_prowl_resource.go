@@ -50,6 +50,7 @@ type NotificationProwl struct {
 	OnGrab                types.Bool   `tfsdk:"on_grab"`
 	IncludeManualGrabs    types.Bool   `tfsdk:"include_manual_grabs"`
 	OnHealthIssue         types.Bool   `tfsdk:"on_health_issue"`
+	OnHealthRestored      types.Bool   `tfsdk:"on_health_restored"`
 }
 
 func (n NotificationProwl) toNotification() *Notification {
@@ -64,6 +65,7 @@ func (n NotificationProwl) toNotification() *Notification {
 		OnGrab:                n.OnGrab,
 		OnApplicationUpdate:   n.OnApplicationUpdate,
 		OnHealthIssue:         n.OnHealthIssue,
+		OnHealthRestored:      n.OnHealthRestored,
 		ConfigContract:        types.StringValue(notificationProwlConfigContract),
 		Implementation:        types.StringValue(notificationProwlImplementation),
 	}
@@ -80,6 +82,7 @@ func (n *NotificationProwl) fromNotification(notification *Notification) {
 	n.IncludeHealthWarnings = notification.IncludeHealthWarnings
 	n.OnApplicationUpdate = notification.OnApplicationUpdate
 	n.OnHealthIssue = notification.OnHealthIssue
+	n.OnHealthRestored = notification.OnHealthRestored
 }
 
 func (r *NotificationProwlResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -92,6 +95,11 @@ func (r *NotificationProwlResource) Schema(ctx context.Context, req resource.Sch
 		Attributes: map[string]schema.Attribute{
 			"on_health_issue": schema.BoolAttribute{
 				MarkdownDescription: "On health issue flag.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"on_health_restored": schema.BoolAttribute{
+				MarkdownDescription: "On health restored flag.",
 				Optional:            true,
 				Computed:            true,
 			},

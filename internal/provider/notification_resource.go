@@ -120,6 +120,7 @@ type Notification struct {
 	SendSilently          types.Bool   `tfsdk:"send_silently"`
 	AlwaysUpdate          types.Bool   `tfsdk:"always_update"`
 	OnHealthIssue         types.Bool   `tfsdk:"on_health_issue"`
+	OnHealthRestored      types.Bool   `tfsdk:"on_health_restored"`
 	DirectMessage         types.Bool   `tfsdk:"direct_message"`
 	RequireEncryption     types.Bool   `tfsdk:"require_encryption"`
 	UseSSL                types.Bool   `tfsdk:"use_ssl"`
@@ -142,6 +143,11 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 		Attributes: map[string]schema.Attribute{
 			"on_health_issue": schema.BoolAttribute{
 				MarkdownDescription: "On health issue flag.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"on_health_restored": schema.BoolAttribute{
+				MarkdownDescription: "On health restored flag.",
 				Optional:            true,
 				Computed:            true,
 			},
@@ -695,6 +701,7 @@ func (r *NotificationResource) ImportState(ctx context.Context, req resource.Imp
 func (n *Notification) write(ctx context.Context, notification *prowlarr.NotificationResource) {
 	n.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, notification.GetTags())
 	n.OnHealthIssue = types.BoolValue(notification.GetOnHealthIssue())
+	n.OnHealthRestored = types.BoolValue(notification.GetOnHealthRestored())
 	n.OnApplicationUpdate = types.BoolValue(notification.GetOnApplicationUpdate())
 	n.OnGrab = types.BoolValue(notification.GetOnGrab())
 	n.IncludeManualGrabs = types.BoolValue(notification.GetIncludeManualGrabs())
@@ -722,6 +729,7 @@ func (n *Notification) read(ctx context.Context) *prowlarr.NotificationResource 
 
 	notification := prowlarr.NewNotificationResource()
 	notification.SetOnHealthIssue(n.OnHealthIssue.ValueBool())
+	notification.SetOnHealthRestored(n.OnHealthRestored.ValueBool())
 	notification.SetOnApplicationUpdate(n.OnApplicationUpdate.ValueBool())
 	notification.SetOnGrab(n.OnGrab.ValueBool())
 	notification.SetIncludeManualGrabs(n.IncludeManualGrabs.ValueBool())

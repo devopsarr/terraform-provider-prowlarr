@@ -51,6 +51,7 @@ type NotificationGotify struct {
 	OnGrab                types.Bool   `tfsdk:"on_grab"`
 	IncludeManualGrabs    types.Bool   `tfsdk:"include_manual_grabs"`
 	OnHealthIssue         types.Bool   `tfsdk:"on_health_issue"`
+	OnHealthRestored      types.Bool   `tfsdk:"on_health_restored"`
 }
 
 func (n NotificationGotify) toNotification() *Notification {
@@ -66,6 +67,7 @@ func (n NotificationGotify) toNotification() *Notification {
 		OnGrab:                n.OnGrab,
 		OnApplicationUpdate:   n.OnApplicationUpdate,
 		OnHealthIssue:         n.OnHealthIssue,
+		OnHealthRestored:      n.OnHealthRestored,
 		ConfigContract:        types.StringValue(notificationGotifyConfigContract),
 		Implementation:        types.StringValue(notificationGotifyImplementation),
 	}
@@ -83,6 +85,7 @@ func (n *NotificationGotify) fromNotification(notification *Notification) {
 	n.IncludeHealthWarnings = notification.IncludeHealthWarnings
 	n.OnApplicationUpdate = notification.OnApplicationUpdate
 	n.OnHealthIssue = notification.OnHealthIssue
+	n.OnHealthRestored = notification.OnHealthRestored
 }
 
 func (r *NotificationGotifyResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -95,6 +98,11 @@ func (r *NotificationGotifyResource) Schema(ctx context.Context, req resource.Sc
 		Attributes: map[string]schema.Attribute{
 			"on_health_issue": schema.BoolAttribute{
 				MarkdownDescription: "On health issue flag.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"on_health_restored": schema.BoolAttribute{
+				MarkdownDescription: "On health restored flag.",
 				Optional:            true,
 				Computed:            true,
 			},

@@ -55,6 +55,7 @@ type NotificationEmail struct {
 	OnGrab                types.Bool   `tfsdk:"on_grab"`
 	IncludeManualGrabs    types.Bool   `tfsdk:"include_manual_grabs"`
 	OnHealthIssue         types.Bool   `tfsdk:"on_health_issue"`
+	OnHealthRestored      types.Bool   `tfsdk:"on_health_restored"`
 }
 
 func (n NotificationEmail) toNotification() *Notification {
@@ -76,6 +77,7 @@ func (n NotificationEmail) toNotification() *Notification {
 		OnGrab:                n.OnGrab,
 		OnApplicationUpdate:   n.OnApplicationUpdate,
 		OnHealthIssue:         n.OnHealthIssue,
+		OnHealthRestored:      n.OnHealthRestored,
 		ConfigContract:        types.StringValue(notificationEmailConfigContract),
 		Implementation:        types.StringValue(notificationEmailImplementation),
 	}
@@ -99,6 +101,7 @@ func (n *NotificationEmail) fromNotification(notification *Notification) {
 	n.IncludeHealthWarnings = notification.IncludeHealthWarnings
 	n.OnApplicationUpdate = notification.OnApplicationUpdate
 	n.OnHealthIssue = notification.OnHealthIssue
+	n.OnHealthRestored = notification.OnHealthRestored
 }
 
 func (r *NotificationEmailResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -111,6 +114,11 @@ func (r *NotificationEmailResource) Schema(ctx context.Context, req resource.Sch
 		Attributes: map[string]schema.Attribute{
 			"on_health_issue": schema.BoolAttribute{
 				MarkdownDescription: "On health issue flag.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"on_health_restored": schema.BoolAttribute{
+				MarkdownDescription: "On health restored flag.",
 				Optional:            true,
 				Computed:            true,
 			},

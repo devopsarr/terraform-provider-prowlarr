@@ -49,6 +49,7 @@ resource "prowlarr_notification_apprise" "example" {
 - `on_application_update` (Boolean) On application update flag.
 - `on_grab` (Boolean) On release grab flag.
 - `on_health_issue` (Boolean) On health issue flag.
+- `on_health_restored` (Boolean) On health restored flag.
 - `server_url` (String) Server URL.
 - `stateless_urls` (String) Comma separated stateless URLs.
 - `tags` (Set of Number) List of associated tags.

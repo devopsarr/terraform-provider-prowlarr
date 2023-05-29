@@ -49,6 +49,7 @@ type NotificationWebhook struct {
 	ID                    types.Int64  `tfsdk:"id"`
 	Method                types.Int64  `tfsdk:"method"`
 	OnHealthIssue         types.Bool   `tfsdk:"on_health_issue"`
+	OnHealthRestored      types.Bool   `tfsdk:"on_health_restored"`
 	OnApplicationUpdate   types.Bool   `tfsdk:"on_application_update"`
 	OnGrab                types.Bool   `tfsdk:"on_grab"`
 	IncludeManualGrabs    types.Bool   `tfsdk:"include_manual_grabs"`
@@ -69,6 +70,7 @@ func (n NotificationWebhook) toNotification() *Notification {
 		OnGrab:                n.OnGrab,
 		OnApplicationUpdate:   n.OnApplicationUpdate,
 		OnHealthIssue:         n.OnHealthIssue,
+		OnHealthRestored:      n.OnHealthRestored,
 		ConfigContract:        types.StringValue(notificationWebhookConfigContract),
 		Implementation:        types.StringValue(notificationWebhookImplementation),
 	}
@@ -87,6 +89,7 @@ func (n *NotificationWebhook) fromNotification(notification *Notification) {
 	n.IncludeHealthWarnings = notification.IncludeHealthWarnings
 	n.OnApplicationUpdate = notification.OnApplicationUpdate
 	n.OnHealthIssue = notification.OnHealthIssue
+	n.OnHealthRestored = notification.OnHealthRestored
 }
 
 func (r *NotificationWebhookResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -99,6 +102,11 @@ func (r *NotificationWebhookResource) Schema(ctx context.Context, req resource.S
 		Attributes: map[string]schema.Attribute{
 			"on_health_issue": schema.BoolAttribute{
 				MarkdownDescription: "On health issue flag.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"on_health_restored": schema.BoolAttribute{
+				MarkdownDescription: "On health restored flag.",
 				Optional:            true,
 				Computed:            true,
 			},

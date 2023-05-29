@@ -44,6 +44,7 @@ resource "prowlarr_notification_gotify" "example" {
 - `on_application_update` (Boolean) On application update flag.
 - `on_grab` (Boolean) On release grab flag.
 - `on_health_issue` (Boolean) On health issue flag.
+- `on_health_restored` (Boolean) On health restored flag.
 - `priority` (Number) Priority. `0` Min, `2` Low, `5` Normal, `8` High.
 - `tags` (Set of Number) List of associated tags.
 

@@ -45,6 +45,7 @@ resource "prowlarr_notification_webhook" "example" {
 - `on_application_update` (Boolean) On application update flag.
 - `on_grab` (Boolean) On release grab flag.
 - `on_health_issue` (Boolean) On health issue flag.
+- `on_health_restored` (Boolean) On health restored flag.
 - `password` (String, Sensitive) password.
 - `tags` (Set of Number) List of associated tags.
 - `username` (String) Username.

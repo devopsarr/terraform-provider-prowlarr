@@ -43,6 +43,7 @@ resource "prowlarr_notification_simplepush" "example" {
 - `on_application_update` (Boolean) On application update flag.
 - `on_grab` (Boolean) On release grab flag.
 - `on_health_issue` (Boolean) On health issue flag.
+- `on_health_restored` (Boolean) On health restored flag.
 - `tags` (Set of Number) List of associated tags.
 
 ### Read-Only

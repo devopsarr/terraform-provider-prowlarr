@@ -47,6 +47,7 @@ type NotificationBoxcar struct {
 	OnGrab                types.Bool   `tfsdk:"on_grab"`
 	IncludeManualGrabs    types.Bool   `tfsdk:"include_manual_grabs"`
 	OnHealthIssue         types.Bool   `tfsdk:"on_health_issue"`
+	OnHealthRestored      types.Bool   `tfsdk:"on_health_restored"`
 }
 
 func (n NotificationBoxcar) toNotification() *Notification {
@@ -60,6 +61,7 @@ func (n NotificationBoxcar) toNotification() *Notification {
 		OnGrab:                n.OnGrab,
 		OnApplicationUpdate:   n.OnApplicationUpdate,
 		OnHealthIssue:         n.OnHealthIssue,
+		OnHealthRestored:      n.OnHealthRestored,
 		ConfigContract:        types.StringValue(notificationBoxcarConfigContract),
 		Implementation:        types.StringValue(notificationBoxcarImplementation),
 	}
@@ -75,6 +77,7 @@ func (n *NotificationBoxcar) fromNotification(notification *Notification) {
 	n.IncludeHealthWarnings = notification.IncludeHealthWarnings
 	n.OnApplicationUpdate = notification.OnApplicationUpdate
 	n.OnHealthIssue = notification.OnHealthIssue
+	n.OnHealthRestored = notification.OnHealthRestored
 }
 
 func (r *NotificationBoxcarResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -87,6 +90,11 @@ func (r *NotificationBoxcarResource) Schema(ctx context.Context, req resource.Sc
 		Attributes: map[string]schema.Attribute{
 			"on_health_issue": schema.BoolAttribute{
 				MarkdownDescription: "On health issue flag.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"on_health_restored": schema.BoolAttribute{
+				MarkdownDescription: "On health restored flag.",
 				Optional:            true,
 				Computed:            true,
 			},
