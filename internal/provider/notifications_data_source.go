@@ -295,6 +295,7 @@ func (d *NotificationsDataSource) Schema(ctx context.Context, req datasource.Sch
 						"sender_number": schema.StringAttribute{
 							MarkdownDescription: "Sender Number.",
 							Computed:            true,
+							Sensitive:           true,
 						},
 						"receiver_id": schema.StringAttribute{
 							MarkdownDescription: "Receiver ID.",

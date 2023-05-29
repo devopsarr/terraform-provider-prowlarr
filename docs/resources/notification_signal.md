@@ -41,7 +41,7 @@ resource "prowlarr_notification_signal" "example" {
 - `host` (String) Host.
 - `name` (String) NotificationSignal name.
 - `receiver_id` (String) Receiver ID.
-- `sender_number` (String) Sender Number.
+- `sender_number` (String, Sensitive) Sender Number.
 
 ### Optional
 
