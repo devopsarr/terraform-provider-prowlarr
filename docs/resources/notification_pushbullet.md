@@ -40,7 +40,9 @@ resource "prowlarr_notification_pushbullet" "example" {
 - `channel_tags` (Set of String) List of channel tags.
 - `device_ids` (Set of String) List of devices IDs.
 - `include_health_warnings` (Boolean) Include health warnings.
+- `include_manual_grabs` (Boolean) Include manual grab flag.
 - `on_application_update` (Boolean) On application update flag.
+- `on_grab` (Boolean) On release grab flag.
 - `on_health_issue` (Boolean) On health issue flag.
 - `sender_id` (String) Sender ID.
 - `tags` (Set of Number) List of associated tags.

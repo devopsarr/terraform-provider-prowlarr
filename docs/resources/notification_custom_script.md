@@ -33,13 +33,13 @@ resource "prowlarr_notification_custom_script" "example" {
 
 - `include_health_warnings` (Boolean) Include health warnings.
 - `name` (String) NotificationCustomScript name.
-- `on_application_update` (Boolean) On application update flag.
-- `on_health_issue` (Boolean) On health issue flag.
 - `path` (String) Path.
 
 ### Optional
 
 - `arguments` (String) Arguments.
+- `on_application_update` (Boolean) On application update flag.
+- `on_health_issue` (Boolean) On health issue flag.
 - `tags` (Set of Number) List of associated tags.
 
 ### Read-Only

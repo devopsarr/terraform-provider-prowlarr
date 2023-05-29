@@ -44,7 +44,9 @@ resource "prowlarr_notification_discord" "example" {
 - `avatar` (String) Avatar.
 - `grab_fields` (Set of Number) Grab fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Group, `5` Size, `6` Links, `7` Release, `8` Poster, `9` Fanart.
 - `include_health_warnings` (Boolean) Include health warnings.
+- `include_manual_grabs` (Boolean) Include manual grab flag.
 - `on_application_update` (Boolean) On application update flag.
+- `on_grab` (Boolean) On release grab flag.
 - `on_health_issue` (Boolean) On health issue flag.
 - `tags` (Set of Number) List of associated tags.
 - `username` (String) Username.

@@ -41,7 +41,9 @@ resource "prowlarr_notification_join" "example" {
 - `devices` (Set of String) List of devices.
 - `expire` (Number) Expire.
 - `include_health_warnings` (Boolean) Include health warnings.
+- `include_manual_grabs` (Boolean) Include manual grab flag.
 - `on_application_update` (Boolean) On application update flag.
+- `on_grab` (Boolean) On release grab flag.
 - `on_health_issue` (Boolean) On health issue flag.
 - `priority` (Number) Priority. `-2` Silent, `-1` Quiet, `0` Normal, `1` High, `2` Emergency, `8` High.
 - `retry` (Number) Retry.

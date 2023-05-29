@@ -38,8 +38,6 @@ resource "prowlarr_notification" "example" {
 - `implementation` (String) Notification implementation name.
 - `include_health_warnings` (Boolean) Include health warnings.
 - `name` (String) Notification name.
-- `on_application_update` (Boolean) On application update flag.
-- `on_health_issue` (Boolean) On health issue flag.
 
 ### Optional
 
@@ -80,6 +78,7 @@ resource "prowlarr_notification" "example" {
 - `grab_fields` (Set of Number) Grab fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Group, `5` Size, `6` Links, `7` Release, `8` Poster, `9` Fanart.
 - `host` (String) Host.
 - `icon` (String) Icon.
+- `include_manual_grabs` (Boolean) Include manual grab flag.
 - `instance_name` (String) Instance name.
 - `key` (String) Key.
 - `map_from` (String) Map From.
@@ -88,6 +87,9 @@ resource "prowlarr_notification" "example" {
 - `method` (Number) Method. `1` POST, `2` PUT.
 - `notification_type` (Number) Notification type. `0` Info, `1` Success, `2` Warning, `3` Failure.
 - `notify` (Boolean) Notify flag.
+- `on_application_update` (Boolean) On application update flag.
+- `on_grab` (Boolean) On release grab flag.
+- `on_health_issue` (Boolean) On health issue flag.
 - `password` (String) password.
 - `path` (String) Path.
 - `port` (Number) Port.

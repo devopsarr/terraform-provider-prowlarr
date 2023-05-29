@@ -71,6 +71,7 @@ Read-Only:
 - `id` (Number) Notification ID.
 - `implementation` (String) Notification implementation name.
 - `include_health_warnings` (Boolean) Include health warnings.
+- `include_manual_grabs` (Boolean) Include manual grab flag.
 - `instance_name` (String) Instance name.
 - `key` (String) Key.
 - `map_from` (String) Map From.
@@ -81,6 +82,7 @@ Read-Only:
 - `notification_type` (Number) Notification type. `0` Info, `1` Success, `2` Warning, `3` Failure.
 - `notify` (Boolean) Notify flag.
 - `on_application_update` (Boolean) On application update flag.
+- `on_grab` (Boolean) On release grab flag.
 - `on_health_issue` (Boolean) On health issue flag.
 - `password` (String) password.
 - `path` (String) Path.

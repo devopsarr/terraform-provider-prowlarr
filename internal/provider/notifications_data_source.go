@@ -60,6 +60,14 @@ func (d *NotificationsDataSource) Schema(ctx context.Context, req datasource.Sch
 							MarkdownDescription: "On application update flag.",
 							Computed:            true,
 						},
+						"on_grab": schema.BoolAttribute{
+							MarkdownDescription: "On release grab flag.",
+							Computed:            true,
+						},
+						"include_manual_grabs": schema.BoolAttribute{
+							MarkdownDescription: "Include manual grab flag.",
+							Computed:            true,
+						},
 						"include_health_warnings": schema.BoolAttribute{
 							MarkdownDescription: "Include health warnings.",
 							Computed:            true,

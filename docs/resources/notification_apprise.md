@@ -44,8 +44,10 @@ resource "prowlarr_notification_apprise" "example" {
 - `configuration_key` (String, Sensitive) ConfigurationKey.
 - `field_tags` (Set of String) Tags and emojis.
 - `include_health_warnings` (Boolean) Include health warnings.
+- `include_manual_grabs` (Boolean) Include manual grab flag.
 - `notification_type` (Number) Notification type. `0` Info, `1` Success, `2` Warning, `3` Failure.
 - `on_application_update` (Boolean) On application update flag.
+- `on_grab` (Boolean) On release grab flag.
 - `on_health_issue` (Boolean) On health issue flag.
 - `server_url` (String) Server URL.
 - `stateless_urls` (String) Comma separated stateless URLs.

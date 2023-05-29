@@ -128,6 +128,8 @@ type Notification struct {
 	UpdateLibrary         types.Bool   `tfsdk:"update_library"`
 	IncludeHealthWarnings types.Bool   `tfsdk:"include_health_warnings"`
 	OnApplicationUpdate   types.Bool   `tfsdk:"on_application_update"`
+	OnGrab                types.Bool   `tfsdk:"on_grab"`
+	IncludeManualGrabs    types.Bool   `tfsdk:"include_manual_grabs"`
 }
 
 func (r *NotificationResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -140,11 +142,23 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 		Attributes: map[string]schema.Attribute{
 			"on_health_issue": schema.BoolAttribute{
 				MarkdownDescription: "On health issue flag.",
-				Required:            true,
+				Optional:            true,
+				Computed:            true,
 			},
 			"on_application_update": schema.BoolAttribute{
 				MarkdownDescription: "On application update flag.",
-				Required:            true,
+				Optional:            true,
+				Computed:            true,
+			},
+			"on_grab": schema.BoolAttribute{
+				MarkdownDescription: "On release grab flag.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"include_manual_grabs": schema.BoolAttribute{
+				MarkdownDescription: "Include manual grab flag.",
+				Optional:            true,
+				Computed:            true,
 			},
 			"include_health_warnings": schema.BoolAttribute{
 				MarkdownDescription: "Include health warnings.",
@@ -682,6 +696,8 @@ func (n *Notification) write(ctx context.Context, notification *prowlarr.Notific
 	n.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, notification.GetTags())
 	n.OnHealthIssue = types.BoolValue(notification.GetOnHealthIssue())
 	n.OnApplicationUpdate = types.BoolValue(notification.GetOnApplicationUpdate())
+	n.OnGrab = types.BoolValue(notification.GetOnGrab())
+	n.IncludeManualGrabs = types.BoolValue(notification.GetIncludeManualGrabs())
 	n.IncludeHealthWarnings = types.BoolValue(notification.GetIncludeHealthWarnings())
 	n.ID = types.Int64Value(int64(notification.GetId()))
 	n.Name = types.StringValue(notification.GetName())
@@ -707,6 +723,8 @@ func (n *Notification) read(ctx context.Context) *prowlarr.NotificationResource 
 	notification := prowlarr.NewNotificationResource()
 	notification.SetOnHealthIssue(n.OnHealthIssue.ValueBool())
 	notification.SetOnApplicationUpdate(n.OnApplicationUpdate.ValueBool())
+	notification.SetOnGrab(n.OnGrab.ValueBool())
+	notification.SetIncludeManualGrabs(n.IncludeManualGrabs.ValueBool())
 	notification.SetIncludeHealthWarnings(n.IncludeHealthWarnings.ValueBool())
 	notification.SetId(int32(n.ID.ValueInt64()))
 	notification.SetName(n.Name.ValueString())

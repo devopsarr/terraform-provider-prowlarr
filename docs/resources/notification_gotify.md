@@ -40,7 +40,9 @@ resource "prowlarr_notification_gotify" "example" {
 ### Optional
 
 - `include_health_warnings` (Boolean) Include health warnings.
+- `include_manual_grabs` (Boolean) Include manual grab flag.
 - `on_application_update` (Boolean) On application update flag.
+- `on_grab` (Boolean) On release grab flag.
 - `on_health_issue` (Boolean) On health issue flag.
 - `priority` (Number) Priority. `0` Min, `2` Low, `5` Normal, `8` High.
 - `tags` (Set of Number) List of associated tags.
