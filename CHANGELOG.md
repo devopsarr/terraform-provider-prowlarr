@@ -1,5 +1,34 @@
 # Changelog
 
+## [2.0.0](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v1.5.0...v2.0.0) (2023-05-31)
+
+
+### ⚠ BREAKING CHANGES
+
+* align apprise notification with new fields
+
+### Features
+
+* add indexer data source ([1c70d28](https://github.com/devopsarr/terraform-provider-prowlarr/commit/1c70d28105a283af52a5791eb5f6f0fdb1fc9ec0))
+* add indexer resource ([3f59dd2](https://github.com/devopsarr/terraform-provider-prowlarr/commit/3f59dd232fa022037fc3a331b21f83f8fe3a20c3))
+* add indexer schema data source ([08d3551](https://github.com/devopsarr/terraform-provider-prowlarr/commit/08d35512162ab5d26750cbc6bb331823370720ff))
+* add indexer schemas data source ([4efa5f2](https://github.com/devopsarr/terraform-provider-prowlarr/commit/4efa5f28b8d57f9c2f063b8ab10910275e798e24))
+* add indexers data source ([36a4acf](https://github.com/devopsarr/terraform-provider-prowlarr/commit/36a4acfd404d339e8e4271feb97556060843bbcc))
+* add notification health restored flag ([389243e](https://github.com/devopsarr/terraform-provider-prowlarr/commit/389243e5e544520203426075dac67cb7f8a199c4))
+* add notification on grab flag ([933752f](https://github.com/devopsarr/terraform-provider-prowlarr/commit/933752fd5e8f6b2b28993da42ca0f7cba120e0d9))
+* add notification telegram topic id ([a907ede](https://github.com/devopsarr/terraform-provider-prowlarr/commit/a907ede75c3768897d6c340b2a333f0c68f7613c))
+* add ntfy access token ([d7fd0fe](https://github.com/devopsarr/terraform-provider-prowlarr/commit/d7fd0fe8df73dc15a78cb69a2c2e69648ec13c21))
+* add signal notification ([629d45f](https://github.com/devopsarr/terraform-provider-prowlarr/commit/629d45ff920144f31f2548e67b7bbf50989be8ab))
+* add tag details data source ([8e3e6f3](https://github.com/devopsarr/terraform-provider-prowlarr/commit/8e3e6f34952a1a00f0d9eedc95310f50c5159d47))
+* add tags details data source ([cf8eb76](https://github.com/devopsarr/terraform-provider-prowlarr/commit/cf8eb76623b717d074c54beb2c5ca1bdf30d4529))
+* align apprise notification with new fields ([e9f05df](https://github.com/devopsarr/terraform-provider-prowlarr/commit/e9f05df74ddd57a732c75bd915364d2a7893c3db))
+* remove unused discord import fields ([579df45](https://github.com/devopsarr/terraform-provider-prowlarr/commit/579df459010edd2fac7beff50a2f3dd0254ff85d))
+
+
+### Bug Fixes
+
+* notification signal sensitive field ([367ca1b](https://github.com/devopsarr/terraform-provider-prowlarr/commit/367ca1b251e8bc7fa03b98fcd30fbc4a8a81ec2b))
+
 ## [1.5.0](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v1.4.0...v1.5.0) (2023-02-24)
 
 
