@@ -216,23 +216,23 @@ func (r *ApplicationLazyLibrarianResource) Update(ctx context.Context, req resou
 }
 
 func (r *ApplicationLazyLibrarianResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var application *ApplicationLazyLibrarian
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &application)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete ApplicationLazyLibrarian current value
-	_, err := r.client.ApplicationApi.DeleteApplications(ctx, int32(application.ID.ValueInt64())).Execute()
+	_, err := r.client.ApplicationApi.DeleteApplications(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationLazyLibrarianResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+applicationLazyLibrarianResourceName+": "+strconv.Itoa(int(application.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+applicationLazyLibrarianResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 

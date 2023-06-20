@@ -221,23 +221,23 @@ func (r *ApplicationResource) Update(ctx context.Context, req resource.UpdateReq
 }
 
 func (r *ApplicationResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var application *Application
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &application)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete Application current value
-	_, err := r.client.ApplicationApi.DeleteApplications(ctx, int32(application.ID.ValueInt64())).Execute()
+	_, err := r.client.ApplicationApi.DeleteApplications(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+applicationResourceName+": "+strconv.Itoa(int(application.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+applicationResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 

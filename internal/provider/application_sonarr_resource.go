@@ -225,23 +225,23 @@ func (r *ApplicationSonarrResource) Update(ctx context.Context, req resource.Upd
 }
 
 func (r *ApplicationSonarrResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var application *ApplicationSonarr
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &application)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete ApplicationSonarr current value
-	_, err := r.client.ApplicationApi.DeleteApplications(ctx, int32(application.ID.ValueInt64())).Execute()
+	_, err := r.client.ApplicationApi.DeleteApplications(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationSonarrResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+applicationSonarrResourceName+": "+strconv.Itoa(int(application.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+applicationSonarrResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 

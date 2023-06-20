@@ -187,23 +187,23 @@ func (r *IndexerProxyFlaresolverrResource) Update(ctx context.Context, req resou
 }
 
 func (r *IndexerProxyFlaresolverrResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var proxy *IndexerProxyFlaresolverr
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &proxy)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete IndexerProxyFlaresolverr current value
-	_, err := r.client.IndexerProxyApi.DeleteIndexerProxy(ctx, int32(proxy.ID.ValueInt64())).Execute()
+	_, err := r.client.IndexerProxyApi.DeleteIndexerProxy(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerProxyFlaresolverrResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+indexerProxyFlaresolverrResourceName+": "+strconv.Itoa(int(proxy.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+indexerProxyFlaresolverrResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 

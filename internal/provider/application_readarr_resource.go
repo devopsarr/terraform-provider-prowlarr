@@ -216,23 +216,23 @@ func (r *ApplicationReadarrResource) Update(ctx context.Context, req resource.Up
 }
 
 func (r *ApplicationReadarrResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var application *ApplicationReadarr
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &application)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete ApplicationReadarr current value
-	_, err := r.client.ApplicationApi.DeleteApplications(ctx, int32(application.ID.ValueInt64())).Execute()
+	_, err := r.client.ApplicationApi.DeleteApplications(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationReadarrResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+applicationReadarrResourceName+": "+strconv.Itoa(int(application.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+applicationReadarrResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 

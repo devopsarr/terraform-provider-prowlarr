@@ -165,23 +165,23 @@ func (r *SyncProfileResource) Update(ctx context.Context, req resource.UpdateReq
 }
 
 func (r *SyncProfileResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var profile *SyncProfile
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &profile)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete sync profile current value
-	_, err := r.client.AppProfileApi.DeleteAppProfile(ctx, int32(profile.ID.ValueInt64())).Execute()
+	_, err := r.client.AppProfileApi.DeleteAppProfile(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, syncProfileResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+syncProfileResourceName+": "+strconv.Itoa(int(profile.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+syncProfileResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 
