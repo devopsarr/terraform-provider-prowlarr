@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
 func TestAccIndexerSchemasDataSource(t *testing.T) {
@@ -23,7 +23,7 @@ func TestAccIndexerSchemasDataSource(t *testing.T) {
 			{
 				Config: testAccIndexerSchemasDataSourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckTypeSetElemAttr("data.prowlarr_indexer_schemas.test", "indexer_schemas.*", "AlphaRatio"),
+					resource.TestCheckTypeSetElemAttr("data.prowlarr_indexer_schemas.test", "indexer_schemas.*", "Anidex"),
 				),
 			},
 		},

@@ -85,7 +85,7 @@ func (d *IndexerSchemasDataSource) Read(ctx context.Context, req datasource.Read
 		indexers[i] = t.GetName()
 	}
 
-	tfsdk.ValueFrom(ctx, indexers, data.IndexerSchemas.Type(ctx), &data.IndexerSchemas)
+	resp.Diagnostics.Append(tfsdk.ValueFrom(ctx, indexers, data.IndexerSchemas.Type(ctx), &data.IndexerSchemas)...)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.StringValue(strconv.Itoa(len(response)))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

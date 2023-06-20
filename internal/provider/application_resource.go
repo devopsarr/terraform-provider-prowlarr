@@ -232,7 +232,7 @@ func (r *ApplicationResource) Delete(ctx context.Context, req resource.DeleteReq
 	// Delete Application current value
 	_, err := r.client.ApplicationApi.DeleteApplications(ctx, int32(application.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, applicationResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationResourceName, err))
 
 		return
 	}

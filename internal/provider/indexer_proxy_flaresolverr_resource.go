@@ -198,7 +198,7 @@ func (r *IndexerProxyFlaresolverrResource) Delete(ctx context.Context, req resou
 	// Delete IndexerProxyFlaresolverr current value
 	_, err := r.client.IndexerProxyApi.DeleteIndexerProxy(ctx, int32(proxy.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerProxyFlaresolverrResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerProxyFlaresolverrResourceName, err))
 
 		return
 	}

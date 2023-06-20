@@ -227,7 +227,7 @@ func (r *ApplicationWhisparrResource) Delete(ctx context.Context, req resource.D
 	// Delete ApplicationWhisparr current value
 	_, err := r.client.ApplicationApi.DeleteApplications(ctx, int32(application.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, applicationWhisparrResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationWhisparrResourceName, err))
 
 		return
 	}
