@@ -176,7 +176,7 @@ func (r *SyncProfileResource) Delete(ctx context.Context, req resource.DeleteReq
 	// Delete sync profile current value
 	_, err := r.client.AppProfileApi.DeleteAppProfile(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, syncProfileResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, syncProfileResourceName, err))
 
 		return
 	}

@@ -227,7 +227,7 @@ func (r *ApplicationRadarrResource) Delete(ctx context.Context, req resource.Del
 	// Delete ApplicationRadarr current value
 	_, err := r.client.ApplicationApi.DeleteApplications(ctx, int32(application.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, applicationRadarrResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationRadarrResourceName, err))
 
 		return
 	}

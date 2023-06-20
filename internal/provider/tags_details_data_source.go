@@ -40,7 +40,7 @@ func (d *TagsDetailsDataSource) Metadata(ctx context.Context, req datasource.Met
 func (d *TagsDetailsDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "<!-- subcategory:Tags -->[Tag](../resources/tag) list with their associated resources.",
+		MarkdownDescription: "<!-- subcategory:Tag -->[Tag](../resources/tag) list with their associated resources.",
 		Attributes: map[string]schema.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": schema.StringAttribute{

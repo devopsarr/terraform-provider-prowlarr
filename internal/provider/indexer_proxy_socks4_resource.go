@@ -213,7 +213,7 @@ func (r *IndexerProxySocks4Resource) Delete(ctx context.Context, req resource.De
 	// Delete IndexerProxySocks4 current value
 	_, err := r.client.IndexerProxyApi.DeleteIndexerProxy(ctx, int32(proxy.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerProxySocks4ResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerProxySocks4ResourceName, err))
 
 		return
 	}

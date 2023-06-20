@@ -236,7 +236,7 @@ func (r *ApplicationSonarrResource) Delete(ctx context.Context, req resource.Del
 	// Delete ApplicationSonarr current value
 	_, err := r.client.ApplicationApi.DeleteApplications(ctx, int32(application.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, applicationSonarrResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationSonarrResourceName, err))
 
 		return
 	}
