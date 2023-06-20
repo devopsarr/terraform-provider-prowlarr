@@ -8,7 +8,6 @@ import (
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -116,8 +115,7 @@ func (d *TagsDetailsDataSource) Read(ctx context.Context, req datasource.ReadReq
 		tags[i].write(ctx, t)
 	}
 
-	tfsdk.ValueFrom(ctx, tags, data.Tags.Type(ctx), &data.Tags)
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	data.ID = types.StringValue(strconv.Itoa(len(response)))
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+	tagList, diags := types.SetValueFrom(ctx, Tag{}.getType(), tags)
+	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, Tags{Tags: tagList, ID: types.StringValue(strconv.Itoa(len(response)))})...)
 }

@@ -8,13 +8,13 @@ import (
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -611,7 +611,7 @@ func (r *NotificationResource) Create(ctx context.Context, req resource.CreateRe
 	}
 
 	// Create new Notification
-	request := notification.read(ctx)
+	request := notification.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.NotificationApi.CreateNotification(ctx).NotificationResource(*request).Execute()
 	if err != nil {
@@ -625,7 +625,7 @@ func (r *NotificationResource) Create(ctx context.Context, req resource.CreateRe
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Notification
 
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -652,7 +652,7 @@ func (r *NotificationResource) Read(ctx context.Context, req resource.ReadReques
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Notification
 
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -667,7 +667,7 @@ func (r *NotificationResource) Update(ctx context.Context, req resource.UpdateRe
 	}
 
 	// Update Notification
-	request := notification.read(ctx)
+	request := notification.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.NotificationApi.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
@@ -681,7 +681,7 @@ func (r *NotificationResource) Update(ctx context.Context, req resource.UpdateRe
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Notification
 
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -711,8 +711,12 @@ func (r *NotificationResource) ImportState(ctx context.Context, req resource.Imp
 	tflog.Trace(ctx, "imported "+notificationResourceName+": "+req.ID)
 }
 
-func (n *Notification) write(ctx context.Context, notification *prowlarr.NotificationResource) {
-	n.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, notification.GetTags())
+func (n *Notification) write(ctx context.Context, notification *prowlarr.NotificationResource, diags *diag.Diagnostics) {
+	var localDiag diag.Diagnostics
+
+	n.Tags, localDiag = types.SetValueFrom(ctx, types.Int64Type, notification.Tags)
+	diags.Append(localDiag...)
+
 	n.OnHealthIssue = types.BoolValue(notification.GetOnHealthIssue())
 	n.OnHealthRestored = types.BoolValue(notification.GetOnHealthRestored())
 	n.OnApplicationUpdate = types.BoolValue(notification.GetOnApplicationUpdate())
@@ -736,10 +740,7 @@ func (n *Notification) write(ctx context.Context, notification *prowlarr.Notific
 	helpers.WriteFields(ctx, n, notification.GetFields(), notificationFields)
 }
 
-func (n *Notification) read(ctx context.Context) *prowlarr.NotificationResource {
-	tags := make([]*int32, len(n.Tags.Elements()))
-	tfsdk.ValueAs(ctx, n.Tags, &tags)
-
+func (n *Notification) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.NotificationResource {
 	notification := prowlarr.NewNotificationResource()
 	notification.SetOnHealthIssue(n.OnHealthIssue.ValueBool())
 	notification.SetOnHealthRestored(n.OnHealthRestored.ValueBool())
@@ -751,7 +752,7 @@ func (n *Notification) read(ctx context.Context) *prowlarr.NotificationResource 
 	notification.SetName(n.Name.ValueString())
 	notification.SetImplementation(n.Implementation.ValueString())
 	notification.SetConfigContract(n.ConfigContract.ValueString())
-	notification.SetTags(tags)
+	diags.Append(n.Tags.ElementsAs(ctx, &notification.Tags, true)...)
 	notification.SetFields(helpers.ReadFields(ctx, n, notificationFields))
 
 	return notification

@@ -149,7 +149,7 @@ func (d *IndexerDataSource) Read(ctx context.Context, req datasource.ReadRequest
 	}
 
 	tflog.Trace(ctx, "read "+indexerDataSourceName)
-	indexer.write(ctx, value)
+	indexer.write(ctx, value, &resp.Diagnostics)
 	// Map response body to resource schema attribute
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
 }

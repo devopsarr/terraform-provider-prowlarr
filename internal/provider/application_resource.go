@@ -8,13 +8,13 @@ import (
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -146,7 +146,7 @@ func (r *ApplicationResource) Create(ctx context.Context, req resource.CreateReq
 	}
 
 	// Create new Application
-	request := application.read(ctx)
+	request := application.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.ApplicationApi.CreateApplications(ctx).ApplicationResource(*request).Execute()
 	if err != nil {
@@ -160,7 +160,7 @@ func (r *ApplicationResource) Create(ctx context.Context, req resource.CreateReq
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Application
 
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -187,7 +187,7 @@ func (r *ApplicationResource) Read(ctx context.Context, req resource.ReadRequest
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Application
 
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -202,7 +202,7 @@ func (r *ApplicationResource) Update(ctx context.Context, req resource.UpdateReq
 	}
 
 	// Update Application
-	request := application.read(ctx)
+	request := application.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.ApplicationApi.UpdateApplications(ctx, strconv.Itoa(int(request.GetId()))).ApplicationResource(*request).Execute()
 	if err != nil {
@@ -216,7 +216,7 @@ func (r *ApplicationResource) Update(ctx context.Context, req resource.UpdateReq
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Application
 
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -246,8 +246,12 @@ func (r *ApplicationResource) ImportState(ctx context.Context, req resource.Impo
 	tflog.Trace(ctx, "imported "+applicationResourceName+": "+req.ID)
 }
 
-func (a *Application) write(ctx context.Context, application *prowlarr.ApplicationResource) {
-	a.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, application.GetTags())
+func (a *Application) write(ctx context.Context, application *prowlarr.ApplicationResource, diags *diag.Diagnostics) {
+	var localDiag diag.Diagnostics
+
+	a.Tags, localDiag = types.SetValueFrom(ctx, types.Int64Type, application.Tags)
+	diags.Append(localDiag...)
+
 	a.ID = types.Int64Value(int64(application.GetId()))
 	a.Name = types.StringValue(application.GetName())
 	a.SyncLevel = types.StringValue(string(application.GetSyncLevel()))
@@ -258,17 +262,14 @@ func (a *Application) write(ctx context.Context, application *prowlarr.Applicati
 	helpers.WriteFields(ctx, a, application.GetFields(), applicationFields)
 }
 
-func (a *Application) read(ctx context.Context) *prowlarr.ApplicationResource {
-	tags := make([]*int32, len(a.Tags.Elements()))
-	tfsdk.ValueAs(ctx, a.Tags, &tags)
-
+func (a *Application) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.ApplicationResource {
 	application := prowlarr.NewApplicationResource()
 	application.SetSyncLevel(prowlarr.ApplicationSyncLevel(a.SyncLevel.ValueString()))
 	application.SetId(int32(a.ID.ValueInt64()))
 	application.SetName(a.Name.ValueString())
 	application.SetImplementation(a.Implementation.ValueString())
 	application.SetConfigContract(a.ConfigContract.ValueString())
-	application.SetTags(tags)
+	diags.Append(a.Tags.ElementsAs(ctx, &application.Tags, true)...)
 	application.SetFields(helpers.ReadFields(ctx, a, applicationFields))
 
 	return application

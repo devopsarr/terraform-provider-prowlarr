@@ -8,6 +8,7 @@ import (
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -150,7 +151,7 @@ func (r *ApplicationLazyLibrarianResource) Create(ctx context.Context, req resou
 	}
 
 	// Create new ApplicationLazyLibrarian
-	request := application.read(ctx)
+	request := application.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.ApplicationApi.CreateApplications(ctx).ApplicationResource(*request).Execute()
 	if err != nil {
@@ -161,7 +162,7 @@ func (r *ApplicationLazyLibrarianResource) Create(ctx context.Context, req resou
 
 	tflog.Trace(ctx, "created "+applicationLazyLibrarianResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	application.write(ctx, response)
+	application.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &application)...)
 }
 
@@ -185,7 +186,7 @@ func (r *ApplicationLazyLibrarianResource) Read(ctx context.Context, req resourc
 
 	tflog.Trace(ctx, "read "+applicationLazyLibrarianResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	application.write(ctx, response)
+	application.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &application)...)
 }
 
@@ -200,7 +201,7 @@ func (r *ApplicationLazyLibrarianResource) Update(ctx context.Context, req resou
 	}
 
 	// Update ApplicationLazyLibrarian
-	request := application.read(ctx)
+	request := application.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.ApplicationApi.UpdateApplications(ctx, strconv.Itoa(int(request.GetId()))).ApplicationResource(*request).Execute()
 	if err != nil {
@@ -211,7 +212,7 @@ func (r *ApplicationLazyLibrarianResource) Update(ctx context.Context, req resou
 
 	tflog.Trace(ctx, "updated "+applicationLazyLibrarianResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	application.write(ctx, response)
+	application.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &application)...)
 }
 
@@ -241,12 +242,12 @@ func (r *ApplicationLazyLibrarianResource) ImportState(ctx context.Context, req 
 	tflog.Trace(ctx, "imported "+applicationLazyLibrarianResourceName+": "+req.ID)
 }
 
-func (a *ApplicationLazyLibrarian) write(ctx context.Context, application *prowlarr.ApplicationResource) {
+func (a *ApplicationLazyLibrarian) write(ctx context.Context, application *prowlarr.ApplicationResource, diags *diag.Diagnostics) {
 	genericApplication := a.toApplication()
-	genericApplication.write(ctx, application)
+	genericApplication.write(ctx, application, diags)
 	a.fromApplication(genericApplication)
 }
 
-func (a *ApplicationLazyLibrarian) read(ctx context.Context) *prowlarr.ApplicationResource {
-	return a.toApplication().read(ctx)
+func (a *ApplicationLazyLibrarian) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.ApplicationResource {
+	return a.toApplication().read(ctx, diags)
 }

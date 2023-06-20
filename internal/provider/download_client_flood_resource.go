@@ -6,6 +6,7 @@ import (
 
 	"github.com/devopsarr/prowlarr-go/prowlarr"
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -218,7 +219,7 @@ func (r *DownloadClientFloodResource) Create(ctx context.Context, req resource.C
 	}
 
 	// Create new DownloadClientFlood
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -229,7 +230,7 @@ func (r *DownloadClientFloodResource) Create(ctx context.Context, req resource.C
 
 	tflog.Trace(ctx, "created "+downloadClientFloodResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -253,7 +254,7 @@ func (r *DownloadClientFloodResource) Read(ctx context.Context, req resource.Rea
 
 	tflog.Trace(ctx, "read "+downloadClientFloodResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -268,7 +269,7 @@ func (r *DownloadClientFloodResource) Update(ctx context.Context, req resource.U
 	}
 
 	// Update DownloadClientFlood
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -279,7 +280,7 @@ func (r *DownloadClientFloodResource) Update(ctx context.Context, req resource.U
 
 	tflog.Trace(ctx, "updated "+downloadClientFloodResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -309,12 +310,12 @@ func (r *DownloadClientFloodResource) ImportState(ctx context.Context, req resou
 	tflog.Trace(ctx, "imported "+downloadClientFloodResourceName+": "+req.ID)
 }
 
-func (d *DownloadClientFlood) write(ctx context.Context, downloadClient *prowlarr.DownloadClientResource) {
-	genericDownloadClient := DownloadClient{}
-	genericDownloadClient.write(ctx, downloadClient)
-	d.fromDownloadClient(&genericDownloadClient)
+func (d *DownloadClientFlood) write(ctx context.Context, downloadClient *prowlarr.DownloadClientResource, diags *diag.Diagnostics) {
+	genericDownloadClient := d.toDownloadClient()
+	genericDownloadClient.write(ctx, downloadClient, diags)
+	d.fromDownloadClient(genericDownloadClient)
 }
 
-func (d *DownloadClientFlood) read(ctx context.Context) *prowlarr.DownloadClientResource {
-	return d.toDownloadClient().read(ctx)
+func (d *DownloadClientFlood) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.DownloadClientResource {
+	return d.toDownloadClient().read(ctx, diags)
 }

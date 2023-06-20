@@ -119,7 +119,7 @@ func (d *ApplicationDataSource) Read(ctx context.Context, req datasource.ReadReq
 	}
 
 	tflog.Trace(ctx, "read "+applicationDataSourceName)
-	data.write(ctx, application)
+	data.write(ctx, application, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 

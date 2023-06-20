@@ -128,7 +128,7 @@ func (d *IndexerProxiesDataSource) Read(ctx context.Context, req datasource.Read
 	// Map response body to resource schema attribute
 	proxies := make([]IndexerProxy, len(response))
 	for i, p := range response {
-		proxies[i].write(ctx, p)
+		proxies[i].write(ctx, p, &resp.Diagnostics)
 	}
 
 	tfsdk.ValueFrom(ctx, proxies, data.IndexerProxies.Type(ctx), &data.IndexerProxies)

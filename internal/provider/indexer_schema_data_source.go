@@ -8,6 +8,7 @@ import (
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -167,7 +168,7 @@ func (d *IndexerSchemaDataSource) Read(ctx context.Context, req datasource.ReadR
 	tflog.Trace(ctx, "read "+indexerSchemaDataSourceName)
 
 	schema.ID = types.Int64Value(id)
-	schema.write(ctx, value)
+	schema.write(ctx, value, &resp.Diagnostics)
 	// Map response body to resource schema attribute
 	resp.Diagnostics.Append(resp.State.Set(ctx, &schema)...)
 }
@@ -182,9 +183,13 @@ func findIndexerSchema(name string, schemas []*prowlarr.IndexerResource) (*prowl
 	return nil, 0, helpers.ErrDataNotFoundError(indexerSchemaDataSourceName, "name", name)
 }
 
-func (i *IndexerSchema) write(ctx context.Context, indexer *prowlarr.IndexerResource) {
-	i.IndexerURLs, _ = types.SetValueFrom(ctx, types.StringType, indexer.GetIndexerUrls())
-	i.LegacyURLs, _ = types.SetValueFrom(ctx, types.StringType, indexer.GetLegacyUrls())
+func (i *IndexerSchema) write(ctx context.Context, indexer *prowlarr.IndexerResource, diags *diag.Diagnostics) {
+	var tempDiag diag.Diagnostics
+
+	i.IndexerURLs, tempDiag = types.SetValueFrom(ctx, types.StringType, indexer.GetIndexerUrls())
+	diags.Append(tempDiag...)
+	i.LegacyURLs, tempDiag = types.SetValueFrom(ctx, types.StringType, indexer.GetLegacyUrls())
+	diags.Append(tempDiag...)
 	i.ConfigContract = types.StringValue(indexer.GetConfigContract())
 	i.Implementation = types.StringValue(indexer.GetImplementation())
 	i.Name = types.StringValue(indexer.GetName())
@@ -199,7 +204,8 @@ func (i *IndexerSchema) write(ctx context.Context, indexer *prowlarr.IndexerReso
 		fields[n].write(f)
 	}
 
-	i.Fields, _ = types.SetValueFrom(ctx, IndexerSchemaDataSource{}.getFieldSchema().Type(), fields)
+	i.Fields, tempDiag = types.SetValueFrom(ctx, IndexerSchemaDataSource{}.getFieldSchema().Type(), fields)
+	diags.Append(tempDiag...)
 }
 
 func (f *SchemaField) write(field *prowlarr.Field) {

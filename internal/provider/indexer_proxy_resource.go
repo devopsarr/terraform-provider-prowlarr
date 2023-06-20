@@ -7,12 +7,12 @@ import (
 	"github.com/devopsarr/prowlarr-go/prowlarr"
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -140,7 +140,7 @@ func (r *IndexerProxyResource) Create(ctx context.Context, req resource.CreateRe
 	}
 
 	// Create new IndexerProxy
-	request := proxy.read(ctx)
+	request := proxy.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.IndexerProxyApi.CreateIndexerProxy(ctx).IndexerProxyResource(*request).Execute()
 	if err != nil {
@@ -154,7 +154,7 @@ func (r *IndexerProxyResource) Create(ctx context.Context, req resource.CreateRe
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state IndexerProxy
 
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -181,7 +181,7 @@ func (r *IndexerProxyResource) Read(ctx context.Context, req resource.ReadReques
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state IndexerProxy
 
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -196,7 +196,7 @@ func (r *IndexerProxyResource) Update(ctx context.Context, req resource.UpdateRe
 	}
 
 	// Update IndexerProxy
-	request := proxy.read(ctx)
+	request := proxy.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.IndexerProxyApi.UpdateIndexerProxy(ctx, strconv.Itoa(int(request.GetId()))).IndexerProxyResource(*request).Execute()
 	if err != nil {
@@ -210,7 +210,7 @@ func (r *IndexerProxyResource) Update(ctx context.Context, req resource.UpdateRe
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state IndexerProxy
 
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -240,8 +240,12 @@ func (r *IndexerProxyResource) ImportState(ctx context.Context, req resource.Imp
 	tflog.Trace(ctx, "imported "+indexerProxyResourceName+": "+req.ID)
 }
 
-func (i *IndexerProxy) write(ctx context.Context, indexerProxy *prowlarr.IndexerProxyResource) {
-	i.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexerProxy.GetTags())
+func (i *IndexerProxy) write(ctx context.Context, indexerProxy *prowlarr.IndexerProxyResource, diags *diag.Diagnostics) {
+	var localDiag diag.Diagnostics
+
+	i.Tags, localDiag = types.SetValueFrom(ctx, types.Int64Type, indexerProxy.Tags)
+	diags.Append(localDiag...)
+
 	i.ID = types.Int64Value(int64(indexerProxy.GetId()))
 	i.ConfigContract = types.StringValue(indexerProxy.GetConfigContract())
 	i.Implementation = types.StringValue(indexerProxy.GetImplementation())
@@ -250,17 +254,13 @@ func (i *IndexerProxy) write(ctx context.Context, indexerProxy *prowlarr.Indexer
 	helpers.WriteFields(ctx, i, indexerProxy.GetFields(), indexerProxyFields)
 }
 
-func (i *IndexerProxy) read(ctx context.Context) *prowlarr.IndexerProxyResource {
-	tags := make([]*int32, len(i.Tags.Elements()))
-
-	tfsdk.ValueAs(ctx, i.Tags, &tags)
-
+func (i *IndexerProxy) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.IndexerProxyResource {
 	proxy := prowlarr.NewIndexerProxyResource()
 	proxy.SetId(int32(i.ID.ValueInt64()))
 	proxy.SetConfigContract(i.ConfigContract.ValueString())
 	proxy.SetImplementation(i.Implementation.ValueString())
 	proxy.SetName(i.Name.ValueString())
-	proxy.SetTags(tags)
+	diags.Append(i.Tags.ElementsAs(ctx, &proxy.Tags, true)...)
 	proxy.SetFields(helpers.ReadFields(ctx, i, indexerProxyFields))
 
 	return proxy

@@ -8,6 +8,7 @@ import (
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -150,7 +151,7 @@ func (r *ApplicationWhisparrResource) Create(ctx context.Context, req resource.C
 	}
 
 	// Create new ApplicationWhisparr
-	request := application.read(ctx)
+	request := application.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.ApplicationApi.CreateApplications(ctx).ApplicationResource(*request).Execute()
 	if err != nil {
@@ -161,7 +162,7 @@ func (r *ApplicationWhisparrResource) Create(ctx context.Context, req resource.C
 
 	tflog.Trace(ctx, "created "+applicationWhisparrResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	application.write(ctx, response)
+	application.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &application)...)
 }
 
@@ -185,7 +186,7 @@ func (r *ApplicationWhisparrResource) Read(ctx context.Context, req resource.Rea
 
 	tflog.Trace(ctx, "read "+applicationWhisparrResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	application.write(ctx, response)
+	application.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &application)...)
 }
 
@@ -200,7 +201,7 @@ func (r *ApplicationWhisparrResource) Update(ctx context.Context, req resource.U
 	}
 
 	// Update ApplicationWhisparr
-	request := application.read(ctx)
+	request := application.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.ApplicationApi.UpdateApplications(ctx, strconv.Itoa(int(request.GetId()))).ApplicationResource(*request).Execute()
 	if err != nil {
@@ -211,7 +212,7 @@ func (r *ApplicationWhisparrResource) Update(ctx context.Context, req resource.U
 
 	tflog.Trace(ctx, "updated "+applicationWhisparrResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	application.write(ctx, response)
+	application.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &application)...)
 }
 
@@ -241,12 +242,12 @@ func (r *ApplicationWhisparrResource) ImportState(ctx context.Context, req resou
 	tflog.Trace(ctx, "imported "+applicationWhisparrResourceName+": "+req.ID)
 }
 
-func (a *ApplicationWhisparr) write(ctx context.Context, application *prowlarr.ApplicationResource) {
+func (a *ApplicationWhisparr) write(ctx context.Context, application *prowlarr.ApplicationResource, diags *diag.Diagnostics) {
 	genericApplication := a.toApplication()
-	genericApplication.write(ctx, application)
+	genericApplication.write(ctx, application, diags)
 	a.fromApplication(genericApplication)
 }
 
-func (a *ApplicationWhisparr) read(ctx context.Context) *prowlarr.ApplicationResource {
-	return a.toApplication().read(ctx)
+func (a *ApplicationWhisparr) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.ApplicationResource {
+	return a.toApplication().read(ctx, diags)
 }

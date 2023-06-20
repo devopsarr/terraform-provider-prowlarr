@@ -9,13 +9,13 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -375,7 +375,7 @@ func (r *DownloadClientResource) Create(ctx context.Context, req resource.Create
 	}
 
 	// Create new DownloadClient
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -389,7 +389,7 @@ func (r *DownloadClientResource) Create(ctx context.Context, req resource.Create
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state DownloadClient
 
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -416,7 +416,7 @@ func (r *DownloadClientResource) Read(ctx context.Context, req resource.ReadRequ
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state DownloadClient
 
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -431,7 +431,7 @@ func (r *DownloadClientResource) Update(ctx context.Context, req resource.Update
 	}
 
 	// Update DownloadClient
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -445,7 +445,7 @@ func (r *DownloadClientResource) Update(ctx context.Context, req resource.Update
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state DownloadClient
 
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -475,8 +475,9 @@ func (r *DownloadClientResource) ImportState(ctx context.Context, req resource.I
 	tflog.Trace(ctx, "imported "+downloadClientResourceName+": "+req.ID)
 }
 
-func (d *DownloadClient) write(ctx context.Context, downloadClient *prowlarr.DownloadClientResource) {
-	d.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.GetTags())
+func (d *DownloadClient) write(ctx context.Context, downloadClient *prowlarr.DownloadClientResource, diags *diag.Diagnostics) {
+	var localDiag diag.Diagnostics
+
 	d.Enable = types.BoolValue(downloadClient.GetEnable())
 	d.Priority = types.Int64Value(int64(downloadClient.GetPriority()))
 	d.ID = types.Int64Value(int64(downloadClient.GetId()))
@@ -487,33 +488,34 @@ func (d *DownloadClient) write(ctx context.Context, downloadClient *prowlarr.Dow
 	d.AdditionalTags = types.SetValueMust(types.Int64Type, nil)
 	d.FieldTags = types.SetValueMust(types.StringType, nil)
 	d.PostImTags = types.SetValueMust(types.StringType, nil)
-	d.Categories = types.SetValueMust(DownloadClientResource{}.getClientCategorySchema().Type(), nil)
 
 	categories := make([]ClientCategory, len(downloadClient.GetCategories()))
 	for i, c := range downloadClient.GetCategories() {
-		categories[i].write(ctx, c)
+		categories[i].write(ctx, c, diags)
 	}
 
-	tfsdk.ValueFrom(ctx, categories, d.Categories.Type(ctx), &d.Categories)
+	d.Categories, localDiag = types.SetValueFrom(ctx, DownloadClientResource{}.getClientCategorySchema().Type(), categories)
+	diags.Append(localDiag...)
+	d.Tags, localDiag = types.SetValueFrom(ctx, types.Int64Type, downloadClient.Tags)
+	diags.Append(localDiag...)
 	helpers.WriteFields(ctx, d, downloadClient.GetFields(), downloadClientFields)
 }
 
-func (c *ClientCategory) write(ctx context.Context, category *prowlarr.DownloadClientCategory) {
+func (c *ClientCategory) write(ctx context.Context, category *prowlarr.DownloadClientCategory, diags *diag.Diagnostics) {
+	var localDiag diag.Diagnostics
+
 	c.Name = types.StringValue(category.GetClientCategory())
-	c.Categories = types.SetValueMust(types.Int64Type, nil)
-	tfsdk.ValueFrom(ctx, category.Categories, c.Categories.Type(ctx), &c.Categories)
+	c.Categories, localDiag = types.SetValueFrom(ctx, types.Int64Type, category.Categories)
+	diags.Append(localDiag...)
 }
 
-func (d *DownloadClient) read(ctx context.Context) *prowlarr.DownloadClientResource {
-	tags := make([]*int32, len(d.Tags.Elements()))
-	tfsdk.ValueAs(ctx, d.Tags, &tags)
-
+func (d *DownloadClient) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.DownloadClientResource {
 	categories := make([]*ClientCategory, len(d.Categories.Elements()))
-	tfsdk.ValueAs(ctx, d.Categories, &categories)
+	diags.Append(d.Categories.ElementsAs(ctx, &categories, true)...)
 
 	clientCategories := make([]*prowlarr.DownloadClientCategory, len(d.Categories.Elements()))
 	for n, c := range categories {
-		clientCategories[n] = c.read(ctx)
+		clientCategories[n] = c.read(ctx, diags)
 	}
 
 	client := prowlarr.NewDownloadClientResource()
@@ -524,20 +526,17 @@ func (d *DownloadClient) read(ctx context.Context) *prowlarr.DownloadClientResou
 	client.SetImplementation(d.Implementation.ValueString())
 	client.SetName(d.Name.ValueString())
 	client.SetProtocol(prowlarr.DownloadProtocol(d.Protocol.ValueString()))
-	client.SetTags(tags)
 	client.SetFields(helpers.ReadFields(ctx, d, downloadClientFields))
 	client.SetCategories(clientCategories)
+	diags.Append(d.Tags.ElementsAs(ctx, &client.Tags, true)...)
 
 	return client
 }
 
-func (c *ClientCategory) read(ctx context.Context) *prowlarr.DownloadClientCategory {
-	categories := make([]*int32, len(c.Categories.Elements()))
-	tfsdk.ValueAs(ctx, c.Categories, &categories)
-
+func (c *ClientCategory) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.DownloadClientCategory {
 	category := prowlarr.NewDownloadClientCategory()
-	category.SetCategories(categories)
 	category.SetClientCategory(c.Name.ValueString())
+	diags.Append(c.Categories.ElementsAs(ctx, &category.Categories, true)...)
 
 	return category
 }

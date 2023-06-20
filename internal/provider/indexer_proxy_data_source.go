@@ -113,7 +113,7 @@ func (i *IndexerProxyDataSource) Read(ctx context.Context, req datasource.ReadRe
 	}
 
 	tflog.Trace(ctx, "read "+indexerProxyDataSourceName)
-	data.write(ctx, indexerProxy)
+	data.write(ctx, indexerProxy, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 

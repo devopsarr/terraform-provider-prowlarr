@@ -8,6 +8,7 @@ import (
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -150,7 +151,7 @@ func (r *ApplicationLidarrResource) Create(ctx context.Context, req resource.Cre
 	}
 
 	// Create new ApplicationLidarr
-	request := application.read(ctx)
+	request := application.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.ApplicationApi.CreateApplications(ctx).ApplicationResource(*request).Execute()
 	if err != nil {
@@ -161,7 +162,7 @@ func (r *ApplicationLidarrResource) Create(ctx context.Context, req resource.Cre
 
 	tflog.Trace(ctx, "created "+applicationLidarrResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	application.write(ctx, response)
+	application.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &application)...)
 }
 
@@ -185,7 +186,7 @@ func (r *ApplicationLidarrResource) Read(ctx context.Context, req resource.ReadR
 
 	tflog.Trace(ctx, "read "+applicationLidarrResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	application.write(ctx, response)
+	application.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &application)...)
 }
 
@@ -200,7 +201,7 @@ func (r *ApplicationLidarrResource) Update(ctx context.Context, req resource.Upd
 	}
 
 	// Update ApplicationLidarr
-	request := application.read(ctx)
+	request := application.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.ApplicationApi.UpdateApplications(ctx, strconv.Itoa(int(request.GetId()))).ApplicationResource(*request).Execute()
 	if err != nil {
@@ -211,7 +212,7 @@ func (r *ApplicationLidarrResource) Update(ctx context.Context, req resource.Upd
 
 	tflog.Trace(ctx, "updated "+applicationLidarrResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	application.write(ctx, response)
+	application.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &application)...)
 }
 
@@ -241,12 +242,12 @@ func (r *ApplicationLidarrResource) ImportState(ctx context.Context, req resourc
 	tflog.Trace(ctx, "imported "+applicationLidarrResourceName+": "+req.ID)
 }
 
-func (a *ApplicationLidarr) write(ctx context.Context, application *prowlarr.ApplicationResource) {
+func (a *ApplicationLidarr) write(ctx context.Context, application *prowlarr.ApplicationResource, diags *diag.Diagnostics) {
 	genericApplication := a.toApplication()
-	genericApplication.write(ctx, application)
+	genericApplication.write(ctx, application, diags)
 	a.fromApplication(genericApplication)
 }
 
-func (a *ApplicationLidarr) read(ctx context.Context) *prowlarr.ApplicationResource {
-	return a.toApplication().read(ctx)
+func (a *ApplicationLidarr) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.ApplicationResource {
+	return a.toApplication().read(ctx, diags)
 }

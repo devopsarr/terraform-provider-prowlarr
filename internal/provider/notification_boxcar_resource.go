@@ -6,6 +6,7 @@ import (
 
 	"github.com/devopsarr/prowlarr-go/prowlarr"
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -162,7 +163,7 @@ func (r *NotificationBoxcarResource) Create(ctx context.Context, req resource.Cr
 	}
 
 	// Create new NotificationBoxcar
-	request := notification.read(ctx)
+	request := notification.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.NotificationApi.CreateNotification(ctx).NotificationResource(*request).Execute()
 	if err != nil {
@@ -173,7 +174,7 @@ func (r *NotificationBoxcarResource) Create(ctx context.Context, req resource.Cr
 
 	tflog.Trace(ctx, "created "+notificationBoxcarResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	notification.write(ctx, response)
+	notification.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &notification)...)
 }
 
@@ -197,7 +198,7 @@ func (r *NotificationBoxcarResource) Read(ctx context.Context, req resource.Read
 
 	tflog.Trace(ctx, "read "+notificationBoxcarResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	notification.write(ctx, response)
+	notification.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &notification)...)
 }
 
@@ -212,7 +213,7 @@ func (r *NotificationBoxcarResource) Update(ctx context.Context, req resource.Up
 	}
 
 	// Update NotificationBoxcar
-	request := notification.read(ctx)
+	request := notification.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.NotificationApi.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
@@ -223,7 +224,7 @@ func (r *NotificationBoxcarResource) Update(ctx context.Context, req resource.Up
 
 	tflog.Trace(ctx, "updated "+notificationBoxcarResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	notification.write(ctx, response)
+	notification.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &notification)...)
 }
 
@@ -253,12 +254,12 @@ func (r *NotificationBoxcarResource) ImportState(ctx context.Context, req resour
 	tflog.Trace(ctx, "imported "+notificationBoxcarResourceName+": "+req.ID)
 }
 
-func (n *NotificationBoxcar) write(ctx context.Context, notification *prowlarr.NotificationResource) {
+func (n *NotificationBoxcar) write(ctx context.Context, notification *prowlarr.NotificationResource, diags *diag.Diagnostics) {
 	genericNotification := n.toNotification()
-	genericNotification.write(ctx, notification)
+	genericNotification.write(ctx, notification, diags)
 	n.fromNotification(genericNotification)
 }
 
-func (n *NotificationBoxcar) read(ctx context.Context) *prowlarr.NotificationResource {
-	return n.toNotification().read(ctx)
+func (n *NotificationBoxcar) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.NotificationResource {
+	return n.toNotification().read(ctx, diags)
 }

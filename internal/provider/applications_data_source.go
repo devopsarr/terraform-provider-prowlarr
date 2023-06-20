@@ -134,7 +134,7 @@ func (d *ApplicationsDataSource) Read(ctx context.Context, req datasource.ReadRe
 	// Map response body to resource schema attribute
 	profiles := make([]Application, len(response))
 	for i, p := range response {
-		profiles[i].write(ctx, p)
+		profiles[i].write(ctx, p, &resp.Diagnostics)
 	}
 
 	tfsdk.ValueFrom(ctx, profiles, data.Applications.Type(ctx), &data.Applications)
