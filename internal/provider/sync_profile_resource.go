@@ -7,6 +7,7 @@ import (
 
 	"github.com/devopsarr/prowlarr-go/prowlarr"
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -41,6 +42,18 @@ type SyncProfile struct {
 	EnableRss               types.Bool   `tfsdk:"enable_rss"`
 	EnableInteractiveSearch types.Bool   `tfsdk:"enable_interactive_search"`
 	EnableAutomaticSearch   types.Bool   `tfsdk:"enable_automatic_search"`
+}
+
+func (s SyncProfile) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"name":                      types.StringType,
+			"id":                        types.Int64Type,
+			"minimum_seeders":           types.Int64Type,
+			"enable_rss":                types.BoolType,
+			"enable_interactive_search": types.BoolType,
+			"enable_automatic_search":   types.BoolType,
+		})
 }
 
 func (r *SyncProfileResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {

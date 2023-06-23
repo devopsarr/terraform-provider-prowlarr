@@ -9,7 +9,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -90,13 +89,6 @@ func (d *SyncProfilesDataSource) Configure(ctx context.Context, req datasource.C
 }
 
 func (d *SyncProfilesDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data *SyncProfiles
-
-	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
 	// Get sync profiles current value
 	response, _, err := d.client.AppProfileApi.ListAppProfile(ctx).Execute()
 	if err != nil {
@@ -112,8 +104,7 @@ func (d *SyncProfilesDataSource) Read(ctx context.Context, req datasource.ReadRe
 		profiles[i].write(p)
 	}
 
-	tfsdk.ValueFrom(ctx, profiles, data.SyncProfiles.Type(ctx), &data.SyncProfiles)
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	data.ID = types.StringValue(strconv.Itoa(len(response)))
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+	profileList, diags := types.SetValueFrom(ctx, SyncProfile{}.getType(), profiles)
+	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, SyncProfiles{SyncProfiles: profileList, ID: types.StringValue(strconv.Itoa(len(response)))})...)
 }

@@ -92,14 +92,6 @@ func (d *TagsDetailsDataSource) Configure(ctx context.Context, req datasource.Co
 }
 
 func (d *TagsDetailsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data *TagsDetails
-
-	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
 	// Get tagss current value
 	response, _, err := d.client.TagDetailsApi.ListTagDetail(ctx).Execute()
 	if err != nil {
@@ -112,10 +104,10 @@ func (d *TagsDetailsDataSource) Read(ctx context.Context, req datasource.ReadReq
 	// Map response body to resource schema attribute
 	tags := make([]TagDetails, len(response))
 	for i, t := range response {
-		tags[i].write(ctx, t)
+		tags[i].write(ctx, t, &resp.Diagnostics)
 	}
 
-	tagList, diags := types.SetValueFrom(ctx, Tag{}.getType(), tags)
+	tagList, diags := types.SetValueFrom(ctx, TagDetails{}.getType(), tags)
 	resp.Diagnostics.Append(diags...)
-	resp.Diagnostics.Append(resp.State.Set(ctx, Tags{Tags: tagList, ID: types.StringValue(strconv.Itoa(len(response)))})...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, TagsDetails{Tags: tagList, ID: types.StringValue(strconv.Itoa(len(response)))})...)
 }

@@ -41,7 +41,7 @@ resource "prowlarr_download_client_transmission" "example" {
 - `enable` (Boolean) Enable flag.
 - `host` (String) host.
 - `item_priority` (Number) Priority. `0` Last, `1` First.
-- `password` (String) Password.
+- `password` (String, Sensitive) password.
 - `port` (Number) Port.
 - `priority` (Number) Priority.
 - `tags` (Set of Number) List of associated tags.

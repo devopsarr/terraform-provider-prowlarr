@@ -8,6 +8,7 @@ import (
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -54,6 +55,23 @@ type Application struct {
 	BaseURL             types.String `tfsdk:"base_url"`
 	APIKey              types.String `tfsdk:"api_key"`
 	ID                  types.Int64  `tfsdk:"id"`
+}
+
+func (a Application) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"sync_categories":       types.SetType{}.WithElementType(types.Int64Type),
+			"anime_sync_categories": types.SetType{}.WithElementType(types.Int64Type),
+			"tags":                  types.SetType{}.WithElementType(types.Int64Type),
+			"name":                  types.StringType,
+			"config_contract":       types.StringType,
+			"implementation":        types.StringType,
+			"sync_level":            types.StringType,
+			"prowlarr_url":          types.StringType,
+			"base_url":              types.StringType,
+			"api_key":               types.StringType,
+			"id":                    types.Int64Type,
+		})
 }
 
 func (r *ApplicationResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -249,9 +267,6 @@ func (r *ApplicationResource) ImportState(ctx context.Context, req resource.Impo
 func (a *Application) write(ctx context.Context, application *prowlarr.ApplicationResource, diags *diag.Diagnostics) {
 	var localDiag diag.Diagnostics
 
-	a.Tags, localDiag = types.SetValueFrom(ctx, types.Int64Type, application.Tags)
-	diags.Append(localDiag...)
-
 	a.ID = types.Int64Value(int64(application.GetId()))
 	a.Name = types.StringValue(application.GetName())
 	a.SyncLevel = types.StringValue(string(application.GetSyncLevel()))
@@ -259,6 +274,8 @@ func (a *Application) write(ctx context.Context, application *prowlarr.Applicati
 	a.ConfigContract = types.StringValue(application.GetConfigContract())
 	a.SyncCategories = types.SetValueMust(types.Int64Type, nil)
 	a.AnimeSyncCategories = types.SetValueMust(types.Int64Type, nil)
+	a.Tags, localDiag = types.SetValueFrom(ctx, types.Int64Type, application.Tags)
+	diags.Append(localDiag...)
 	helpers.WriteFields(ctx, a, application.GetFields(), applicationFields)
 }
 

@@ -9,6 +9,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -93,10 +94,66 @@ type DownloadClient struct {
 	Enable               types.Bool   `tfsdk:"enable"`
 }
 
+func (d DownloadClient) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"tags":                  types.SetType{}.WithElementType(types.Int64Type),
+			"additional_tags":       types.SetType{}.WithElementType(types.Int64Type),
+			"post_im_tags":          types.SetType{}.WithElementType(types.StringType),
+			"field_tags":            types.SetType{}.WithElementType(types.StringType),
+			"categories":            types.SetType{}.WithElementType(ClientCategory{}.getType()),
+			"nzb_folder":            types.StringType,
+			"category":              types.StringType,
+			"implementation":        types.StringType,
+			"name":                  types.StringType,
+			"protocol":              types.StringType,
+			"magnet_file_extension": types.StringType,
+			"torrent_folder":        types.StringType,
+			"strm_folder":           types.StringType,
+			"host":                  types.StringType,
+			"config_contract":       types.StringType,
+			"destination":           types.StringType,
+			"directory":             types.StringType,
+			"username":              types.StringType,
+			"tv_imported_category":  types.StringType,
+			"password":              types.StringType,
+			"secret_token":          types.StringType,
+			"rpc_path":              types.StringType,
+			"url_base":              types.StringType,
+			"api_key":               types.StringType,
+			"api_url":               types.StringType,
+			"app_id":                types.StringType,
+			"app_token":             types.StringType,
+			"destination_directory": types.StringType,
+			"item_priority":         types.Int64Type,
+			"intial_state":          types.Int64Type,
+			"initial_state":         types.Int64Type,
+			"priority":              types.Int64Type,
+			"port":                  types.Int64Type,
+			"id":                    types.Int64Type,
+			"add_stopped":           types.BoolType,
+			"save_magnet_files":     types.BoolType,
+			"read_only":             types.BoolType,
+			"sequential_order":      types.BoolType,
+			"start_on_add":          types.BoolType,
+			"use_ssl":               types.BoolType,
+			"add_paused":            types.BoolType,
+			"enable":                types.BoolType,
+		})
+}
+
 // ClientCategory is part of DownloadClient.
 type ClientCategory struct {
 	Categories types.Set    `tfsdk:"categories"`
 	Name       types.String `tfsdk:"name"`
+}
+
+func (c ClientCategory) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"categories": types.SetType{}.WithElementType(types.Int64Type),
+			"name":       types.StringType,
+		})
 }
 
 func (r *DownloadClientResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {

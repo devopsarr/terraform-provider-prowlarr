@@ -2,13 +2,13 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/devopsarr/prowlarr-go/prowlarr"
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -85,24 +85,20 @@ func (d *SyncProfileDataSource) Read(ctx context.Context, req datasource.ReadReq
 		return
 	}
 
-	syncProfile, err := findSyncProfile(data.Name.ValueString(), response)
-	if err != nil {
-		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", syncProfileDataSourceName, err))
-
-		return
-	}
-
+	data.find(data.Name.ValueString(), response, &resp.Diagnostics)
 	tflog.Trace(ctx, "read "+syncProfileDataSourceName)
-	data.write(syncProfile)
+	// Map response body to resource schema attribute
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findSyncProfile(name string, syncProfiles []*prowlarr.AppProfileResource) (*prowlarr.AppProfileResource, error) {
-	for _, i := range syncProfiles {
-		if i.GetName() == name {
-			return i, nil
+func (p *SyncProfile) find(name string, syncProfiles []*prowlarr.AppProfileResource, diags *diag.Diagnostics) {
+	for _, profile := range syncProfiles {
+		if profile.GetName() == name {
+			p.write(profile)
+
+			return
 		}
 	}
 
-	return nil, helpers.ErrDataNotFoundError(syncProfileDataSourceName, "name", name)
+	diags.AddError(helpers.DataSourceError, helpers.ParseNotFoundError(syncProfileDataSourceName, "name", name))
 }

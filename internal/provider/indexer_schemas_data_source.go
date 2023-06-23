@@ -8,7 +8,6 @@ import (
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -62,14 +61,6 @@ func (d *IndexerSchemasDataSource) Configure(ctx context.Context, req datasource
 }
 
 func (d *IndexerSchemasDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data *IndexerSchemas
-
-	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
 	// Get indexers current value
 	response, _, err := d.client.IndexerApi.ListIndexerSchema(ctx).Execute()
 	if err != nil {
@@ -85,8 +76,7 @@ func (d *IndexerSchemasDataSource) Read(ctx context.Context, req datasource.Read
 		indexers[i] = t.GetName()
 	}
 
-	resp.Diagnostics.Append(tfsdk.ValueFrom(ctx, indexers, data.IndexerSchemas.Type(ctx), &data.IndexerSchemas)...)
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	data.ID = types.StringValue(strconv.Itoa(len(response)))
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+	indexerList, diags := types.SetValueFrom(ctx, types.StringType, indexers)
+	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, IndexerSchemas{IndexerSchemas: indexerList, ID: types.StringValue(strconv.Itoa(len(response)))})...)
 }

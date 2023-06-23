@@ -2,13 +2,13 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/devopsarr/prowlarr-go/prowlarr"
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -105,24 +105,20 @@ func (i *IndexerProxyDataSource) Read(ctx context.Context, req datasource.ReadRe
 		return
 	}
 
-	indexerProxy, err := findIndexerProxy(data.Name.ValueString(), response)
-	if err != nil {
-		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", indexerProxyDataSourceName, err))
-
-		return
-	}
-
+	data.find(ctx, data.Name.ValueString(), response, &resp.Diagnostics)
 	tflog.Trace(ctx, "read "+indexerProxyDataSourceName)
-	data.write(ctx, indexerProxy, &resp.Diagnostics)
+	// Map response body to resource schema attribute
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findIndexerProxy(name string, indexerProxys []*prowlarr.IndexerProxyResource) (*prowlarr.IndexerProxyResource, error) {
-	for _, i := range indexerProxys {
-		if i.GetName() == name {
-			return i, nil
+func (i *IndexerProxy) find(ctx context.Context, name string, indexerProxies []*prowlarr.IndexerProxyResource, diags *diag.Diagnostics) {
+	for _, proxy := range indexerProxies {
+		if proxy.GetName() == name {
+			i.write(ctx, proxy, diags)
+
+			return
 		}
 	}
 
-	return nil, helpers.ErrDataNotFoundError(indexerProxyDataSourceName, "name", name)
+	diags.AddError(helpers.DataSourceError, helpers.ParseNotFoundError(indexerProxyDataSourceName, "name", name))
 }

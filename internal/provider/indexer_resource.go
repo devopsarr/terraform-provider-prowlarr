@@ -357,7 +357,6 @@ func (f *Field) write(ctx context.Context, field *prowlarr.Field, diags *diag.Di
 func (i *Indexer) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.IndexerResource {
 	fieldList := make([]Field, len(i.Fields.Elements()))
 	diags.Append(i.Fields.ElementsAs(ctx, &fieldList, true)...)
-
 	fields := make([]*prowlarr.Field, len(fieldList))
 
 	for n, f := range fieldList {

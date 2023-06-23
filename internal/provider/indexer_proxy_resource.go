@@ -7,6 +7,7 @@ import (
 	"github.com/devopsarr/prowlarr-go/prowlarr"
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -53,10 +54,20 @@ type IndexerProxy struct {
 	ID             types.Int64  `tfsdk:"id"`
 }
 
-// ProxyCategory is part of IndexerProxy.
-type ProxyCategory struct {
-	Categories types.Set    `tfsdk:"categories"`
-	Name       types.String `tfsdk:"name"`
+func (i IndexerProxy) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"tags":            types.SetType{}.WithElementType(types.Int64Type),
+			"name":            types.StringType,
+			"config_contract": types.StringType,
+			"implementation":  types.StringType,
+			"host":            types.StringType,
+			"username":        types.StringType,
+			"password":        types.StringType,
+			"port":            types.Int64Type,
+			"request_timeout": types.Int64Type,
+			"id":              types.Int64Type,
+		})
 }
 
 func (r *IndexerProxyResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -243,14 +254,12 @@ func (r *IndexerProxyResource) ImportState(ctx context.Context, req resource.Imp
 func (i *IndexerProxy) write(ctx context.Context, indexerProxy *prowlarr.IndexerProxyResource, diags *diag.Diagnostics) {
 	var localDiag diag.Diagnostics
 
-	i.Tags, localDiag = types.SetValueFrom(ctx, types.Int64Type, indexerProxy.Tags)
-	diags.Append(localDiag...)
-
 	i.ID = types.Int64Value(int64(indexerProxy.GetId()))
 	i.ConfigContract = types.StringValue(indexerProxy.GetConfigContract())
 	i.Implementation = types.StringValue(indexerProxy.GetImplementation())
 	i.Name = types.StringValue(indexerProxy.GetName())
-
+	i.Tags, localDiag = types.SetValueFrom(ctx, types.Int64Type, indexerProxy.Tags)
+	diags.Append(localDiag...)
 	helpers.WriteFields(ctx, i, indexerProxy.GetFields(), indexerProxyFields)
 }
 
