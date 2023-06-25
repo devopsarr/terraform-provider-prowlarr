@@ -30,10 +30,10 @@ var (
 )
 
 var downloadClientFields = helpers.Fields{
-	Bools:                  []string{"addPaused", "useSsl", "startOnAdd", "sequentialOrder", "addStopped", "saveMagnetFiles", "readOnly"},
+	Bools:                  []string{"addPaused", "useSsl", "startOnAdd", "addStopped", "saveMagnetFiles", "readOnly"},
 	Ints:                   []string{"port", "itemPriority", "initialState", "intialState"},
 	IntsExceptions:         []string{"priority"},
-	Strings:                []string{"host", "apiKey", "urlBase", "rpcPath", "secretToken", "password", "username", "tvImportedCategory", "directory", "destinationDirectory", "destination", "category", "nzbFolder", "strmFolder", "torrentFolder", "magnetFileExtension", "apiUrl", "appId", "appToken"},
+	Strings:                []string{"host", "apiKey", "urlBase", "rpcPath", "secretToken", "password", "username", "tvImportedCategory", "directory", "destinationDirectory", "destination", "category", "nzbFolder", "strmFolder", "torrentFolder", "magnetFileExtension", "apiUrl", "appId", "appToken", "tvDirectory"},
 	StringSlices:           []string{"fieldTags", "postImTags"},
 	StringSlicesExceptions: []string{"tags"},
 	IntSlices:              []string{"additionalTags"},
@@ -67,6 +67,7 @@ type DownloadClient struct {
 	ConfigContract       types.String `tfsdk:"config_contract"`
 	Destination          types.String `tfsdk:"destination"`
 	Directory            types.String `tfsdk:"directory"`
+	TVDirectory          types.String `tfsdk:"station_directory"`
 	Username             types.String `tfsdk:"username"`
 	TvImportedCategory   types.String `tfsdk:"tv_imported_category"`
 	Password             types.String `tfsdk:"password"`
@@ -87,7 +88,6 @@ type DownloadClient struct {
 	AddStopped           types.Bool   `tfsdk:"add_stopped"`
 	SaveMagnetFiles      types.Bool   `tfsdk:"save_magnet_files"`
 	ReadOnly             types.Bool   `tfsdk:"read_only"`
-	SequentialOrder      types.Bool   `tfsdk:"sequential_order"`
 	StartOnAdd           types.Bool   `tfsdk:"start_on_add"`
 	UseSsl               types.Bool   `tfsdk:"use_ssl"`
 	AddPaused            types.Bool   `tfsdk:"add_paused"`
@@ -114,6 +114,7 @@ func (d DownloadClient) getType() attr.Type {
 			"config_contract":       types.StringType,
 			"destination":           types.StringType,
 			"directory":             types.StringType,
+			"station_directory":     types.StringType,
 			"username":              types.StringType,
 			"tv_imported_category":  types.StringType,
 			"password":              types.StringType,
@@ -134,7 +135,6 @@ func (d DownloadClient) getType() attr.Type {
 			"add_stopped":           types.BoolType,
 			"save_magnet_files":     types.BoolType,
 			"read_only":             types.BoolType,
-			"sequential_order":      types.BoolType,
 			"start_on_add":          types.BoolType,
 			"use_ssl":               types.BoolType,
 			"add_paused":            types.BoolType,
@@ -227,11 +227,6 @@ func (r *DownloadClientResource) Schema(ctx context.Context, req resource.Schema
 			},
 			"start_on_add": schema.BoolAttribute{
 				MarkdownDescription: "Start on add flag.",
-				Optional:            true,
-				Computed:            true,
-			},
-			"sequential_order": schema.BoolAttribute{
-				MarkdownDescription: "Sequential order flag.",
 				Optional:            true,
 				Computed:            true,
 			},
@@ -336,6 +331,12 @@ func (r *DownloadClientResource) Schema(ctx context.Context, req resource.Schema
 				Computed:            true,
 			},
 			"directory": schema.StringAttribute{
+				MarkdownDescription: "Directory.",
+				Optional:            true,
+				Computed:            true,
+			},
+			// needed to decouple TvDirectory
+			"station_directory": schema.StringAttribute{
 				MarkdownDescription: "Directory.",
 				Optional:            true,
 				Computed:            true,

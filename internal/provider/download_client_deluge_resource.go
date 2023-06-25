@@ -47,7 +47,6 @@ type DownloadClientDeluge struct {
 	Name         types.String `tfsdk:"name"`
 	Host         types.String `tfsdk:"host"`
 	URLBase      types.String `tfsdk:"url_base"`
-	Username     types.String `tfsdk:"username"`
 	Password     types.String `tfsdk:"password"`
 	Category     types.String `tfsdk:"category"`
 	ItemPriority types.Int64  `tfsdk:"item_priority"`
@@ -66,7 +65,6 @@ func (d DownloadClientDeluge) toDownloadClient() *DownloadClient {
 		Name:           d.Name,
 		Host:           d.Host,
 		URLBase:        d.URLBase,
-		Username:       d.Username,
 		Password:       d.Password,
 		ItemPriority:   d.ItemPriority,
 		Priority:       d.Priority,
@@ -88,7 +86,6 @@ func (d *DownloadClientDeluge) fromDownloadClient(client *DownloadClient) {
 	d.Name = client.Name
 	d.Host = client.Host
 	d.URLBase = client.URLBase
-	d.Username = client.Username
 	d.Password = client.Password
 	d.Category = client.Category
 	d.ItemPriority = client.ItemPriority
@@ -174,11 +171,6 @@ func (r *DownloadClientDelugeResource) Schema(ctx context.Context, req resource.
 			},
 			"url_base": schema.StringAttribute{
 				MarkdownDescription: "Base URL.",
-				Optional:            true,
-				Computed:            true,
-			},
-			"username": schema.StringAttribute{
-				MarkdownDescription: "Username.",
 				Optional:            true,
 				Computed:            true,
 			},

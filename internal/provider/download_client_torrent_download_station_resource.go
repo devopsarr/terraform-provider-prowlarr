@@ -40,19 +40,19 @@ type DownloadClientTorrentDownloadStationResource struct {
 
 // DownloadClientTorrentDownloadStation describes the download client data model.
 type DownloadClientTorrentDownloadStation struct {
-	Tags       types.Set    `tfsdk:"tags"`
-	Categories types.Set    `tfsdk:"categories"`
-	Name       types.String `tfsdk:"name"`
-	Host       types.String `tfsdk:"host"`
-	Username   types.String `tfsdk:"username"`
-	Password   types.String `tfsdk:"password"`
-	Category   types.String `tfsdk:"category"`
-	Directory  types.String `tfsdk:"directory"`
-	Priority   types.Int64  `tfsdk:"priority"`
-	Port       types.Int64  `tfsdk:"port"`
-	ID         types.Int64  `tfsdk:"id"`
-	UseSsl     types.Bool   `tfsdk:"use_ssl"`
-	Enable     types.Bool   `tfsdk:"enable"`
+	Tags        types.Set    `tfsdk:"tags"`
+	Categories  types.Set    `tfsdk:"categories"`
+	Name        types.String `tfsdk:"name"`
+	Host        types.String `tfsdk:"host"`
+	Username    types.String `tfsdk:"username"`
+	Password    types.String `tfsdk:"password"`
+	Category    types.String `tfsdk:"category"`
+	TVDirectory types.String `tfsdk:"station_directory"`
+	Priority    types.Int64  `tfsdk:"priority"`
+	Port        types.Int64  `tfsdk:"port"`
+	ID          types.Int64  `tfsdk:"id"`
+	UseSsl      types.Bool   `tfsdk:"use_ssl"`
+	Enable      types.Bool   `tfsdk:"enable"`
 }
 
 func (d DownloadClientTorrentDownloadStation) toDownloadClient() *DownloadClient {
@@ -64,7 +64,7 @@ func (d DownloadClientTorrentDownloadStation) toDownloadClient() *DownloadClient
 		Username:       d.Username,
 		Password:       d.Password,
 		Category:       d.Category,
-		Directory:      d.Directory,
+		TVDirectory:    d.TVDirectory,
 		Priority:       d.Priority,
 		Port:           d.Port,
 		ID:             d.ID,
@@ -84,7 +84,7 @@ func (d *DownloadClientTorrentDownloadStation) fromDownloadClient(client *Downlo
 	d.Username = client.Username
 	d.Password = client.Password
 	d.Category = client.Category
-	d.Directory = client.Directory
+	d.TVDirectory = client.TVDirectory
 	d.Priority = client.Priority
 	d.Port = client.Port
 	d.ID = client.ID
@@ -166,7 +166,7 @@ func (r *DownloadClientTorrentDownloadStationResource) Schema(ctx context.Contex
 				Optional:            true,
 				Computed:            true,
 			},
-			"directory": schema.StringAttribute{
+			"station_directory": schema.StringAttribute{
 				MarkdownDescription: "Directory.",
 				Optional:            true,
 				Computed:            true,

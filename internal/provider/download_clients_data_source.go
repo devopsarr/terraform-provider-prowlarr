@@ -114,10 +114,6 @@ func (d *DownloadClientsDataSource) Schema(ctx context.Context, req datasource.S
 							MarkdownDescription: "Start on add flag.",
 							Computed:            true,
 						},
-						"sequential_order": schema.BoolAttribute{
-							MarkdownDescription: "Sequential order flag.",
-							Computed:            true,
-						},
 						"add_stopped": schema.BoolAttribute{
 							MarkdownDescription: "Add stopped flag.",
 							Computed:            true,
@@ -199,6 +195,10 @@ func (d *DownloadClientsDataSource) Schema(ctx context.Context, req datasource.S
 							Computed:            true,
 						},
 						"directory": schema.StringAttribute{
+							MarkdownDescription: "Directory.",
+							Computed:            true,
+						},
+						"station_directory": schema.StringAttribute{
 							MarkdownDescription: "Directory.",
 							Computed:            true,
 						},

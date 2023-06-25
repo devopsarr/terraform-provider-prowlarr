@@ -53,7 +53,6 @@ type DownloadClientNzbvortex struct {
 	Priority     types.Int64  `tfsdk:"priority"`
 	Port         types.Int64  `tfsdk:"port"`
 	ID           types.Int64  `tfsdk:"id"`
-	UseSsl       types.Bool   `tfsdk:"use_ssl"`
 	Enable       types.Bool   `tfsdk:"enable"`
 }
 
@@ -70,7 +69,6 @@ func (d DownloadClientNzbvortex) toDownloadClient() *DownloadClient {
 		Priority:       d.Priority,
 		Port:           d.Port,
 		ID:             d.ID,
-		UseSsl:         d.UseSsl,
 		Enable:         d.Enable,
 		Implementation: types.StringValue(downloadClientNzbvortexImplementation),
 		ConfigContract: types.StringValue(downloadClientNzbvortexConfigContract),
@@ -90,7 +88,6 @@ func (d *DownloadClientNzbvortex) fromDownloadClient(client *DownloadClient) {
 	d.Priority = client.Priority
 	d.Port = client.Port
 	d.ID = client.ID
-	d.UseSsl = client.UseSsl
 	d.Enable = client.Enable
 }
 
@@ -137,11 +134,6 @@ func (r *DownloadClientNzbvortexResource) Schema(ctx context.Context, req resour
 				},
 			},
 			// Field values
-			"use_ssl": schema.BoolAttribute{
-				MarkdownDescription: "Use SSL flag.",
-				Optional:            true,
-				Computed:            true,
-			},
 			"port": schema.Int64Attribute{
 				MarkdownDescription: "Port.",
 				Optional:            true,
