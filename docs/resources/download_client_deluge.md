@@ -46,7 +46,6 @@ resource "prowlarr_download_client_deluge" "example" {
 - `tags` (Set of Number) List of associated tags.
 - `url_base` (String) Base URL.
 - `use_ssl` (Boolean) Use SSL flag.
-- `username` (String) Username.
 
 ### Read-Only
 

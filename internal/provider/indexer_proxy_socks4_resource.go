@@ -7,6 +7,7 @@ import (
 	"github.com/devopsarr/prowlarr-go/prowlarr"
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -136,7 +137,7 @@ func (r *IndexerProxySocks4Resource) Create(ctx context.Context, req resource.Cr
 	}
 
 	// Create new IndexerProxySocks4
-	request := proxy.read(ctx)
+	request := proxy.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.IndexerProxyApi.CreateIndexerProxy(ctx).IndexerProxyResource(*request).Execute()
 	if err != nil {
@@ -147,7 +148,7 @@ func (r *IndexerProxySocks4Resource) Create(ctx context.Context, req resource.Cr
 
 	tflog.Trace(ctx, "created "+indexerProxySocks4ResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	proxy.write(ctx, response)
+	proxy.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &proxy)...)
 }
 
@@ -171,7 +172,7 @@ func (r *IndexerProxySocks4Resource) Read(ctx context.Context, req resource.Read
 
 	tflog.Trace(ctx, "read "+indexerProxySocks4ResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	proxy.write(ctx, response)
+	proxy.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &proxy)...)
 }
 
@@ -186,7 +187,7 @@ func (r *IndexerProxySocks4Resource) Update(ctx context.Context, req resource.Up
 	}
 
 	// Update IndexerProxySocks4
-	request := proxy.read(ctx)
+	request := proxy.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.IndexerProxyApi.UpdateIndexerProxy(ctx, strconv.Itoa(int(request.GetId()))).IndexerProxyResource(*request).Execute()
 	if err != nil {
@@ -197,28 +198,28 @@ func (r *IndexerProxySocks4Resource) Update(ctx context.Context, req resource.Up
 
 	tflog.Trace(ctx, "updated "+indexerProxySocks4ResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	proxy.write(ctx, response)
+	proxy.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &proxy)...)
 }
 
 func (r *IndexerProxySocks4Resource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var proxy *IndexerProxySocks4
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &proxy)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete IndexerProxySocks4 current value
-	_, err := r.client.IndexerProxyApi.DeleteIndexerProxy(ctx, int32(proxy.ID.ValueInt64())).Execute()
+	_, err := r.client.IndexerProxyApi.DeleteIndexerProxy(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerProxySocks4ResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+indexerProxySocks4ResourceName+": "+strconv.Itoa(int(proxy.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+indexerProxySocks4ResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -227,12 +228,12 @@ func (r *IndexerProxySocks4Resource) ImportState(ctx context.Context, req resour
 	tflog.Trace(ctx, "imported "+indexerProxySocks4ResourceName+": "+req.ID)
 }
 
-func (i *IndexerProxySocks4) write(ctx context.Context, indexerProxy *prowlarr.IndexerProxyResource) {
+func (i *IndexerProxySocks4) write(ctx context.Context, indexerProxy *prowlarr.IndexerProxyResource, diags *diag.Diagnostics) {
 	genericIndexerProxy := i.toIndexerProxy()
-	genericIndexerProxy.write(ctx, indexerProxy)
+	genericIndexerProxy.write(ctx, indexerProxy, diags)
 	i.fromIndexerProxy(genericIndexerProxy)
 }
 
-func (i *IndexerProxySocks4) read(ctx context.Context) *prowlarr.IndexerProxyResource {
-	return i.toIndexerProxy().read(ctx)
+func (i *IndexerProxySocks4) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.IndexerProxyResource {
+	return i.toIndexerProxy().read(ctx, diags)
 }

@@ -2,12 +2,12 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/devopsarr/prowlarr-go/prowlarr"
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -125,9 +125,9 @@ func (d *IndexerDataSource) Configure(ctx context.Context, req datasource.Config
 }
 
 func (d *IndexerDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var indexer *Indexer
+	var data *Indexer
 
-	resp.Diagnostics.Append(req.Config.Get(ctx, &indexer)...)
+	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -141,25 +141,20 @@ func (d *IndexerDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		return
 	}
 
-	value, err := findIndexer(indexer.Name.ValueString(), response)
-	if err != nil {
-		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", indexerDataSourceName, err))
-
-		return
-	}
-
+	data.find(ctx, data.Name.ValueString(), response, &resp.Diagnostics)
 	tflog.Trace(ctx, "read "+indexerDataSourceName)
-	indexer.write(ctx, value)
 	// Map response body to resource schema attribute
-	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findIndexer(name string, indexers []*prowlarr.IndexerResource) (*prowlarr.IndexerResource, error) {
-	for _, t := range indexers {
-		if t.GetName() == name {
-			return t, nil
+func (i *Indexer) find(ctx context.Context, name string, indexers []*prowlarr.IndexerResource, diags *diag.Diagnostics) {
+	for _, indexer := range indexers {
+		if indexer.GetName() == name {
+			i.write(ctx, indexer, diags)
+
+			return
 		}
 	}
 
-	return nil, helpers.ErrDataNotFoundError(indexerDataSourceName, "name", name)
+	diags.AddError(helpers.DataSourceError, helpers.ParseNotFoundError(indexerDataSourceName, "name", name))
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -186,9 +187,10 @@ func (r *DownloadClientTransmissionResource) Schema(ctx context.Context, req res
 				Computed:            true,
 			},
 			"password": schema.StringAttribute{
-				MarkdownDescription: "Password.",
+				MarkdownDescription: "password.",
 				Optional:            true,
 				Computed:            true,
+				Sensitive:           true,
 			},
 			"category": schema.StringAttribute{
 				MarkdownDescription: "Category.",
@@ -221,7 +223,7 @@ func (r *DownloadClientTransmissionResource) Create(ctx context.Context, req res
 	}
 
 	// Create new DownloadClientTransmission
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -232,7 +234,7 @@ func (r *DownloadClientTransmissionResource) Create(ctx context.Context, req res
 
 	tflog.Trace(ctx, "created "+downloadClientTransmissionResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -256,7 +258,7 @@ func (r *DownloadClientTransmissionResource) Read(ctx context.Context, req resou
 
 	tflog.Trace(ctx, "read "+downloadClientTransmissionResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -271,7 +273,7 @@ func (r *DownloadClientTransmissionResource) Update(ctx context.Context, req res
 	}
 
 	// Update DownloadClientTransmission
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -282,28 +284,28 @@ func (r *DownloadClientTransmissionResource) Update(ctx context.Context, req res
 
 	tflog.Trace(ctx, "updated "+downloadClientTransmissionResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
 func (r *DownloadClientTransmissionResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var client *DownloadClientTransmission
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &client)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete DownloadClientTransmission current value
-	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(client.ID.ValueInt64())).Execute()
+	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientTransmissionResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+downloadClientTransmissionResourceName+": "+strconv.Itoa(int(client.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+downloadClientTransmissionResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -312,12 +314,12 @@ func (r *DownloadClientTransmissionResource) ImportState(ctx context.Context, re
 	tflog.Trace(ctx, "imported "+downloadClientTransmissionResourceName+": "+req.ID)
 }
 
-func (d *DownloadClientTransmission) write(ctx context.Context, downloadClient *prowlarr.DownloadClientResource) {
+func (d *DownloadClientTransmission) write(ctx context.Context, downloadClient *prowlarr.DownloadClientResource, diags *diag.Diagnostics) {
 	genericDownloadClient := d.toDownloadClient()
-	genericDownloadClient.write(ctx, downloadClient)
+	genericDownloadClient.write(ctx, downloadClient, diags)
 	d.fromDownloadClient(genericDownloadClient)
 }
 
-func (d *DownloadClientTransmission) read(ctx context.Context) *prowlarr.DownloadClientResource {
-	return d.toDownloadClient().read(ctx)
+func (d *DownloadClientTransmission) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.DownloadClientResource {
+	return d.toDownloadClient().read(ctx, diags)
 }

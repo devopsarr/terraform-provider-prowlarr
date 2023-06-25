@@ -7,6 +7,7 @@ import (
 	"github.com/devopsarr/prowlarr-go/prowlarr"
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -46,7 +47,6 @@ type DownloadClientDeluge struct {
 	Name         types.String `tfsdk:"name"`
 	Host         types.String `tfsdk:"host"`
 	URLBase      types.String `tfsdk:"url_base"`
-	Username     types.String `tfsdk:"username"`
 	Password     types.String `tfsdk:"password"`
 	Category     types.String `tfsdk:"category"`
 	ItemPriority types.Int64  `tfsdk:"item_priority"`
@@ -65,7 +65,6 @@ func (d DownloadClientDeluge) toDownloadClient() *DownloadClient {
 		Name:           d.Name,
 		Host:           d.Host,
 		URLBase:        d.URLBase,
-		Username:       d.Username,
 		Password:       d.Password,
 		ItemPriority:   d.ItemPriority,
 		Priority:       d.Priority,
@@ -87,7 +86,6 @@ func (d *DownloadClientDeluge) fromDownloadClient(client *DownloadClient) {
 	d.Name = client.Name
 	d.Host = client.Host
 	d.URLBase = client.URLBase
-	d.Username = client.Username
 	d.Password = client.Password
 	d.Category = client.Category
 	d.ItemPriority = client.ItemPriority
@@ -176,11 +174,6 @@ func (r *DownloadClientDelugeResource) Schema(ctx context.Context, req resource.
 				Optional:            true,
 				Computed:            true,
 			},
-			"username": schema.StringAttribute{
-				MarkdownDescription: "Username.",
-				Optional:            true,
-				Computed:            true,
-			},
 			"category": schema.StringAttribute{
 				MarkdownDescription: "Category.",
 				Optional:            true,
@@ -213,7 +206,7 @@ func (r *DownloadClientDelugeResource) Create(ctx context.Context, req resource.
 	}
 
 	// Create new DownloadClientDeluge
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -224,7 +217,7 @@ func (r *DownloadClientDelugeResource) Create(ctx context.Context, req resource.
 
 	tflog.Trace(ctx, "created "+downloadClientDelugeResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -248,7 +241,7 @@ func (r *DownloadClientDelugeResource) Read(ctx context.Context, req resource.Re
 
 	tflog.Trace(ctx, "read "+downloadClientDelugeResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -263,7 +256,7 @@ func (r *DownloadClientDelugeResource) Update(ctx context.Context, req resource.
 	}
 
 	// Update DownloadClientDeluge
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -274,28 +267,28 @@ func (r *DownloadClientDelugeResource) Update(ctx context.Context, req resource.
 
 	tflog.Trace(ctx, "updated "+downloadClientDelugeResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
 func (r *DownloadClientDelugeResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var client *DownloadClientDeluge
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &client)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete DownloadClientDeluge current value
-	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(client.ID.ValueInt64())).Execute()
+	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientDelugeResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+downloadClientDelugeResourceName+": "+strconv.Itoa(int(client.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+downloadClientDelugeResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -304,12 +297,12 @@ func (r *DownloadClientDelugeResource) ImportState(ctx context.Context, req reso
 	tflog.Trace(ctx, "imported "+downloadClientDelugeResourceName+": "+req.ID)
 }
 
-func (d *DownloadClientDeluge) write(ctx context.Context, downloadClient *prowlarr.DownloadClientResource) {
-	genericDownloadClient := DownloadClient{}
-	genericDownloadClient.write(ctx, downloadClient)
-	d.fromDownloadClient(&genericDownloadClient)
+func (d *DownloadClientDeluge) write(ctx context.Context, downloadClient *prowlarr.DownloadClientResource, diags *diag.Diagnostics) {
+	genericDownloadClient := d.toDownloadClient()
+	genericDownloadClient.write(ctx, downloadClient, diags)
+	d.fromDownloadClient(genericDownloadClient)
 }
 
-func (d *DownloadClientDeluge) read(ctx context.Context) *prowlarr.DownloadClientResource {
-	return d.toDownloadClient().read(ctx)
+func (d *DownloadClientDeluge) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.DownloadClientResource {
+	return d.toDownloadClient().read(ctx, diags)
 }

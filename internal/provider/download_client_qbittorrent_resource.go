@@ -7,6 +7,7 @@ import (
 	"github.com/devopsarr/prowlarr-go/prowlarr"
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -43,45 +44,43 @@ type DownloadClientQbittorrentResource struct {
 
 // DownloadClientQbittorrent describes the download client data model.
 type DownloadClientQbittorrent struct {
-	Tags            types.Set    `tfsdk:"tags"`
-	Categories      types.Set    `tfsdk:"categories"`
-	Name            types.String `tfsdk:"name"`
-	Host            types.String `tfsdk:"host"`
-	URLBase         types.String `tfsdk:"url_base"`
-	Username        types.String `tfsdk:"username"`
-	Password        types.String `tfsdk:"password"`
-	Category        types.String `tfsdk:"category"`
-	ItemPriority    types.Int64  `tfsdk:"item_priority"`
-	Priority        types.Int64  `tfsdk:"priority"`
-	Port            types.Int64  `tfsdk:"port"`
-	ID              types.Int64  `tfsdk:"id"`
-	InitialState    types.Int64  `tfsdk:"initial_state"`
-	UseSsl          types.Bool   `tfsdk:"use_ssl"`
-	Enable          types.Bool   `tfsdk:"enable"`
-	SequentialOrder types.Bool   `tfsdk:"sequential_order"`
+	Tags         types.Set    `tfsdk:"tags"`
+	Categories   types.Set    `tfsdk:"categories"`
+	Name         types.String `tfsdk:"name"`
+	Host         types.String `tfsdk:"host"`
+	URLBase      types.String `tfsdk:"url_base"`
+	Username     types.String `tfsdk:"username"`
+	Password     types.String `tfsdk:"password"`
+	Category     types.String `tfsdk:"category"`
+	ItemPriority types.Int64  `tfsdk:"item_priority"`
+	Priority     types.Int64  `tfsdk:"priority"`
+	Port         types.Int64  `tfsdk:"port"`
+	ID           types.Int64  `tfsdk:"id"`
+	InitialState types.Int64  `tfsdk:"initial_state"`
+	UseSsl       types.Bool   `tfsdk:"use_ssl"`
+	Enable       types.Bool   `tfsdk:"enable"`
 }
 
 func (d DownloadClientQbittorrent) toDownloadClient() *DownloadClient {
 	return &DownloadClient{
-		Tags:            d.Tags,
-		Categories:      d.Categories,
-		Name:            d.Name,
-		Host:            d.Host,
-		URLBase:         d.URLBase,
-		Username:        d.Username,
-		Password:        d.Password,
-		Category:        d.Category,
-		ItemPriority:    d.ItemPriority,
-		Priority:        d.Priority,
-		Port:            d.Port,
-		ID:              d.ID,
-		InitialState:    d.InitialState,
-		UseSsl:          d.UseSsl,
-		Enable:          d.Enable,
-		SequentialOrder: d.SequentialOrder,
-		Implementation:  types.StringValue(downloadClientQbittorrentImplementation),
-		ConfigContract:  types.StringValue(downloadClientQbittorrentConfigContract),
-		Protocol:        types.StringValue(downloadClientQbittorrentProtocol),
+		Tags:           d.Tags,
+		Categories:     d.Categories,
+		Name:           d.Name,
+		Host:           d.Host,
+		URLBase:        d.URLBase,
+		Username:       d.Username,
+		Password:       d.Password,
+		Category:       d.Category,
+		ItemPriority:   d.ItemPriority,
+		Priority:       d.Priority,
+		Port:           d.Port,
+		ID:             d.ID,
+		InitialState:   d.InitialState,
+		UseSsl:         d.UseSsl,
+		Enable:         d.Enable,
+		Implementation: types.StringValue(downloadClientQbittorrentImplementation),
+		ConfigContract: types.StringValue(downloadClientQbittorrentConfigContract),
+		Protocol:       types.StringValue(downloadClientQbittorrentProtocol),
 	}
 }
 
@@ -101,7 +100,6 @@ func (d *DownloadClientQbittorrent) fromDownloadClient(client *DownloadClient) {
 	d.InitialState = client.InitialState
 	d.UseSsl = client.UseSsl
 	d.Enable = client.Enable
-	d.SequentialOrder = client.SequentialOrder
 }
 
 func (r *DownloadClientQbittorrentResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -149,11 +147,6 @@ func (r *DownloadClientQbittorrentResource) Schema(ctx context.Context, req reso
 			// Field values
 			"use_ssl": schema.BoolAttribute{
 				MarkdownDescription: "Use SSL flag.",
-				Optional:            true,
-				Computed:            true,
-			},
-			"sequential_order": schema.BoolAttribute{
-				MarkdownDescription: "Sequential order flag.",
 				Optional:            true,
 				Computed:            true,
 			},
@@ -225,7 +218,7 @@ func (r *DownloadClientQbittorrentResource) Create(ctx context.Context, req reso
 	}
 
 	// Create new DownloadClientQbittorrent
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -236,7 +229,7 @@ func (r *DownloadClientQbittorrentResource) Create(ctx context.Context, req reso
 
 	tflog.Trace(ctx, "created "+downloadClientQbittorrentResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -260,7 +253,7 @@ func (r *DownloadClientQbittorrentResource) Read(ctx context.Context, req resour
 
 	tflog.Trace(ctx, "read "+downloadClientQbittorrentResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -275,7 +268,7 @@ func (r *DownloadClientQbittorrentResource) Update(ctx context.Context, req reso
 	}
 
 	// Update DownloadClientQbittorrent
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -286,28 +279,28 @@ func (r *DownloadClientQbittorrentResource) Update(ctx context.Context, req reso
 
 	tflog.Trace(ctx, "updated "+downloadClientQbittorrentResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
 func (r *DownloadClientQbittorrentResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var client *DownloadClientQbittorrent
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &client)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete DownloadClientQbittorrent current value
-	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(client.ID.ValueInt64())).Execute()
+	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientQbittorrentResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+downloadClientQbittorrentResourceName+": "+strconv.Itoa(int(client.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+downloadClientQbittorrentResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -316,12 +309,12 @@ func (r *DownloadClientQbittorrentResource) ImportState(ctx context.Context, req
 	tflog.Trace(ctx, "imported "+downloadClientQbittorrentResourceName+": "+req.ID)
 }
 
-func (d *DownloadClientQbittorrent) write(ctx context.Context, downloadClient *prowlarr.DownloadClientResource) {
-	genericDownloadClient := DownloadClient{}
-	genericDownloadClient.write(ctx, downloadClient)
-	d.fromDownloadClient(&genericDownloadClient)
+func (d *DownloadClientQbittorrent) write(ctx context.Context, downloadClient *prowlarr.DownloadClientResource, diags *diag.Diagnostics) {
+	genericDownloadClient := d.toDownloadClient()
+	genericDownloadClient.write(ctx, downloadClient, diags)
+	d.fromDownloadClient(genericDownloadClient)
 }
 
-func (d *DownloadClientQbittorrent) read(ctx context.Context) *prowlarr.DownloadClientResource {
-	return d.toDownloadClient().read(ctx)
+func (d *DownloadClientQbittorrent) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.DownloadClientResource {
+	return d.toDownloadClient().read(ctx, diags)
 }

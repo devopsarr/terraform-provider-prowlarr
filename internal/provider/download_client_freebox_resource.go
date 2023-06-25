@@ -7,6 +7,7 @@ import (
 	"github.com/devopsarr/prowlarr-go/prowlarr"
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -215,7 +216,7 @@ func (r *DownloadClientFreeboxResource) Create(ctx context.Context, req resource
 	}
 
 	// Create new DownloadClientFreebox
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -226,7 +227,7 @@ func (r *DownloadClientFreeboxResource) Create(ctx context.Context, req resource
 
 	tflog.Trace(ctx, "created "+downloadClientFreeboxResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -250,7 +251,7 @@ func (r *DownloadClientFreeboxResource) Read(ctx context.Context, req resource.R
 
 	tflog.Trace(ctx, "read "+downloadClientFreeboxResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -265,7 +266,7 @@ func (r *DownloadClientFreeboxResource) Update(ctx context.Context, req resource
 	}
 
 	// Update DownloadClientFreebox
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -276,28 +277,28 @@ func (r *DownloadClientFreeboxResource) Update(ctx context.Context, req resource
 
 	tflog.Trace(ctx, "updated "+downloadClientFreeboxResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
 func (r *DownloadClientFreeboxResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var client *DownloadClientFreebox
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &client)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete DownloadClientFreebox current value
-	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(client.ID.ValueInt64())).Execute()
+	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientFreeboxResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+downloadClientFreeboxResourceName+": "+strconv.Itoa(int(client.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+downloadClientFreeboxResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -306,12 +307,12 @@ func (r *DownloadClientFreeboxResource) ImportState(ctx context.Context, req res
 	tflog.Trace(ctx, "imported "+downloadClientFreeboxResourceName+": "+req.ID)
 }
 
-func (d *DownloadClientFreebox) write(ctx context.Context, downloadClient *prowlarr.DownloadClientResource) {
-	genericDownloadClient := DownloadClient{}
-	genericDownloadClient.write(ctx, downloadClient)
-	d.fromDownloadClient(&genericDownloadClient)
+func (d *DownloadClientFreebox) write(ctx context.Context, downloadClient *prowlarr.DownloadClientResource, diags *diag.Diagnostics) {
+	genericDownloadClient := d.toDownloadClient()
+	genericDownloadClient.write(ctx, downloadClient, diags)
+	d.fromDownloadClient(genericDownloadClient)
 }
 
-func (d *DownloadClientFreebox) read(ctx context.Context) *prowlarr.DownloadClientResource {
-	return d.toDownloadClient().read(ctx)
+func (d *DownloadClientFreebox) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.DownloadClientResource {
+	return d.toDownloadClient().read(ctx, diags)
 }

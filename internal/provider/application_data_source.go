@@ -2,13 +2,13 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/devopsarr/prowlarr-go/prowlarr"
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -111,24 +111,20 @@ func (d *ApplicationDataSource) Read(ctx context.Context, req datasource.ReadReq
 		return
 	}
 
-	application, err := findApplication(data.Name.ValueString(), response)
-	if err != nil {
-		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", applicationDataSourceName, err))
-
-		return
-	}
-
+	data.find(ctx, data.Name.ValueString(), response, &resp.Diagnostics)
 	tflog.Trace(ctx, "read "+applicationDataSourceName)
-	data.write(ctx, application)
+	// Map response body to resource schema attribute
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findApplication(name string, applications []*prowlarr.ApplicationResource) (*prowlarr.ApplicationResource, error) {
-	for _, i := range applications {
-		if i.GetName() == name {
-			return i, nil
+func (a *Application) find(ctx context.Context, name string, applications []*prowlarr.ApplicationResource, diags *diag.Diagnostics) {
+	for _, app := range applications {
+		if app.GetName() == name {
+			a.write(ctx, app, diags)
+
+			return
 		}
 	}
 
-	return nil, helpers.ErrDataNotFoundError(applicationDataSourceName, "name", name)
+	diags.AddError(helpers.DataSourceError, helpers.ParseNotFoundError(applicationDataSourceName, "name", name))
 }

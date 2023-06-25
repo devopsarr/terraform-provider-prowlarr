@@ -2,12 +2,12 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/devopsarr/prowlarr-go/prowlarr"
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -141,9 +141,9 @@ func (d *IndexerSchemaDataSource) Configure(ctx context.Context, req datasource.
 }
 
 func (d *IndexerSchemaDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var schema *IndexerSchema
+	var data *IndexerSchema
 
-	resp.Diagnostics.Append(req.Config.Get(ctx, &schema)...)
+	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -157,34 +157,28 @@ func (d *IndexerSchemaDataSource) Read(ctx context.Context, req datasource.ReadR
 		return
 	}
 
-	value, id, err := findIndexerSchema(schema.Name.ValueString(), response)
-	if err != nil {
-		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", indexerSchemaDataSourceName, err))
-
-		return
-	}
-
+	data.find(ctx, data.Name.ValueString(), response, &resp.Diagnostics)
 	tflog.Trace(ctx, "read "+indexerSchemaDataSourceName)
-
-	schema.ID = types.Int64Value(id)
-	schema.write(ctx, value)
 	// Map response body to resource schema attribute
-	resp.Diagnostics.Append(resp.State.Set(ctx, &schema)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findIndexerSchema(name string, schemas []*prowlarr.IndexerResource) (*prowlarr.IndexerResource, int64, error) {
-	for i, t := range schemas {
-		if t.GetName() == name {
-			return t, int64(i), nil
+func (i *IndexerSchema) find(ctx context.Context, name string, schemas []*prowlarr.IndexerResource, diags *diag.Diagnostics) {
+	for id, indexer := range schemas {
+		if indexer.GetName() == name {
+			i.ID = types.Int64Value(int64(id))
+			i.write(ctx, indexer, diags)
+
+			return
 		}
 	}
 
-	return nil, 0, helpers.ErrDataNotFoundError(indexerSchemaDataSourceName, "name", name)
+	diags.AddError(helpers.DataSourceError, helpers.ParseNotFoundError(indexerSchemaDataSourceName, "name", name))
 }
 
-func (i *IndexerSchema) write(ctx context.Context, indexer *prowlarr.IndexerResource) {
-	i.IndexerURLs, _ = types.SetValueFrom(ctx, types.StringType, indexer.GetIndexerUrls())
-	i.LegacyURLs, _ = types.SetValueFrom(ctx, types.StringType, indexer.GetLegacyUrls())
+func (i *IndexerSchema) write(ctx context.Context, indexer *prowlarr.IndexerResource, diags *diag.Diagnostics) {
+	var tempDiag diag.Diagnostics
+
 	i.ConfigContract = types.StringValue(indexer.GetConfigContract())
 	i.Implementation = types.StringValue(indexer.GetImplementation())
 	i.Name = types.StringValue(indexer.GetName())
@@ -199,7 +193,12 @@ func (i *IndexerSchema) write(ctx context.Context, indexer *prowlarr.IndexerReso
 		fields[n].write(f)
 	}
 
-	i.Fields, _ = types.SetValueFrom(ctx, IndexerSchemaDataSource{}.getFieldSchema().Type(), fields)
+	i.Fields, tempDiag = types.SetValueFrom(ctx, IndexerSchemaDataSource{}.getFieldSchema().Type(), fields)
+	diags.Append(tempDiag...)
+	i.IndexerURLs, tempDiag = types.SetValueFrom(ctx, types.StringType, indexer.GetIndexerUrls())
+	diags.Append(tempDiag...)
+	i.LegacyURLs, tempDiag = types.SetValueFrom(ctx, types.StringType, indexer.GetLegacyUrls())
+	diags.Append(tempDiag...)
 }
 
 func (f *SchemaField) write(field *prowlarr.Field) {

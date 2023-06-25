@@ -43,7 +43,6 @@ resource "prowlarr_download_client_qbittorrent" "example" {
 - `password` (String, Sensitive) Password.
 - `port` (Number) Port.
 - `priority` (Number) Priority.
-- `sequential_order` (Boolean) Sequential order flag.
 - `tags` (Set of Number) List of associated tags.
 - `url_base` (String) Base URL.
 - `use_ssl` (Boolean) Use SSL flag.

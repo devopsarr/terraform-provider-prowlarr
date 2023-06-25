@@ -43,7 +43,6 @@ resource "prowlarr_download_client_nzbvortex" "example" {
 - `priority` (Number) Priority.
 - `tags` (Set of Number) List of associated tags.
 - `url_base` (String) Base URL.
-- `use_ssl` (Boolean) Use SSL flag.
 
 ### Read-Only
 

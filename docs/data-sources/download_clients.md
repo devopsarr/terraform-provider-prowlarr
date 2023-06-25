@@ -63,8 +63,8 @@ Read-Only:
 - `rpc_path` (String) RPC path.
 - `save_magnet_files` (Boolean) Save magnet files flag.
 - `secret_token` (String, Sensitive) Secret token.
-- `sequential_order` (Boolean) Sequential order flag.
 - `start_on_add` (Boolean) Start on add flag.
+- `station_directory` (String) Directory.
 - `strm_folder` (String) STRM folder.
 - `tags` (Set of Number) List of associated tags.
 - `torrent_folder` (String) Torrent folder.

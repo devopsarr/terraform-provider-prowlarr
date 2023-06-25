@@ -34,12 +34,12 @@ resource "prowlarr_download_client_torrent_download_station" "example" {
 ### Optional
 
 - `category` (String) Category.
-- `directory` (String) Directory.
 - `enable` (Boolean) Enable flag.
 - `host` (String) host.
 - `password` (String, Sensitive) Password.
 - `port` (Number) Port.
 - `priority` (Number) Priority.
+- `station_directory` (String) Directory.
 - `tags` (Set of Number) List of associated tags.
 - `use_ssl` (Boolean) Use SSL flag.
 - `username` (String) Username.

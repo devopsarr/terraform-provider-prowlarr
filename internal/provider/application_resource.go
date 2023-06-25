@@ -8,13 +8,14 @@ import (
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -54,6 +55,23 @@ type Application struct {
 	BaseURL             types.String `tfsdk:"base_url"`
 	APIKey              types.String `tfsdk:"api_key"`
 	ID                  types.Int64  `tfsdk:"id"`
+}
+
+func (a Application) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"sync_categories":       types.SetType{}.WithElementType(types.Int64Type),
+			"anime_sync_categories": types.SetType{}.WithElementType(types.Int64Type),
+			"tags":                  types.SetType{}.WithElementType(types.Int64Type),
+			"name":                  types.StringType,
+			"config_contract":       types.StringType,
+			"implementation":        types.StringType,
+			"sync_level":            types.StringType,
+			"prowlarr_url":          types.StringType,
+			"base_url":              types.StringType,
+			"api_key":               types.StringType,
+			"id":                    types.Int64Type,
+		})
 }
 
 func (r *ApplicationResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -146,7 +164,7 @@ func (r *ApplicationResource) Create(ctx context.Context, req resource.CreateReq
 	}
 
 	// Create new Application
-	request := application.read(ctx)
+	request := application.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.ApplicationApi.CreateApplications(ctx).ApplicationResource(*request).Execute()
 	if err != nil {
@@ -160,7 +178,7 @@ func (r *ApplicationResource) Create(ctx context.Context, req resource.CreateReq
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Application
 
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -187,7 +205,7 @@ func (r *ApplicationResource) Read(ctx context.Context, req resource.ReadRequest
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Application
 
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -202,7 +220,7 @@ func (r *ApplicationResource) Update(ctx context.Context, req resource.UpdateReq
 	}
 
 	// Update Application
-	request := application.read(ctx)
+	request := application.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.ApplicationApi.UpdateApplications(ctx, strconv.Itoa(int(request.GetId()))).ApplicationResource(*request).Execute()
 	if err != nil {
@@ -216,28 +234,28 @@ func (r *ApplicationResource) Update(ctx context.Context, req resource.UpdateReq
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Application
 
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
 func (r *ApplicationResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var application *Application
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &application)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete Application current value
-	_, err := r.client.ApplicationApi.DeleteApplications(ctx, int32(application.ID.ValueInt64())).Execute()
+	_, err := r.client.ApplicationApi.DeleteApplications(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+applicationResourceName+": "+strconv.Itoa(int(application.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+applicationResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -246,8 +264,9 @@ func (r *ApplicationResource) ImportState(ctx context.Context, req resource.Impo
 	tflog.Trace(ctx, "imported "+applicationResourceName+": "+req.ID)
 }
 
-func (a *Application) write(ctx context.Context, application *prowlarr.ApplicationResource) {
-	a.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, application.GetTags())
+func (a *Application) write(ctx context.Context, application *prowlarr.ApplicationResource, diags *diag.Diagnostics) {
+	var localDiag diag.Diagnostics
+
 	a.ID = types.Int64Value(int64(application.GetId()))
 	a.Name = types.StringValue(application.GetName())
 	a.SyncLevel = types.StringValue(string(application.GetSyncLevel()))
@@ -255,20 +274,19 @@ func (a *Application) write(ctx context.Context, application *prowlarr.Applicati
 	a.ConfigContract = types.StringValue(application.GetConfigContract())
 	a.SyncCategories = types.SetValueMust(types.Int64Type, nil)
 	a.AnimeSyncCategories = types.SetValueMust(types.Int64Type, nil)
+	a.Tags, localDiag = types.SetValueFrom(ctx, types.Int64Type, application.Tags)
+	diags.Append(localDiag...)
 	helpers.WriteFields(ctx, a, application.GetFields(), applicationFields)
 }
 
-func (a *Application) read(ctx context.Context) *prowlarr.ApplicationResource {
-	tags := make([]*int32, len(a.Tags.Elements()))
-	tfsdk.ValueAs(ctx, a.Tags, &tags)
-
+func (a *Application) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.ApplicationResource {
 	application := prowlarr.NewApplicationResource()
 	application.SetSyncLevel(prowlarr.ApplicationSyncLevel(a.SyncLevel.ValueString()))
 	application.SetId(int32(a.ID.ValueInt64()))
 	application.SetName(a.Name.ValueString())
 	application.SetImplementation(a.Implementation.ValueString())
 	application.SetConfigContract(a.ConfigContract.ValueString())
-	application.SetTags(tags)
+	diags.Append(a.Tags.ElementsAs(ctx, &application.Tags, true)...)
 	application.SetFields(helpers.ReadFields(ctx, a, applicationFields))
 
 	return application

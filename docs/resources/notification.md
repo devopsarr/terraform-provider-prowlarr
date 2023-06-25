@@ -91,7 +91,7 @@ resource "prowlarr_notification" "example" {
 - `on_grab` (Boolean) On release grab flag.
 - `on_health_issue` (Boolean) On health issue flag.
 - `on_health_restored` (Boolean) On health restored flag.
-- `password` (String) password.
+- `password` (String, Sensitive) password.
 - `path` (String) Path.
 - `port` (Number) Port.
 - `priority` (Number) Priority.

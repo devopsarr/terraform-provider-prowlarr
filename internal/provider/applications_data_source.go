@@ -9,7 +9,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -115,13 +114,6 @@ func (d *ApplicationsDataSource) Configure(ctx context.Context, req datasource.C
 }
 
 func (d *ApplicationsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data *Applications
-
-	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
 	// Get applications current value
 	response, _, err := d.client.ApplicationApi.ListApplications(ctx).Execute()
 	if err != nil {
@@ -132,13 +124,12 @@ func (d *ApplicationsDataSource) Read(ctx context.Context, req datasource.ReadRe
 
 	tflog.Trace(ctx, "read "+applicationsDataSourceName)
 	// Map response body to resource schema attribute
-	profiles := make([]Application, len(response))
-	for i, p := range response {
-		profiles[i].write(ctx, p)
+	applications := make([]Application, len(response))
+	for i, a := range response {
+		applications[i].write(ctx, a, &resp.Diagnostics)
 	}
 
-	tfsdk.ValueFrom(ctx, profiles, data.Applications.Type(ctx), &data.Applications)
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	data.ID = types.StringValue(strconv.Itoa(len(response)))
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+	appList, diags := types.SetValueFrom(ctx, Application{}.getType(), applications)
+	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, Applications{Applications: appList, ID: types.StringValue(strconv.Itoa(len(response)))})...)
 }

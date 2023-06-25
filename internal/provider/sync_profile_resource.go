@@ -7,6 +7,7 @@ import (
 
 	"github.com/devopsarr/prowlarr-go/prowlarr"
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -41,6 +42,18 @@ type SyncProfile struct {
 	EnableRss               types.Bool   `tfsdk:"enable_rss"`
 	EnableInteractiveSearch types.Bool   `tfsdk:"enable_interactive_search"`
 	EnableAutomaticSearch   types.Bool   `tfsdk:"enable_automatic_search"`
+}
+
+func (s SyncProfile) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"name":                      types.StringType,
+			"id":                        types.Int64Type,
+			"minimum_seeders":           types.Int64Type,
+			"enable_rss":                types.BoolType,
+			"enable_interactive_search": types.BoolType,
+			"enable_automatic_search":   types.BoolType,
+		})
 }
 
 func (r *SyncProfileResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -165,23 +178,23 @@ func (r *SyncProfileResource) Update(ctx context.Context, req resource.UpdateReq
 }
 
 func (r *SyncProfileResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var profile *SyncProfile
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &profile)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete sync profile current value
-	_, err := r.client.AppProfileApi.DeleteAppProfile(ctx, int32(profile.ID.ValueInt64())).Execute()
+	_, err := r.client.AppProfileApi.DeleteAppProfile(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, syncProfileResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+syncProfileResourceName+": "+strconv.Itoa(int(profile.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+syncProfileResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 

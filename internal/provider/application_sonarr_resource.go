@@ -8,6 +8,7 @@ import (
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -159,7 +160,7 @@ func (r *ApplicationSonarrResource) Create(ctx context.Context, req resource.Cre
 	}
 
 	// Create new ApplicationSonarr
-	request := application.read(ctx)
+	request := application.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.ApplicationApi.CreateApplications(ctx).ApplicationResource(*request).Execute()
 	if err != nil {
@@ -170,7 +171,7 @@ func (r *ApplicationSonarrResource) Create(ctx context.Context, req resource.Cre
 
 	tflog.Trace(ctx, "created "+applicationSonarrResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	application.write(ctx, response)
+	application.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &application)...)
 }
 
@@ -194,7 +195,7 @@ func (r *ApplicationSonarrResource) Read(ctx context.Context, req resource.ReadR
 
 	tflog.Trace(ctx, "read "+applicationSonarrResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	application.write(ctx, response)
+	application.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &application)...)
 }
 
@@ -209,7 +210,7 @@ func (r *ApplicationSonarrResource) Update(ctx context.Context, req resource.Upd
 	}
 
 	// Update ApplicationSonarr
-	request := application.read(ctx)
+	request := application.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.ApplicationApi.UpdateApplications(ctx, strconv.Itoa(int(request.GetId()))).ApplicationResource(*request).Execute()
 	if err != nil {
@@ -220,28 +221,28 @@ func (r *ApplicationSonarrResource) Update(ctx context.Context, req resource.Upd
 
 	tflog.Trace(ctx, "updated "+applicationSonarrResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	application.write(ctx, response)
+	application.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &application)...)
 }
 
 func (r *ApplicationSonarrResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var application *ApplicationSonarr
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &application)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete ApplicationSonarr current value
-	_, err := r.client.ApplicationApi.DeleteApplications(ctx, int32(application.ID.ValueInt64())).Execute()
+	_, err := r.client.ApplicationApi.DeleteApplications(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationSonarrResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+applicationSonarrResourceName+": "+strconv.Itoa(int(application.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+applicationSonarrResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -250,12 +251,12 @@ func (r *ApplicationSonarrResource) ImportState(ctx context.Context, req resourc
 	tflog.Trace(ctx, "imported "+applicationSonarrResourceName+": "+req.ID)
 }
 
-func (a *ApplicationSonarr) write(ctx context.Context, application *prowlarr.ApplicationResource) {
+func (a *ApplicationSonarr) write(ctx context.Context, application *prowlarr.ApplicationResource, diags *diag.Diagnostics) {
 	genericApplication := a.toApplication()
-	genericApplication.write(ctx, application)
+	genericApplication.write(ctx, application, diags)
 	a.fromApplication(genericApplication)
 }
 
-func (a *ApplicationSonarr) read(ctx context.Context) *prowlarr.ApplicationResource {
-	return a.toApplication().read(ctx)
+func (a *ApplicationSonarr) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.ApplicationResource {
+	return a.toApplication().read(ctx, diags)
 }

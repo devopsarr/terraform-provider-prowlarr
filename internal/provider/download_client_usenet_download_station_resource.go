@@ -6,6 +6,7 @@ import (
 
 	"github.com/devopsarr/prowlarr-go/prowlarr"
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -39,19 +40,19 @@ type DownloadClientUsenetDownloadStationResource struct {
 
 // DownloadClientUsenetDownloadStation describes the download client data model.
 type DownloadClientUsenetDownloadStation struct {
-	Tags       types.Set    `tfsdk:"tags"`
-	Categories types.Set    `tfsdk:"categories"`
-	Name       types.String `tfsdk:"name"`
-	Host       types.String `tfsdk:"host"`
-	Username   types.String `tfsdk:"username"`
-	Password   types.String `tfsdk:"password"`
-	Category   types.String `tfsdk:"category"`
-	Directory  types.String `tfsdk:"directory"`
-	Priority   types.Int64  `tfsdk:"priority"`
-	Port       types.Int64  `tfsdk:"port"`
-	ID         types.Int64  `tfsdk:"id"`
-	UseSsl     types.Bool   `tfsdk:"use_ssl"`
-	Enable     types.Bool   `tfsdk:"enable"`
+	Tags        types.Set    `tfsdk:"tags"`
+	Categories  types.Set    `tfsdk:"categories"`
+	Name        types.String `tfsdk:"name"`
+	Host        types.String `tfsdk:"host"`
+	Username    types.String `tfsdk:"username"`
+	Password    types.String `tfsdk:"password"`
+	Category    types.String `tfsdk:"category"`
+	TVDirectory types.String `tfsdk:"station_directory"`
+	Priority    types.Int64  `tfsdk:"priority"`
+	Port        types.Int64  `tfsdk:"port"`
+	ID          types.Int64  `tfsdk:"id"`
+	UseSsl      types.Bool   `tfsdk:"use_ssl"`
+	Enable      types.Bool   `tfsdk:"enable"`
 }
 
 func (d DownloadClientUsenetDownloadStation) toDownloadClient() *DownloadClient {
@@ -63,7 +64,7 @@ func (d DownloadClientUsenetDownloadStation) toDownloadClient() *DownloadClient 
 		Username:       d.Username,
 		Password:       d.Password,
 		Category:       d.Category,
-		Directory:      d.Directory,
+		TVDirectory:    d.TVDirectory,
 		Priority:       d.Priority,
 		Port:           d.Port,
 		ID:             d.ID,
@@ -83,7 +84,7 @@ func (d *DownloadClientUsenetDownloadStation) fromDownloadClient(client *Downloa
 	d.Username = client.Username
 	d.Password = client.Password
 	d.Category = client.Category
-	d.Directory = client.Directory
+	d.TVDirectory = client.TVDirectory
 	d.Priority = client.Priority
 	d.Port = client.Port
 	d.ID = client.ID
@@ -165,7 +166,7 @@ func (r *DownloadClientUsenetDownloadStationResource) Schema(ctx context.Context
 				Optional:            true,
 				Computed:            true,
 			},
-			"directory": schema.StringAttribute{
+			"station_directory": schema.StringAttribute{
 				MarkdownDescription: "Directory.",
 				Optional:            true,
 				Computed:            true,
@@ -191,7 +192,7 @@ func (r *DownloadClientUsenetDownloadStationResource) Create(ctx context.Context
 	}
 
 	// Create new DownloadClientUsenetDownloadStation
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -202,7 +203,7 @@ func (r *DownloadClientUsenetDownloadStationResource) Create(ctx context.Context
 
 	tflog.Trace(ctx, "created "+downloadClientUsenetDownloadStationResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -226,7 +227,7 @@ func (r *DownloadClientUsenetDownloadStationResource) Read(ctx context.Context, 
 
 	tflog.Trace(ctx, "read "+downloadClientUsenetDownloadStationResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -241,7 +242,7 @@ func (r *DownloadClientUsenetDownloadStationResource) Update(ctx context.Context
 	}
 
 	// Update DownloadClientUsenetDownloadStation
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -252,28 +253,28 @@ func (r *DownloadClientUsenetDownloadStationResource) Update(ctx context.Context
 
 	tflog.Trace(ctx, "updated "+downloadClientUsenetDownloadStationResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
 func (r *DownloadClientUsenetDownloadStationResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var client *DownloadClientUsenetDownloadStation
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &client)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete DownloadClientUsenetDownloadStation current value
-	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(client.ID.ValueInt64())).Execute()
+	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientUsenetDownloadStationResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+downloadClientUsenetDownloadStationResourceName+": "+strconv.Itoa(int(client.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+downloadClientUsenetDownloadStationResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -282,12 +283,12 @@ func (r *DownloadClientUsenetDownloadStationResource) ImportState(ctx context.Co
 	tflog.Trace(ctx, "imported "+downloadClientUsenetDownloadStationResourceName+": "+req.ID)
 }
 
-func (d *DownloadClientUsenetDownloadStation) write(ctx context.Context, downloadClient *prowlarr.DownloadClientResource) {
-	genericDownloadClient := DownloadClient{}
-	genericDownloadClient.write(ctx, downloadClient)
-	d.fromDownloadClient(&genericDownloadClient)
+func (d *DownloadClientUsenetDownloadStation) write(ctx context.Context, downloadClient *prowlarr.DownloadClientResource, diags *diag.Diagnostics) {
+	genericDownloadClient := d.toDownloadClient()
+	genericDownloadClient.write(ctx, downloadClient, diags)
+	d.fromDownloadClient(genericDownloadClient)
 }
 
-func (d *DownloadClientUsenetDownloadStation) read(ctx context.Context) *prowlarr.DownloadClientResource {
-	return d.toDownloadClient().read(ctx)
+func (d *DownloadClientUsenetDownloadStation) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.DownloadClientResource {
+	return d.toDownloadClient().read(ctx, diags)
 }
