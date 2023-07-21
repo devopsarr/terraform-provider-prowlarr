@@ -8,6 +8,7 @@ import (
 	"github.com/devopsarr/prowlarr-go/prowlarr"
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -53,6 +54,24 @@ type Indexer struct {
 	Enable         types.Bool   `tfsdk:"enable"`
 }
 
+func (i Indexer) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"tags":            types.SetType{}.WithElementType(types.Int64Type),
+			"fields":          types.SetType{}.WithElementType(Field{}.getType()),
+			"config_contract": types.StringType,
+			"implementation":  types.StringType,
+			"name":            types.StringType,
+			"protocol":        types.StringType,
+			"language":        types.StringType,
+			"privacy":         types.StringType,
+			"app_profile_id":  types.Int64Type,
+			"priority":        types.Int64Type,
+			"id":              types.Int64Type,
+			"enable":          types.BoolType,
+		})
+}
+
 // Field is part of Indexer.
 type Field struct {
 	SetValue       types.Set    `tfsdk:"set_value"`
@@ -63,11 +82,23 @@ type Field struct {
 	BoolValue      types.Bool   `tfsdk:"bool_value"`
 }
 
-func (r *IndexerResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (f Field) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"set_value":       types.SetType{}.WithElementType(types.Int64Type),
+			"number_value":    types.NumberType,
+			"name":            types.StringType,
+			"text_value":      types.StringType,
+			"sensitive_value": types.StringType,
+			"bool_value":      types.BoolType,
+		})
+}
+
+func (r *IndexerResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + indexerResourceName
 }
 
-func (r *IndexerResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *IndexerResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Indexers -->Generic Indexer resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/prowlarr/indexers) documentation.",
 		Attributes: map[string]schema.Attribute{
@@ -311,7 +342,7 @@ func (i *Indexer) write(ctx context.Context, indexer *prowlarr.IndexerResource, 
 		}
 	}
 
-	i.Fields, localDiag = types.SetValueFrom(ctx, IndexerResource{}.getFieldSchema().Type(), fields)
+	i.Fields, localDiag = types.SetValueFrom(ctx, Field{}.getType(), fields)
 	diags.Append(localDiag...)
 }
 

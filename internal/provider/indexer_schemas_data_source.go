@@ -32,11 +32,11 @@ type IndexerSchemas struct {
 	ID             types.String `tfsdk:"id"`
 }
 
-func (d *IndexerSchemasDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *IndexerSchemasDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + indexerSchemasDataSourceName
 }
 
-func (d *IndexerSchemasDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *IndexerSchemasDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
 		MarkdownDescription: "<!-- subcategory:Indexers -->List all available [Indexer Schemas](../data-sources/indexer_schema).",
@@ -60,7 +60,7 @@ func (d *IndexerSchemasDataSource) Configure(ctx context.Context, req datasource
 	}
 }
 
-func (d *IndexerSchemasDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *IndexerSchemasDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get indexers current value
 	response, _, err := d.client.IndexerApi.ListIndexerSchema(ctx).Execute()
 	if err != nil {

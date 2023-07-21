@@ -67,11 +67,11 @@ func (i *IndexerProxyFlaresolverr) fromIndexerProxy(proxy *IndexerProxy) {
 	i.ID = proxy.ID
 }
 
-func (r *IndexerProxyFlaresolverrResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *IndexerProxyFlaresolverrResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + indexerProxyFlaresolverrResourceName
 }
 
-func (r *IndexerProxyFlaresolverrResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *IndexerProxyFlaresolverrResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Indexer Proxies -->Indexer Proxy Flaresolverr resource.\nFor more information refer to [Indexer Proxy](https://wiki.servarr.com/prowlarr/settings#indexer-proxies) and [Flaresolverr](https://wiki.servarr.com/prowlarr/supported#flaresolverr).",
 		Attributes: map[string]schema.Attribute{

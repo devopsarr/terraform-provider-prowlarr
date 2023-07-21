@@ -78,11 +78,11 @@ func (a *ApplicationLazyLibrarian) fromApplication(application *Application) {
 	a.APIKey = application.APIKey
 }
 
-func (r *ApplicationLazyLibrarianResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *ApplicationLazyLibrarianResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + applicationLazyLibrarianResourceName
 }
 
-func (r *ApplicationLazyLibrarianResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *ApplicationLazyLibrarianResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Applications -->Application LazyLibrarian resource.\nFor more information refer to [Application](https://wiki.servarr.com/prowlarr/settings#applications) and [LazyLibrarian](https://wiki.servarr.com/prowlarr/supported#lazylibrarian).",
 		Attributes: map[string]schema.Attribute{

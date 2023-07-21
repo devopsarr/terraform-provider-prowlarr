@@ -103,11 +103,11 @@ func (d *DownloadClientFreebox) fromDownloadClient(client *DownloadClient) {
 	d.Enable = client.Enable
 }
 
-func (r *DownloadClientFreeboxResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *DownloadClientFreeboxResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + downloadClientFreeboxResourceName
 }
 
-func (r *DownloadClientFreeboxResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *DownloadClientFreeboxResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Download Clients -->Download Client Freebox resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/prowlarr/settings#download-clients) and [Freebox](https://wiki.servarr.com/prowlarr/supported#torrentfreeboxdownload).",
 		Attributes: map[string]schema.Attribute{

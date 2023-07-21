@@ -73,11 +73,11 @@ func (i *IndexerProxySocks4) fromIndexerProxy(proxy *IndexerProxy) {
 	i.ID = proxy.ID
 }
 
-func (r *IndexerProxySocks4Resource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *IndexerProxySocks4Resource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + indexerProxySocks4ResourceName
 }
 
-func (r *IndexerProxySocks4Resource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *IndexerProxySocks4Resource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Indexer Proxies -->Indexer Proxy Socks4 resource.\nFor more information refer to [Indexer Proxy](https://wiki.servarr.com/prowlarr/settings#indexer-proxies) and [Socks4](https://wiki.servarr.com/prowlarr/supported#socks4).",
 		Attributes: map[string]schema.Attribute{

@@ -33,11 +33,11 @@ type Applications struct {
 	ID           types.String `tfsdk:"id"`
 }
 
-func (d *ApplicationsDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *ApplicationsDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + applicationsDataSourceName
 }
 
-func (d *ApplicationsDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *ApplicationsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Applications -->List all available [Applications](../resources/application).",
@@ -113,7 +113,7 @@ func (d *ApplicationsDataSource) Configure(ctx context.Context, req datasource.C
 	}
 }
 
-func (d *ApplicationsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *ApplicationsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get applications current value
 	response, _, err := d.client.ApplicationApi.ListApplications(ctx).Execute()
 	if err != nil {
