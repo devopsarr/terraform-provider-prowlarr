@@ -228,7 +228,7 @@ func (p *ProwlarrProvider) DataSources(_ context.Context) []func() datasource.Da
 		NewNotificationDataSource,
 		NewNotificationsDataSource,
 
-		// System Status
+		// System
 		NewSystemStatusDataSource,
 
 		// Tags
