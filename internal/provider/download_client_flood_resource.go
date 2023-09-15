@@ -101,11 +101,11 @@ func (d *DownloadClientFlood) fromDownloadClient(client *DownloadClient) {
 	d.Enable = client.Enable
 }
 
-func (r *DownloadClientFloodResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *DownloadClientFloodResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + downloadClientFloodResourceName
 }
 
-func (r *DownloadClientFloodResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *DownloadClientFloodResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Download Clients -->Download Client Flood resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/prowlarr/settings#download-clients) and [Flood](https://wiki.servarr.com/prowlarr/supported#flood).",
 		Attributes: map[string]schema.Attribute{

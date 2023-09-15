@@ -74,11 +74,11 @@ func (a Application) getType() attr.Type {
 		})
 }
 
-func (r *ApplicationResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *ApplicationResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + applicationResourceName
 }
 
-func (r *ApplicationResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *ApplicationResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Applications -->Generic Application resource. When possible use a specific resource instead.\nFor more information refer to [Application](https://wiki.servarr.com/prowlarr/settings#applications).",
 		Attributes: map[string]schema.Attribute{

@@ -96,11 +96,11 @@ func (n *NotificationTwitter) fromNotification(notification *Notification) {
 	n.OnHealthRestored = notification.OnHealthRestored
 }
 
-func (r *NotificationTwitterResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *NotificationTwitterResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + notificationTwitterResourceName
 }
 
-func (r *NotificationTwitterResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *NotificationTwitterResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Twitter resource.\nFor more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect) and [Twitter](https://wiki.servarr.com/prowlarr/supported#twitter).",
 		Attributes: map[string]schema.Attribute{

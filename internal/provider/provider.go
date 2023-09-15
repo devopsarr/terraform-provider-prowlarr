@@ -33,12 +33,12 @@ type Prowlarr struct {
 	URL    types.String `tfsdk:"url"`
 }
 
-func (p *ProwlarrProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
+func (p *ProwlarrProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
 	resp.TypeName = "prowlarr"
 	resp.Version = p.version
 }
 
-func (p *ProwlarrProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
+func (p *ProwlarrProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "The Prowlarr provider is used to interact with any [Prowlarr](https://prowlarr.com/) installation. You must configure the provider with the proper credentials before you can use it. Use the left navigation to read about the available resources.",
 		Attributes: map[string]schema.Attribute{
@@ -130,7 +130,7 @@ func (p *ProwlarrProvider) Configure(ctx context.Context, req provider.Configure
 	resp.ResourceData = client
 }
 
-func (p *ProwlarrProvider) Resources(ctx context.Context) []func() resource.Resource {
+func (p *ProwlarrProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		// Applications
 		NewSyncProfileResource,
@@ -202,7 +202,7 @@ func (p *ProwlarrProvider) Resources(ctx context.Context) []func() resource.Reso
 	}
 }
 
-func (p *ProwlarrProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
+func (p *ProwlarrProvider) DataSources(_ context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		// Applications
 		NewSyncProfileDataSource,

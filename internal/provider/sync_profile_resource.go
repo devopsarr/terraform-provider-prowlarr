@@ -56,11 +56,11 @@ func (s SyncProfile) getType() attr.Type {
 		})
 }
 
-func (r *SyncProfileResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *SyncProfileResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + syncProfileResourceName
 }
 
-func (r *SyncProfileResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *SyncProfileResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Applications -->Sync Profile resource.\nFor more information refer to [Sync Profiles](https://wiki.servarr.com/prowlarr/settings#sync-profiles) documentation.",
 		Attributes: map[string]schema.Attribute{

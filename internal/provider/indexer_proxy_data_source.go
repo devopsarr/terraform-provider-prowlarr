@@ -27,11 +27,11 @@ type IndexerProxyDataSource struct {
 	client *prowlarr.APIClient
 }
 
-func (i *IndexerProxyDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (i *IndexerProxyDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + indexerProxyDataSourceName
 }
 
-func (i *IndexerProxyDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (i *IndexerProxyDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Indexer Proxies -->Single [Indexer Proxy](../resources/indexer_proxy).",

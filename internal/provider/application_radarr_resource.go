@@ -78,11 +78,11 @@ func (a *ApplicationRadarr) fromApplication(application *Application) {
 	a.APIKey = application.APIKey
 }
 
-func (r *ApplicationRadarrResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *ApplicationRadarrResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + applicationRadarrResourceName
 }
 
-func (r *ApplicationRadarrResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *ApplicationRadarrResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Applications -->Application Radarr resource.\nFor more information refer to [Application](https://wiki.servarr.com/prowlarr/settings#applications) and [Radarr](https://wiki.servarr.com/prowlarr/supported#radarr).",
 		Attributes: map[string]schema.Attribute{

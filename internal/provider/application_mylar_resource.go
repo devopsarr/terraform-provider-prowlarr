@@ -78,11 +78,11 @@ func (a *ApplicationMylar) fromApplication(application *Application) {
 	a.APIKey = application.APIKey
 }
 
-func (r *ApplicationMylarResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *ApplicationMylarResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + applicationMylarResourceName
 }
 
-func (r *ApplicationMylarResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *ApplicationMylarResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Applications -->Application Mylar resource.\nFor more information refer to [Application](https://wiki.servarr.com/prowlarr/settings#applications) and [Mylar](https://wiki.servarr.com/prowlarr/supported#mylar).",
 		Attributes: map[string]schema.Attribute{
