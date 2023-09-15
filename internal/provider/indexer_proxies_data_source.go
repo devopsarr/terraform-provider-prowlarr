@@ -33,11 +33,11 @@ type IndexerProxies struct {
 	ID             types.String `tfsdk:"id"`
 }
 
-func (d *IndexerProxiesDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *IndexerProxiesDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + indexerProxiesDataSourceName
 }
 
-func (d *IndexerProxiesDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *IndexerProxiesDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Indexer Proxies -->List all available [Indexer Proxies](../resources/indexer_proxy).",
@@ -107,7 +107,7 @@ func (d *IndexerProxiesDataSource) Configure(ctx context.Context, req datasource
 	}
 }
 
-func (d *IndexerProxiesDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *IndexerProxiesDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get indexer proxies current value
 	response, _, err := d.client.IndexerProxyApi.ListIndexerProxy(ctx).Execute()
 	if err != nil {

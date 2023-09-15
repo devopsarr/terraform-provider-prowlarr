@@ -63,11 +63,11 @@ type Field struct {
 	BoolValue      types.Bool   `tfsdk:"bool_value"`
 }
 
-func (r *IndexerResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *IndexerResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + indexerResourceName
 }
 
-func (r *IndexerResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *IndexerResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Indexers -->Generic Indexer resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/prowlarr/indexers) documentation.",
 		Attributes: map[string]schema.Attribute{

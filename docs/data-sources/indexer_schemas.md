@@ -23,6 +23,6 @@ data "prowlarr_indexer_schemas" "example" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `indexer_schemas` (Set of String) Indexer name list.
+- `indexer_schemas` (List of String) Indexer name list.
 
 

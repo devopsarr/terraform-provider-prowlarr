@@ -93,11 +93,11 @@ func (n *NotificationDiscord) fromNotification(notification *Notification) {
 	n.OnHealthRestored = notification.OnHealthRestored
 }
 
-func (r *NotificationDiscordResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *NotificationDiscordResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + notificationDiscordResourceName
 }
 
-func (r *NotificationDiscordResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *NotificationDiscordResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Discord resource.\nFor more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect) and [Discord](https://wiki.servarr.com/prowlarr/supported#discord).",
 		Attributes: map[string]schema.Attribute{

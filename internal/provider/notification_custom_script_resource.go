@@ -79,11 +79,11 @@ func (n *NotificationCustomScript) fromNotification(notification *Notification) 
 	n.OnHealthRestored = notification.OnHealthRestored
 }
 
-func (r *NotificationCustomScriptResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *NotificationCustomScriptResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + notificationCustomScriptResourceName
 }
 
-func (r *NotificationCustomScriptResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *NotificationCustomScriptResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Custom Script resource.\nFor more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect) and [Custom Script](https://wiki.servarr.com/prowlarr/supported#customscript).",
 		Attributes: map[string]schema.Attribute{

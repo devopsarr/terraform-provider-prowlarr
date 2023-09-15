@@ -33,11 +33,11 @@ type SyncProfiles struct {
 	ID           types.String `tfsdk:"id"`
 }
 
-func (d *SyncProfilesDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *SyncProfilesDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + syncProfilesDataSourceName
 }
 
-func (d *SyncProfilesDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *SyncProfilesDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Applications -->List all available [Sync Profiles](../resources/sync_profile).",
@@ -88,7 +88,7 @@ func (d *SyncProfilesDataSource) Configure(ctx context.Context, req datasource.C
 	}
 }
 
-func (d *SyncProfilesDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *SyncProfilesDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get sync profiles current value
 	response, _, err := d.client.AppProfileApi.ListAppProfile(ctx).Execute()
 	if err != nil {
