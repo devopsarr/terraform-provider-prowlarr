@@ -197,6 +197,9 @@ func (p *ProwlarrProvider) Resources(_ context.Context) []func() resource.Resour
 		NewNotificationTwitterResource,
 		NewNotificationWebhookResource,
 
+		// System
+		NewHostResource,
+
 		// Tags
 		NewTagResource,
 	}
