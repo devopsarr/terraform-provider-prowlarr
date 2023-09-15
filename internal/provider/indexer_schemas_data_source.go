@@ -28,7 +28,7 @@ type IndexerSchemasDataSource struct {
 
 // IndexerSchemas describes the indexers data model.
 type IndexerSchemas struct {
-	IndexerSchemas types.Set    `tfsdk:"indexer_schemas"`
+	IndexerSchemas types.List   `tfsdk:"indexer_schemas"`
 	ID             types.String `tfsdk:"id"`
 }
 
@@ -45,7 +45,7 @@ func (d *IndexerSchemasDataSource) Schema(_ context.Context, _ datasource.Schema
 			"id": schema.StringAttribute{
 				Computed: true,
 			},
-			"indexer_schemas": schema.SetAttribute{
+			"indexer_schemas": schema.ListAttribute{
 				MarkdownDescription: "Indexer name list.",
 				Computed:            true,
 				ElementType:         types.StringType,
@@ -76,7 +76,7 @@ func (d *IndexerSchemasDataSource) Read(ctx context.Context, _ datasource.ReadRe
 		indexers[i] = t.GetName()
 	}
 
-	indexerList, diags := types.SetValueFrom(ctx, types.StringType, indexers)
+	indexerList, diags := types.ListValueFrom(ctx, types.StringType, indexers)
 	resp.Diagnostics.Append(diags...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, IndexerSchemas{IndexerSchemas: indexerList, ID: types.StringValue(strconv.Itoa(len(response)))})...)
 }
