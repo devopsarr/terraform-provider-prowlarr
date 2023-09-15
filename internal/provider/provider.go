@@ -197,6 +197,9 @@ func (p *ProwlarrProvider) Resources(_ context.Context) []func() resource.Resour
 		NewNotificationTwitterResource,
 		NewNotificationWebhookResource,
 
+		// System
+		NewHostResource,
+
 		// Tags
 		NewTagResource,
 	}
@@ -228,7 +231,8 @@ func (p *ProwlarrProvider) DataSources(_ context.Context) []func() datasource.Da
 		NewNotificationDataSource,
 		NewNotificationsDataSource,
 
-		// System Status
+		// System
+		NewHostDataSource,
 		NewSystemStatusDataSource,
 
 		// Tags
