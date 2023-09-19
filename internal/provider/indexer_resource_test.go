@@ -76,6 +76,10 @@ func testAccIndexerResourceConfig(name, url string) string {
 				number_value = 2
 			},
 			{
+				name = "baseSettings.limitsUnit"
+				number_value = 0
+			},
+			{
 				name = "torrentBaseSettings.seedRatio"
 				number_value = 0.5
 			}
@@ -92,6 +96,10 @@ func testAccIndexerResourceConfig(name, url string) string {
 
 		fields = [
 			{
+				name = "baseUrl"
+				text_value = "https://hdbits.org/"
+			},
+			{
 				name = "username"
 				text_value = "test"
 			},
@@ -106,6 +114,10 @@ func testAccIndexerResourceConfig(name, url string) string {
 			{
 				name = "mediums"
 				set_value = [1,3]
+			},
+			{
+				name = "baseSettings.limitsUnit"
+				number_value = 0
 			},
 			{
 				name = "torrentBaseSettings.seedRatio"
