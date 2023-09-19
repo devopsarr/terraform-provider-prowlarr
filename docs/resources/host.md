@@ -17,7 +17,7 @@ For more information refer to [Host](https://wiki.servarr.com/prowlarr/settings#
 ```terraform
 resource "prowlarr_host" "test" {
   launch_browser  = true
-  port            = 8989
+  port            = 9696
   url_base        = ""
   bind_address    = "*"
   application_url = ""
