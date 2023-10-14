@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.1.0](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v2.0.0...v2.1.0) (2023-10-12)
+
+
+### Features
+
+* **devopsarr/terraform-provider-radarr#203:** add host data source ([f79583b](https://github.com/devopsarr/terraform-provider-prowlarr/commit/f79583bf026625945846fac7d176f1f09cc4ebb3))
+* **devopsarr/terraform-provider-radarr#203:** add host resource ([b02bf54](https://github.com/devopsarr/terraform-provider-prowlarr/commit/b02bf544aabdaafcea76f4b099e8b072534fdd2d))
+* improve diagnostics part 1 ([c1008a8](https://github.com/devopsarr/terraform-provider-prowlarr/commit/c1008a84e780420c04e6370706c2a6979968255a))
+* improve diagnostics part 2 ([6f886be](https://github.com/devopsarr/terraform-provider-prowlarr/commit/6f886beadc4cb7bde936e8a7ce2d6e3b8d9c1221))
+* use only ID for delete ([2276191](https://github.com/devopsarr/terraform-provider-prowlarr/commit/227619130b49f9f8a3a449df8035c836cd42c183))
+
+
+### Bug Fixes
+
+* move indexer schema to list to avoid issue with duplicate names ([a58799b](https://github.com/devopsarr/terraform-provider-prowlarr/commit/a58799b389fb9394b036c8816643b4949640b200))
+* resource delete error message ([af23fe8](https://github.com/devopsarr/terraform-provider-prowlarr/commit/af23fe8031a3ec09941d5f23e88c18b446f361b2))
+* wrong field assignment for download clients ([a71bd61](https://github.com/devopsarr/terraform-provider-prowlarr/commit/a71bd61064383610ca41ea30e14006f957b5b07b))
+
 ## [2.0.0](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v1.5.0...v2.0.0) (2023-05-31)
 
 
