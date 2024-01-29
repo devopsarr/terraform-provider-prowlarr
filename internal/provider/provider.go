@@ -29,8 +29,9 @@ type ProwlarrProvider struct {
 
 // Prowlarr describes the provider data model.
 type Prowlarr struct {
-	APIKey types.String `tfsdk:"api_key"`
-	URL    types.String `tfsdk:"url"`
+	APIKey        types.String `tfsdk:"api_key"`
+	Authorization types.String `tfsdk:"authorization"`
+	URL           types.String `tfsdk:"url"`
 }
 
 func (p *ProwlarrProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -44,6 +45,11 @@ func (p *ProwlarrProvider) Schema(_ context.Context, _ provider.SchemaRequest, r
 		Attributes: map[string]schema.Attribute{
 			"api_key": schema.StringAttribute{
 				MarkdownDescription: "API key for Prowlarr authentication. Can be specified via the `PROWLARR_API_KEY` environment variable.",
+				Optional:            true,
+				Sensitive:           true,
+			},
+			"authorization": schema.StringAttribute{
+				MarkdownDescription: "Token for token-based authentication with Prowlarr. This is an alternative to using an API key. Set this via the `PROWLARR_AUTHORIZATION` environment variable. One of `authorization` or `api_key` must be provided, but not both.",
 				Optional:            true,
 				Sensitive:           true,
 			},
@@ -110,11 +116,26 @@ func (p *ProwlarrProvider) Configure(ctx context.Context, req provider.Configure
 		key = data.APIKey.ValueString()
 	}
 
-	if key == "" {
-		// Error vs warning - empty value must stop execution
+	var authorization string
+	if data.Authorization.IsNull() {
+		authorization = os.Getenv("PROWLARR_AUTHORIZATION")
+	} else {
+		authorization = data.Authorization.ValueString()
+	}
+
+	if key == "" && authorization == "" {
 		resp.Diagnostics.AddError(
-			"Unable to find API key",
-			"API key cannot be an empty string",
+			"Missing Authentication Credentials",
+			"Both 'api_key' and 'authorization' are empty. You must provide either an API key or an authorization token for Prowlarr authentication.",
+		)
+
+		return
+	}
+
+	if key != "" && authorization != "" {
+		resp.Diagnostics.AddError(
+			"Conflicting Authentication Credentials",
+			"Both 'api_key' and 'authorization' are provided. You must only provide one of these for Prowlarr authentication",
 		)
 
 		return
@@ -122,7 +143,15 @@ func (p *ProwlarrProvider) Configure(ctx context.Context, req provider.Configure
 
 	// Configuring client. API Key management could be changed once new options avail in sdk.
 	config := prowlarr.NewConfiguration()
-	config.AddDefaultHeader("X-Api-Key", key)
+
+	if key != "" {
+		config.AddDefaultHeader("X-Api-Key", key)
+	}
+
+	if authorization != "" {
+		config.AddDefaultHeader("Authorization", authorization)
+	}
+
 	config.Servers[0].URL = url
 	client := prowlarr.NewAPIClient(config)
 
