@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.2.0](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v2.1.0...v2.2.0) (2024-01-30)
+
+
+### Features
+
+* add additional auth ([478146c](https://github.com/devopsarr/terraform-provider-prowlarr/commit/478146ce6b0e038b1e136f85c3391b575d160229))
+* update go to 1.21 ([c4f1361](https://github.com/devopsarr/terraform-provider-prowlarr/commit/c4f13617d00880e5a84ab3a8c62aa85d35b8aea0))
+
 ## [2.1.0](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v2.0.0...v2.1.0) (2023-10-12)
 
 
