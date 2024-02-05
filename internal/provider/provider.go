@@ -49,7 +49,7 @@ func (p *ProwlarrProvider) Schema(_ context.Context, _ provider.SchemaRequest, r
 				Sensitive:           true,
 			},
 			"authorization": schema.StringAttribute{
-				MarkdownDescription: "Token for token-based authentication with Prowlarr. This is an alternative to using an API key. Set this via the `PROWLARR_AUTHORIZATION` environment variable. One of `authorization` or `api_key` must be provided, but not both.",
+				MarkdownDescription: "This token is passed as an authentication header, complementing the `api_key`. Set it using the `PROWLARR_AUTHORIZATION` environment variable. Both `authorization` and `api_key` are required for complete authentication.",
 				Optional:            true,
 				Sensitive:           true,
 			},
@@ -126,16 +126,7 @@ func (p *ProwlarrProvider) Configure(ctx context.Context, req provider.Configure
 	if key == "" && authorization == "" {
 		resp.Diagnostics.AddError(
 			"Missing Authentication Credentials",
-			"Both 'api_key' and 'authorization' are empty. You must provide either an API key or an authorization token for Prowlarr authentication.",
-		)
-
-		return
-	}
-
-	if key != "" && authorization != "" {
-		resp.Diagnostics.AddError(
-			"Conflicting Authentication Credentials",
-			"Both 'api_key' and 'authorization' are provided. You must only provide one of these for Prowlarr authentication",
+			"Both 'api_key' and 'authorization' are empty. You must provide at least one of these.",
 		)
 
 		return
