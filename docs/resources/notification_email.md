@@ -51,8 +51,8 @@ resource "prowlarr_notification_email" "example" {
 - `on_health_restored` (Boolean) On health restored flag.
 - `password` (String, Sensitive) Password.
 - `port` (Number) Port.
-- `require_encryption` (Boolean) Require encryption flag.
 - `tags` (Set of Number) List of associated tags.
+- `use_encryption` (Number) Use Encryption. `0` Preferred, `1` Always, `2` Never.
 - `username` (String) Username.
 
 ### Read-Only

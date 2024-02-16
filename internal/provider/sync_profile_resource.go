@@ -114,7 +114,7 @@ func (r *SyncProfileResource) Create(ctx context.Context, req resource.CreateReq
 	// Create new Sync Profile
 	request := profile.read()
 
-	response, _, err := r.client.AppProfileApi.CreateAppProfile(ctx).AppProfileResource(*request).Execute()
+	response, _, err := r.client.AppProfileAPI.CreateAppProfile(ctx).AppProfileResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, syncProfileResourceName, err))
 
@@ -138,7 +138,7 @@ func (r *SyncProfileResource) Read(ctx context.Context, req resource.ReadRequest
 	}
 
 	// Get sync profile current value
-	response, _, err := r.client.AppProfileApi.GetAppProfileById(ctx, int32(profile.ID.ValueInt64())).Execute()
+	response, _, err := r.client.AppProfileAPI.GetAppProfileById(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, syncProfileResourceName, err))
 
@@ -164,7 +164,7 @@ func (r *SyncProfileResource) Update(ctx context.Context, req resource.UpdateReq
 	// Update SyncProfile
 	request := profile.read()
 
-	response, _, err := r.client.AppProfileApi.UpdateAppProfile(ctx, fmt.Sprint(request.GetId())).AppProfileResource(*request).Execute()
+	response, _, err := r.client.AppProfileAPI.UpdateAppProfile(ctx, fmt.Sprint(request.GetId())).AppProfileResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, syncProfileResourceName, err))
 
@@ -187,7 +187,7 @@ func (r *SyncProfileResource) Delete(ctx context.Context, req resource.DeleteReq
 	}
 
 	// Delete sync profile current value
-	_, err := r.client.AppProfileApi.DeleteAppProfile(ctx, int32(ID)).Execute()
+	_, err := r.client.AppProfileAPI.DeleteAppProfile(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, syncProfileResourceName, err))
 

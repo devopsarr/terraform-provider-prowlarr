@@ -435,7 +435,7 @@ func (r *DownloadClientResource) Create(ctx context.Context, req resource.Create
 	// Create new DownloadClient
 	request := client.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
+	response, _, err := r.client.DownloadClientAPI.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, downloadClientResourceName, err))
 
@@ -447,13 +447,14 @@ func (r *DownloadClientResource) Create(ctx context.Context, req resource.Create
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state DownloadClient
 
+	state.writeSensitive(client)
 	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
 func (r *DownloadClientResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
-	var client DownloadClient
+	var client *DownloadClient
 
 	resp.Diagnostics.Append(req.State.Get(ctx, &client)...)
 
@@ -462,7 +463,7 @@ func (r *DownloadClientResource) Read(ctx context.Context, req resource.ReadRequ
 	}
 
 	// Get DownloadClient current value
-	response, _, err := r.client.DownloadClientApi.GetDownloadClientById(ctx, int32(client.ID.ValueInt64())).Execute()
+	response, _, err := r.client.DownloadClientAPI.GetDownloadClientById(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientResourceName, err))
 
@@ -474,6 +475,7 @@ func (r *DownloadClientResource) Read(ctx context.Context, req resource.ReadRequ
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state DownloadClient
 
+	state.writeSensitive(client)
 	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
@@ -491,7 +493,7 @@ func (r *DownloadClientResource) Update(ctx context.Context, req resource.Update
 	// Update DownloadClient
 	request := client.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
+	response, _, err := r.client.DownloadClientAPI.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, downloadClientResourceName, err))
 
@@ -503,6 +505,7 @@ func (r *DownloadClientResource) Update(ctx context.Context, req resource.Update
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state DownloadClient
 
+	state.writeSensitive(client)
 	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
@@ -517,7 +520,7 @@ func (r *DownloadClientResource) Delete(ctx context.Context, req resource.Delete
 	}
 
 	// Delete DownloadClient current value
-	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(ID)).Execute()
+	_, err := r.client.DownloadClientAPI.DeleteDownloadClient(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientResourceName, err))
 
@@ -549,7 +552,7 @@ func (d *DownloadClient) write(ctx context.Context, downloadClient *prowlarr.Dow
 
 	categories := make([]ClientCategory, len(downloadClient.GetCategories()))
 	for i, c := range downloadClient.GetCategories() {
-		categories[i].write(ctx, c, diags)
+		categories[i].write(ctx, &c, diags)
 	}
 
 	d.Categories, localDiag = types.SetValueFrom(ctx, DownloadClientResource{}.getClientCategorySchema().Type(), categories)
@@ -571,7 +574,7 @@ func (d *DownloadClient) read(ctx context.Context, diags *diag.Diagnostics) *pro
 	categories := make([]*ClientCategory, len(d.Categories.Elements()))
 	diags.Append(d.Categories.ElementsAs(ctx, &categories, true)...)
 
-	clientCategories := make([]*prowlarr.DownloadClientCategory, len(d.Categories.Elements()))
+	clientCategories := make([]prowlarr.DownloadClientCategory, len(d.Categories.Elements()))
 	for n, c := range categories {
 		clientCategories[n] = c.read(ctx, diags)
 	}
@@ -591,10 +594,30 @@ func (d *DownloadClient) read(ctx context.Context, diags *diag.Diagnostics) *pro
 	return client
 }
 
-func (c *ClientCategory) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.DownloadClientCategory {
-	category := prowlarr.NewDownloadClientCategory()
+// writeSensitive copy sensitive data from another resource.
+func (c *ClientCategory) read(ctx context.Context, diags *diag.Diagnostics) prowlarr.DownloadClientCategory {
+	category := *prowlarr.NewDownloadClientCategory()
 	category.SetClientCategory(c.Name.ValueString())
 	diags.Append(c.Categories.ElementsAs(ctx, &category.Categories, true)...)
 
 	return category
+}
+
+// writeSensitive copy sensitive data from another resource.
+func (d *DownloadClient) writeSensitive(client *DownloadClient) {
+	if !client.Password.IsUnknown() {
+		d.Password = client.Password
+	}
+
+	if !client.APIKey.IsUnknown() {
+		d.APIKey = client.APIKey
+	}
+
+	if !client.SecretToken.IsUnknown() {
+		d.SecretToken = client.SecretToken
+	}
+
+	if !client.AppToken.IsUnknown() {
+		d.AppToken = client.AppToken
+	}
 }

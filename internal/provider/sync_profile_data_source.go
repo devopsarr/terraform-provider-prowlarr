@@ -78,7 +78,7 @@ func (d *SyncProfileDataSource) Read(ctx context.Context, req datasource.ReadReq
 		return
 	}
 	// Get syncProfile current value
-	response, _, err := d.client.AppProfileApi.ListAppProfile(ctx).Execute()
+	response, _, err := d.client.AppProfileAPI.ListAppProfile(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, syncProfileDataSourceName, err))
 
@@ -91,10 +91,10 @@ func (d *SyncProfileDataSource) Read(ctx context.Context, req datasource.ReadReq
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (p *SyncProfile) find(name string, syncProfiles []*prowlarr.AppProfileResource, diags *diag.Diagnostics) {
+func (p *SyncProfile) find(name string, syncProfiles []prowlarr.AppProfileResource, diags *diag.Diagnostics) {
 	for _, profile := range syncProfiles {
 		if profile.GetName() == name {
-			p.write(profile)
+			p.write(&profile)
 
 			return
 		}

@@ -153,7 +153,7 @@ func (d *IndexersDataSource) Read(ctx context.Context, req datasource.ReadReques
 	}
 
 	// Get indexers current value
-	response, _, err := d.client.IndexerApi.ListIndexer(ctx).Execute()
+	response, _, err := d.client.IndexerAPI.ListIndexer(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexersDataSourceName, err))
 
@@ -164,7 +164,7 @@ func (d *IndexersDataSource) Read(ctx context.Context, req datasource.ReadReques
 	// Map response body to resource schema attribute
 	indexers := make([]Indexer, len(response))
 	for i, t := range response {
-		indexers[i].write(ctx, t, &resp.Diagnostics)
+		indexers[i].write(ctx, &t, &resp.Diagnostics)
 	}
 
 	tfsdk.ValueFrom(ctx, indexers, data.Indexers.Type(ctx), &data.Indexers)

@@ -42,9 +42,10 @@ func TestAccNotificationJoinResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "prowlarr_notification_join.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "prowlarr_notification_join.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"api_key"},
 			},
 			// Delete testing automatically occurs in TestCase
 		},
@@ -56,10 +57,10 @@ func testAccNotificationJoinResourceConfig(name string, priority int) string {
 	resource "prowlarr_notification_join" "test" {
 		on_health_issue                    = false
 		on_application_update              = false
-	  
+
 		include_health_warnings = false
 		name                    = "%s"
-	  
+
 		device_names = "test,test1"
 		api_key = "Key"
 		priority = %d

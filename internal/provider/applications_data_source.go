@@ -115,7 +115,7 @@ func (d *ApplicationsDataSource) Configure(ctx context.Context, req datasource.C
 
 func (d *ApplicationsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get applications current value
-	response, _, err := d.client.ApplicationApi.ListApplications(ctx).Execute()
+	response, _, err := d.client.ApplicationAPI.ListApplications(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, applicationsDataSourceName, err))
 
@@ -126,7 +126,7 @@ func (d *ApplicationsDataSource) Read(ctx context.Context, _ datasource.ReadRequ
 	// Map response body to resource schema attribute
 	applications := make([]Application, len(response))
 	for i, a := range response {
-		applications[i].write(ctx, a, &resp.Diagnostics)
+		applications[i].write(ctx, &a, &resp.Diagnostics)
 	}
 
 	appList, diags := types.SetValueFrom(ctx, Application{}.getType(), applications)

@@ -12,6 +12,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
+const SensitiveValue = "********"
+
 type fieldException struct {
 	apiName string
 	tfName  string
@@ -81,8 +83,8 @@ func selectReadField(name string, fieldCase interface{}) reflect.Value {
 }
 
 // setField sets the prowlarr field value.
-func setField(name string, value interface{}) *prowlarr.Field {
-	field := prowlarr.NewField()
+func setField(name string, value interface{}) prowlarr.Field {
+	field := *prowlarr.NewField()
 	field.SetName(name)
 	field.SetValue(value)
 
@@ -156,7 +158,7 @@ func writeIntSliceField(ctx context.Context, fieldOutput *prowlarr.Field, fieldC
 }
 
 // readStringField reads from a string struct field and return a prowlarr field.
-func readStringField(name string, fieldCase interface{}) *prowlarr.Field {
+func readStringField(name string, fieldCase interface{}) prowlarr.Field {
 	fieldName := selectAPIName(name)
 	stringField := (*types.String)(selectReadField(name, fieldCase).Addr().UnsafePointer())
 
@@ -164,11 +166,11 @@ func readStringField(name string, fieldCase interface{}) *prowlarr.Field {
 		return setField(fieldName, stringField.ValueString())
 	}
 
-	return nil
+	return *prowlarr.NewField()
 }
 
 // readBoolField reads from a bool struct field and return a prowlarr field.
-func readBoolField(name string, fieldCase interface{}) *prowlarr.Field {
+func readBoolField(name string, fieldCase interface{}) prowlarr.Field {
 	fieldName := selectAPIName(name)
 	boolField := (*types.Bool)(selectReadField(name, fieldCase).Addr().UnsafePointer())
 
@@ -176,11 +178,11 @@ func readBoolField(name string, fieldCase interface{}) *prowlarr.Field {
 		return setField(fieldName, boolField.ValueBool())
 	}
 
-	return nil
+	return *prowlarr.NewField()
 }
 
 // readIntField reads from a int struct field and return a prowlarr field.
-func readIntField(name string, fieldCase interface{}) *prowlarr.Field {
+func readIntField(name string, fieldCase interface{}) prowlarr.Field {
 	fieldName := selectAPIName(name)
 	intField := (*types.Int64)(selectReadField(name, fieldCase).Addr().UnsafePointer())
 
@@ -188,11 +190,11 @@ func readIntField(name string, fieldCase interface{}) *prowlarr.Field {
 		return setField(fieldName, intField.ValueInt64())
 	}
 
-	return nil
+	return *prowlarr.NewField()
 }
 
 // readFloatField reads from a float struct field and return a prowlarr field.
-func readFloatField(name string, fieldCase interface{}) *prowlarr.Field {
+func readFloatField(name string, fieldCase interface{}) prowlarr.Field {
 	fieldName := selectAPIName(name)
 	floatField := (*types.Float64)(selectReadField(name, fieldCase).Addr().UnsafePointer())
 
@@ -200,11 +202,11 @@ func readFloatField(name string, fieldCase interface{}) *prowlarr.Field {
 		return setField(fieldName, floatField.ValueFloat64())
 	}
 
-	return nil
+	return *prowlarr.NewField()
 }
 
 // readStringSliceField reads from a string slice struct field and return a prowlarr field.
-func readStringSliceField(ctx context.Context, name string, fieldCase interface{}) *prowlarr.Field {
+func readStringSliceField(ctx context.Context, name string, fieldCase interface{}) prowlarr.Field {
 	fieldName := selectAPIName(name)
 	sliceField := (*types.Set)(selectReadField(name, fieldCase).Addr().UnsafePointer())
 
@@ -215,11 +217,11 @@ func readStringSliceField(ctx context.Context, name string, fieldCase interface{
 		return setField(fieldName, slice)
 	}
 
-	return nil
+	return *prowlarr.NewField()
 }
 
 // readIntSliceField reads from a int slice struct field and return a prowlarr field.
-func readIntSliceField(ctx context.Context, name string, fieldCase interface{}) *prowlarr.Field {
+func readIntSliceField(ctx context.Context, name string, fieldCase interface{}) prowlarr.Field {
 	fieldName := selectAPIName(name)
 	sliceField := (*types.Set)(selectReadField(name, fieldCase).Addr().UnsafePointer())
 
@@ -230,7 +232,7 @@ func readIntSliceField(ctx context.Context, name string, fieldCase interface{}) 
 		return setField(fieldName, slice)
 	}
 
-	return nil
+	return *prowlarr.NewField()
 }
 
 // Fields contains all the field lists of a specific resource per type.
@@ -247,7 +249,6 @@ type Fields struct {
 	IntSlicesExceptions    []string
 	StringSlices           []string
 	StringSlicesExceptions []string
-	Sensitive              []string
 }
 
 // getList return a specific list of fields.
@@ -259,19 +260,19 @@ func (f Fields) getList(list string) []string {
 }
 
 // ReadFields takes in input a field container and populates a prowlarr.Field slice.
-func ReadFields(ctx context.Context, fieldContainer interface{}, fieldLists Fields) []*prowlarr.Field {
-	var output []*prowlarr.Field
+func ReadFields(ctx context.Context, fieldContainer interface{}, fieldLists Fields) []prowlarr.Field {
+	var output []prowlarr.Field
 
 	// Map each list to its read function.
-	readFuncs := map[string]func(string, interface{}) *prowlarr.Field{
+	readFuncs := map[string]func(string, interface{}) prowlarr.Field{
 		"Bools":   readBoolField,
 		"Ints":    readIntField,
 		"Floats":  readFloatField,
 		"Strings": readStringField,
-		"StringSlices": func(name string, fieldContainer interface{}) *prowlarr.Field {
+		"StringSlices": func(name string, fieldContainer interface{}) prowlarr.Field {
 			return readStringSliceField(ctx, name, fieldContainer)
 		},
-		"IntSlices": func(name string, fieldContainer interface{}) *prowlarr.Field {
+		"IntSlices": func(name string, fieldContainer interface{}) prowlarr.Field {
 			return readIntSliceField(ctx, name, fieldContainer)
 		},
 	}
@@ -279,7 +280,7 @@ func ReadFields(ctx context.Context, fieldContainer interface{}, fieldLists Fiel
 	// Loop over the map to populate the prowlarr.Field slice.
 	for fieldType, readFunc := range readFuncs {
 		for _, f := range fieldLists.getList(fieldType) {
-			if field := readFunc(f, fieldContainer); field != nil {
+			if field := readFunc(f, fieldContainer); field.HasName() {
 				output = append(output, field)
 			}
 		}
@@ -289,7 +290,7 @@ func ReadFields(ctx context.Context, fieldContainer interface{}, fieldLists Fiel
 }
 
 // WriteFields takes in input a prowlarr.Field slice and populate the relevant container fields.
-func WriteFields(ctx context.Context, fieldContainer interface{}, fields []*prowlarr.Field, fieldLists Fields) {
+func WriteFields(ctx context.Context, fieldContainer interface{}, fields []prowlarr.Field, fieldLists Fields) {
 	// Map each list to its write function.
 	writeFuncs := map[string]func(*prowlarr.Field, interface{}){
 		"Bools":             writeBoolField,
@@ -317,13 +318,16 @@ func WriteFields(ctx context.Context, fieldContainer interface{}, fields []*prow
 	// Loop over each field and populate the related container field with the corresponding write function.
 	for _, f := range fields {
 		fieldName := f.GetName()
-		if slices.Contains(fieldLists.Sensitive, fieldName) && f.GetValue() != nil {
-			continue
+		// Manage sensitive data.
+		if f.GetValue() == SensitiveValue {
+			if tempField := readStringField(fieldName, fieldContainer); tempField.GetValue() != nil {
+				f = tempField
+			}
 		}
 
 		for listName, writeFunc := range writeFuncs {
 			if slices.Contains(fieldLists.getList(listName), fieldName) {
-				writeFunc(f, fieldContainer)
+				writeFunc(&f, fieldContainer)
 
 				break
 			}

@@ -98,8 +98,8 @@ func (d *NotificationDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 				MarkdownDescription: "Notify flag.",
 				Computed:            true,
 			},
-			"require_encryption": schema.BoolAttribute{
-				MarkdownDescription: "Require encryption flag.",
+			"use_encryption": schema.Int64Attribute{
+				MarkdownDescription: "Use Encryption. `0` Preferred, `1` Always, `2` Never.",
 				Computed:            true,
 			},
 			"send_silently": schema.BoolAttribute{
@@ -410,7 +410,7 @@ func (d *NotificationDataSource) Read(ctx context.Context, req datasource.ReadRe
 		return
 	}
 	// Get notification current value
-	response, _, err := d.client.NotificationApi.ListNotification(ctx).Execute()
+	response, _, err := d.client.NotificationAPI.ListNotification(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationDataSourceName, err))
 
@@ -423,10 +423,10 @@ func (d *NotificationDataSource) Read(ctx context.Context, req datasource.ReadRe
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (n *Notification) find(ctx context.Context, name string, notifications []*prowlarr.NotificationResource, diags *diag.Diagnostics) {
+func (n *Notification) find(ctx context.Context, name string, notifications []prowlarr.NotificationResource, diags *diag.Diagnostics) {
 	for _, notification := range notifications {
 		if notification.GetName() == name {
-			n.write(ctx, notification, diags)
+			n.write(ctx, &notification, diags)
 
 			return
 		}

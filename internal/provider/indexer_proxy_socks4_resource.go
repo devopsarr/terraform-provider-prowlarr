@@ -139,7 +139,7 @@ func (r *IndexerProxySocks4Resource) Create(ctx context.Context, req resource.Cr
 	// Create new IndexerProxySocks4
 	request := proxy.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.IndexerProxyApi.CreateIndexerProxy(ctx).IndexerProxyResource(*request).Execute()
+	response, _, err := r.client.IndexerProxyAPI.CreateIndexerProxy(ctx).IndexerProxyResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, indexerProxySocks4ResourceName, err))
 
@@ -163,7 +163,7 @@ func (r *IndexerProxySocks4Resource) Read(ctx context.Context, req resource.Read
 	}
 
 	// Get IndexerProxySocks4 current value
-	response, _, err := r.client.IndexerProxyApi.GetIndexerProxyById(ctx, int32(proxy.ID.ValueInt64())).Execute()
+	response, _, err := r.client.IndexerProxyAPI.GetIndexerProxyById(ctx, int32(proxy.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerProxySocks4ResourceName, err))
 
@@ -189,7 +189,7 @@ func (r *IndexerProxySocks4Resource) Update(ctx context.Context, req resource.Up
 	// Update IndexerProxySocks4
 	request := proxy.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.IndexerProxyApi.UpdateIndexerProxy(ctx, strconv.Itoa(int(request.GetId()))).IndexerProxyResource(*request).Execute()
+	response, _, err := r.client.IndexerProxyAPI.UpdateIndexerProxy(ctx, strconv.Itoa(int(request.GetId()))).IndexerProxyResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, indexerProxySocks4ResourceName, err))
 
@@ -212,7 +212,7 @@ func (r *IndexerProxySocks4Resource) Delete(ctx context.Context, req resource.De
 	}
 
 	// Delete IndexerProxySocks4 current value
-	_, err := r.client.IndexerProxyApi.DeleteIndexerProxy(ctx, int32(ID)).Execute()
+	_, err := r.client.IndexerProxyAPI.DeleteIndexerProxy(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerProxySocks4ResourceName, err))
 

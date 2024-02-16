@@ -98,7 +98,7 @@ func (i *IndexerProxyDataSource) Read(ctx context.Context, req datasource.ReadRe
 		return
 	}
 	// Get indexerProxy current value
-	response, _, err := i.client.IndexerProxyApi.ListIndexerProxy(ctx).Execute()
+	response, _, err := i.client.IndexerProxyAPI.ListIndexerProxy(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerProxyDataSourceName, err))
 
@@ -111,10 +111,10 @@ func (i *IndexerProxyDataSource) Read(ctx context.Context, req datasource.ReadRe
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (i *IndexerProxy) find(ctx context.Context, name string, indexerProxies []*prowlarr.IndexerProxyResource, diags *diag.Diagnostics) {
+func (i *IndexerProxy) find(ctx context.Context, name string, indexerProxies []prowlarr.IndexerProxyResource, diags *diag.Diagnostics) {
 	for _, proxy := range indexerProxies {
 		if proxy.GetName() == name {
-			i.write(ctx, proxy, diags)
+			i.write(ctx, &proxy, diags)
 
 			return
 		}

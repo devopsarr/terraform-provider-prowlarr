@@ -109,7 +109,7 @@ func (d *IndexerProxiesDataSource) Configure(ctx context.Context, req datasource
 
 func (d *IndexerProxiesDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get indexer proxies current value
-	response, _, err := d.client.IndexerProxyApi.ListIndexerProxy(ctx).Execute()
+	response, _, err := d.client.IndexerProxyAPI.ListIndexerProxy(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerProxiesDataSourceName, err))
 
@@ -120,7 +120,7 @@ func (d *IndexerProxiesDataSource) Read(ctx context.Context, _ datasource.ReadRe
 	// Map response body to resource schema attribute
 	proxies := make([]IndexerProxy, len(response))
 	for i, p := range response {
-		proxies[i].write(ctx, p, &resp.Diagnostics)
+		proxies[i].write(ctx, &p, &resp.Diagnostics)
 	}
 
 	proxyList, diags := types.SetValueFrom(ctx, IndexerProxy{}.getType(), proxies)

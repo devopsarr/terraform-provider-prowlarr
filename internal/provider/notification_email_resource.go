@@ -6,12 +6,14 @@ import (
 
 	"github.com/devopsarr/prowlarr-go/prowlarr"
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -50,7 +52,7 @@ type NotificationEmail struct {
 	Password              types.String `tfsdk:"password"`
 	ID                    types.Int64  `tfsdk:"id"`
 	Port                  types.Int64  `tfsdk:"port"`
-	RequireEncryption     types.Bool   `tfsdk:"require_encryption"`
+	UseEncryption         types.Int64  `tfsdk:"use_encryption"`
 	IncludeHealthWarnings types.Bool   `tfsdk:"include_health_warnings"`
 	OnApplicationUpdate   types.Bool   `tfsdk:"on_application_update"`
 	OnGrab                types.Bool   `tfsdk:"on_grab"`
@@ -72,7 +74,7 @@ func (n NotificationEmail) toNotification() *Notification {
 		Password:              n.Password,
 		Name:                  n.Name,
 		ID:                    n.ID,
-		RequireEncryption:     n.RequireEncryption,
+		UseEncryption:         n.UseEncryption,
 		IncludeHealthWarnings: n.IncludeHealthWarnings,
 		IncludeManualGrabs:    n.IncludeManualGrabs,
 		OnGrab:                n.OnGrab,
@@ -96,7 +98,7 @@ func (n *NotificationEmail) fromNotification(notification *Notification) {
 	n.Password = notification.Password
 	n.Name = notification.Name
 	n.ID = notification.ID
-	n.RequireEncryption = notification.RequireEncryption
+	n.UseEncryption = notification.UseEncryption
 	n.IncludeManualGrabs = notification.IncludeManualGrabs
 	n.OnGrab = notification.OnGrab
 	n.IncludeHealthWarnings = notification.IncludeHealthWarnings
@@ -161,10 +163,13 @@ func (r *NotificationEmailResource) Schema(_ context.Context, _ resource.SchemaR
 				},
 			},
 			// Field values
-			"require_encryption": schema.BoolAttribute{
-				MarkdownDescription: "Require encryption flag.",
+			"use_encryption": schema.Int64Attribute{
+				MarkdownDescription: "Use Encryption. `0` Preferred, `1` Always, `2` Never.",
 				Optional:            true,
 				Computed:            true,
+				Validators: []validator.Int64{
+					int64validator.OneOf(0, 1, 2),
+				},
 			},
 			"port": schema.Int64Attribute{
 				MarkdownDescription: "Port.",
@@ -230,7 +235,7 @@ func (r *NotificationEmailResource) Create(ctx context.Context, req resource.Cre
 	// Create new NotificationEmail
 	request := notification.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.NotificationApi.CreateNotification(ctx).NotificationResource(*request).Execute()
+	response, _, err := r.client.NotificationAPI.CreateNotification(ctx).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, notificationEmailResourceName, err))
 
@@ -254,7 +259,7 @@ func (r *NotificationEmailResource) Read(ctx context.Context, req resource.ReadR
 	}
 
 	// Get NotificationEmail current value
-	response, _, err := r.client.NotificationApi.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
+	response, _, err := r.client.NotificationAPI.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationEmailResourceName, err))
 
@@ -280,7 +285,7 @@ func (r *NotificationEmailResource) Update(ctx context.Context, req resource.Upd
 	// Update NotificationEmail
 	request := notification.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.NotificationApi.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
+	response, _, err := r.client.NotificationAPI.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, notificationEmailResourceName, err))
 
@@ -303,7 +308,7 @@ func (r *NotificationEmailResource) Delete(ctx context.Context, req resource.Del
 	}
 
 	// Delete NotificationEmail current value
-	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(ID)).Execute()
+	_, err := r.client.NotificationAPI.DeleteNotification(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, notificationEmailResourceName, err))
 

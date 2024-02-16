@@ -106,7 +106,7 @@ func (d *TagDetailsDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	}
 
 	// Get tags current value
-	response, _, err := d.client.TagDetailsApi.ListTagDetail(ctx).Execute()
+	response, _, err := d.client.TagDetailsAPI.ListTagDetail(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, tagDetailsDataSourceName, err))
 
@@ -119,10 +119,10 @@ func (d *TagDetailsDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (t *TagDetails) find(ctx context.Context, label string, tags []*prowlarr.TagDetailsResource, diags *diag.Diagnostics) {
+func (t *TagDetails) find(ctx context.Context, label string, tags []prowlarr.TagDetailsResource, diags *diag.Diagnostics) {
 	for _, tag := range tags {
 		if tag.GetLabel() == label {
-			t.write(ctx, tag, diags)
+			t.write(ctx, &tag, diags)
 
 			return
 		}

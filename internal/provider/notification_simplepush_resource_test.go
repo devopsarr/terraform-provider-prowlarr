@@ -42,9 +42,10 @@ func TestAccNotificationSimplepushResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "prowlarr_notification_simplepush.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "prowlarr_notification_simplepush.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"key"},
 			},
 			// Delete testing automatically occurs in TestCase
 		},
@@ -56,10 +57,10 @@ func testAccNotificationSimplepushResourceConfig(name, key string) string {
 	resource "prowlarr_notification_simplepush" "test" {
 		on_health_issue                    = false
 		on_application_update              = false
-	  
+
 		include_health_warnings = false
 		name                    = "%s"
-	  
+
 		key = "%s"
 		event = "ringtone:default"
 	}`, name, key)

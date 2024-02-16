@@ -162,7 +162,7 @@ func (r *ApplicationSonarrResource) Create(ctx context.Context, req resource.Cre
 	// Create new ApplicationSonarr
 	request := application.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.ApplicationApi.CreateApplications(ctx).ApplicationResource(*request).Execute()
+	response, _, err := r.client.ApplicationAPI.CreateApplications(ctx).ApplicationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, applicationSonarrResourceName, err))
 
@@ -186,7 +186,7 @@ func (r *ApplicationSonarrResource) Read(ctx context.Context, req resource.ReadR
 	}
 
 	// Get ApplicationSonarr current value
-	response, _, err := r.client.ApplicationApi.GetApplicationsById(ctx, int32(application.ID.ValueInt64())).Execute()
+	response, _, err := r.client.ApplicationAPI.GetApplicationsById(ctx, int32(application.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, applicationSonarrResourceName, err))
 
@@ -212,7 +212,7 @@ func (r *ApplicationSonarrResource) Update(ctx context.Context, req resource.Upd
 	// Update ApplicationSonarr
 	request := application.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.ApplicationApi.UpdateApplications(ctx, strconv.Itoa(int(request.GetId()))).ApplicationResource(*request).Execute()
+	response, _, err := r.client.ApplicationAPI.UpdateApplications(ctx, strconv.Itoa(int(request.GetId()))).ApplicationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, applicationSonarrResourceName, err))
 
@@ -235,7 +235,7 @@ func (r *ApplicationSonarrResource) Delete(ctx context.Context, req resource.Del
 	}
 
 	// Delete ApplicationSonarr current value
-	_, err := r.client.ApplicationApi.DeleteApplications(ctx, int32(ID)).Execute()
+	_, err := r.client.ApplicationAPI.DeleteApplications(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationSonarrResourceName, err))
 

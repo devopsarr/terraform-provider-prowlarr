@@ -139,7 +139,7 @@ func (r *IndexerProxyHTTPResource) Create(ctx context.Context, req resource.Crea
 	// Create new IndexerProxyHTTP
 	request := proxy.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.IndexerProxyApi.CreateIndexerProxy(ctx).IndexerProxyResource(*request).Execute()
+	response, _, err := r.client.IndexerProxyAPI.CreateIndexerProxy(ctx).IndexerProxyResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, indexerProxyHTTPResourceName, err))
 
@@ -163,7 +163,7 @@ func (r *IndexerProxyHTTPResource) Read(ctx context.Context, req resource.ReadRe
 	}
 
 	// Get IndexerProxyHTTP current value
-	response, _, err := r.client.IndexerProxyApi.GetIndexerProxyById(ctx, int32(proxy.ID.ValueInt64())).Execute()
+	response, _, err := r.client.IndexerProxyAPI.GetIndexerProxyById(ctx, int32(proxy.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerProxyHTTPResourceName, err))
 
@@ -189,7 +189,7 @@ func (r *IndexerProxyHTTPResource) Update(ctx context.Context, req resource.Upda
 	// Update IndexerProxyHTTP
 	request := proxy.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.IndexerProxyApi.UpdateIndexerProxy(ctx, strconv.Itoa(int(request.GetId()))).IndexerProxyResource(*request).Execute()
+	response, _, err := r.client.IndexerProxyAPI.UpdateIndexerProxy(ctx, strconv.Itoa(int(request.GetId()))).IndexerProxyResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, indexerProxyHTTPResourceName, err))
 
@@ -212,7 +212,7 @@ func (r *IndexerProxyHTTPResource) Delete(ctx context.Context, req resource.Dele
 	}
 
 	// Delete IndexerProxyHTTP current value
-	_, err := r.client.IndexerProxyApi.DeleteIndexerProxy(ctx, int32(ID)).Execute()
+	_, err := r.client.IndexerProxyAPI.DeleteIndexerProxy(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerProxyHTTPResourceName, err))
 

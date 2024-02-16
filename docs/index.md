@@ -25,4 +25,5 @@ provider "prowlarr" {
 ### Optional
 
 - `api_key` (String, Sensitive) API key for Prowlarr authentication. Can be specified via the `PROWLARR_API_KEY` environment variable.
+- `authorization` (String, Sensitive) Token for token-based authentication with Prowlarr. This is an alternative to using an API key. Set this via the `PROWLARR_AUTHORIZATION` environment variable. One of `authorization` or `api_key` must be provided, but not both.
 - `url` (String) Full Prowlarr URL with protocol and port (e.g. `https://test.prowlarr.com:9696`). You should **NOT** supply any path (`/api`), the SDK will use the appropriate paths. Can be specified via the `PROWLARR_URL` environment variable.

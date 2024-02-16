@@ -153,7 +153,7 @@ func (r *IndexerProxyResource) Create(ctx context.Context, req resource.CreateRe
 	// Create new IndexerProxy
 	request := proxy.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.IndexerProxyApi.CreateIndexerProxy(ctx).IndexerProxyResource(*request).Execute()
+	response, _, err := r.client.IndexerProxyAPI.CreateIndexerProxy(ctx).IndexerProxyResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, indexerProxyResourceName, err))
 
@@ -165,13 +165,14 @@ func (r *IndexerProxyResource) Create(ctx context.Context, req resource.CreateRe
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state IndexerProxy
 
+	state.writeSensitive(proxy)
 	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
 func (r *IndexerProxyResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
-	var proxy IndexerProxy
+	var proxy *IndexerProxy
 
 	resp.Diagnostics.Append(req.State.Get(ctx, &proxy)...)
 
@@ -180,7 +181,7 @@ func (r *IndexerProxyResource) Read(ctx context.Context, req resource.ReadReques
 	}
 
 	// Get IndexerProxy current value
-	response, _, err := r.client.IndexerProxyApi.GetIndexerProxyById(ctx, int32(proxy.ID.ValueInt64())).Execute()
+	response, _, err := r.client.IndexerProxyAPI.GetIndexerProxyById(ctx, int32(proxy.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerProxyResourceName, err))
 
@@ -192,6 +193,7 @@ func (r *IndexerProxyResource) Read(ctx context.Context, req resource.ReadReques
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state IndexerProxy
 
+	state.writeSensitive(proxy)
 	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
@@ -209,7 +211,7 @@ func (r *IndexerProxyResource) Update(ctx context.Context, req resource.UpdateRe
 	// Update IndexerProxy
 	request := proxy.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.IndexerProxyApi.UpdateIndexerProxy(ctx, strconv.Itoa(int(request.GetId()))).IndexerProxyResource(*request).Execute()
+	response, _, err := r.client.IndexerProxyAPI.UpdateIndexerProxy(ctx, strconv.Itoa(int(request.GetId()))).IndexerProxyResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, indexerProxyResourceName, err))
 
@@ -221,6 +223,7 @@ func (r *IndexerProxyResource) Update(ctx context.Context, req resource.UpdateRe
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state IndexerProxy
 
+	state.writeSensitive(proxy)
 	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
@@ -235,7 +238,7 @@ func (r *IndexerProxyResource) Delete(ctx context.Context, req resource.DeleteRe
 	}
 
 	// Delete IndexerProxy current value
-	_, err := r.client.IndexerProxyApi.DeleteIndexerProxy(ctx, int32(ID)).Execute()
+	_, err := r.client.IndexerProxyAPI.DeleteIndexerProxy(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerProxyResourceName, err))
 
@@ -273,4 +276,11 @@ func (i *IndexerProxy) read(ctx context.Context, diags *diag.Diagnostics) *prowl
 	proxy.SetFields(helpers.ReadFields(ctx, i, indexerProxyFields))
 
 	return proxy
+}
+
+// writeSensitive copy sensitive data from another resource.
+func (i *IndexerProxy) writeSensitive(proxy *IndexerProxy) {
+	if !proxy.Password.IsUnknown() {
+		i.Password = proxy.Password
+	}
 }

@@ -60,6 +60,7 @@ func testAccIndexerResourceConfig(name, url string) string {
 		implementation = "Cardigann"
     	config_contract = "CardigannSettings"
 		protocol = "torrent"
+		app_profile_id = 1
 		tags = []
 
 		fields = [
@@ -92,6 +93,7 @@ func testAccIndexerResourceConfig(name, url string) string {
 		implementation = "HDBits"
     	config_contract = "HDBitsSettings"
 		protocol = "torrent"
+		app_profile_id = 1
 		tags = []
 
 		fields = [
@@ -105,7 +107,7 @@ func testAccIndexerResourceConfig(name, url string) string {
 			},
 			{
 				name = "apiKey"
-				text_value = "test"
+				sensitive_value = "test"
 			},
 			{
 				name = "codecs"
@@ -126,6 +128,18 @@ func testAccIndexerResourceConfig(name, url string) string {
 			{
 				name = "torrentBaseSettings.seedTime"
 				number_value = 5
+			},
+			{
+				name = "freeleechOnly"
+				bool_value = false
+			},
+			{
+				name = "useFilenames"
+				bool_value = true
+			},
+			{
+				name = "origins"
+				set_value = []
 			},
 		]
 	}

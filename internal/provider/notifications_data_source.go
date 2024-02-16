@@ -113,8 +113,8 @@ func (d *NotificationsDataSource) Schema(_ context.Context, _ datasource.SchemaR
 							MarkdownDescription: "Notify flag.",
 							Computed:            true,
 						},
-						"require_encryption": schema.BoolAttribute{
-							MarkdownDescription: "Require encryption flag.",
+						"use_encryption": schema.Int64Attribute{
+							MarkdownDescription: "Use Encryption. `0` Preferred, `1` Always, `2` Never.",
 							Computed:            true,
 						},
 						"send_silently": schema.BoolAttribute{
@@ -421,7 +421,7 @@ func (d *NotificationsDataSource) Configure(ctx context.Context, req datasource.
 
 func (d *NotificationsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get notifications current value
-	response, _, err := d.client.NotificationApi.ListNotification(ctx).Execute()
+	response, _, err := d.client.NotificationAPI.ListNotification(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationsDataSourceName, err))
 
@@ -432,7 +432,7 @@ func (d *NotificationsDataSource) Read(ctx context.Context, _ datasource.ReadReq
 	// Map response body to resource schema attribute
 	notifications := make([]Notification, len(response))
 	for i, n := range response {
-		notifications[i].write(ctx, n, &resp.Diagnostics)
+		notifications[i].write(ctx, &n, &resp.Diagnostics)
 	}
 
 	notificationList, diags := types.SetValueFrom(ctx, Notification{}.getType(), notifications)

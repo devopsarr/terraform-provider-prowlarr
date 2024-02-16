@@ -104,7 +104,7 @@ func (d *ApplicationDataSource) Read(ctx context.Context, req datasource.ReadReq
 		return
 	}
 	// Get application current value
-	response, _, err := d.client.ApplicationApi.ListApplications(ctx).Execute()
+	response, _, err := d.client.ApplicationAPI.ListApplications(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, applicationDataSourceName, err))
 
@@ -117,10 +117,10 @@ func (d *ApplicationDataSource) Read(ctx context.Context, req datasource.ReadReq
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (a *Application) find(ctx context.Context, name string, applications []*prowlarr.ApplicationResource, diags *diag.Diagnostics) {
+func (a *Application) find(ctx context.Context, name string, applications []prowlarr.ApplicationResource, diags *diag.Diagnostics) {
 	for _, app := range applications {
 		if app.GetName() == name {
-			a.write(ctx, app, diags)
+			a.write(ctx, &app, diags)
 
 			return
 		}
