@@ -42,9 +42,10 @@ func TestAccNotificationSignalResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "prowlarr_notification_signal.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "prowlarr_notification_signal.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"auth_password", "sender_number"},
 			},
 			// Delete testing automatically occurs in TestCase
 		},
@@ -56,7 +57,7 @@ func testAccNotificationSignalResourceConfig(name, token string) string {
 	resource "prowlarr_notification_signal" "test" {
 		on_health_issue                    = false
 		on_application_update              = false
-	  
+
 		include_health_warnings = false
 		name                    = "%s"
 

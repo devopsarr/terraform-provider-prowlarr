@@ -42,9 +42,10 @@ func TestAccNotificationAppriseResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "prowlarr_notification_apprise.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "prowlarr_notification_apprise.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"auth_password"},
 			},
 			// Delete testing automatically occurs in TestCase
 		},
@@ -56,7 +57,7 @@ func testAccNotificationAppriseResourceConfig(name, key string) string {
 	resource "prowlarr_notification_apprise" "test" {
 		on_health_issue                    = false
 		on_application_update              = false
-	  
+
 		include_health_warnings = false
 		name                    = "%s"
 

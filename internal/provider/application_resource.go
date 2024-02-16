@@ -166,7 +166,7 @@ func (r *ApplicationResource) Create(ctx context.Context, req resource.CreateReq
 	// Create new Application
 	request := application.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.ApplicationApi.CreateApplications(ctx).ApplicationResource(*request).Execute()
+	response, _, err := r.client.ApplicationAPI.CreateApplications(ctx).ApplicationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, applicationResourceName, err))
 
@@ -178,6 +178,7 @@ func (r *ApplicationResource) Create(ctx context.Context, req resource.CreateReq
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Application
 
+	state.writeSensitive(application)
 	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
@@ -193,7 +194,7 @@ func (r *ApplicationResource) Read(ctx context.Context, req resource.ReadRequest
 	}
 
 	// Get Application current value
-	response, _, err := r.client.ApplicationApi.GetApplicationsById(ctx, int32(application.ID.ValueInt64())).Execute()
+	response, _, err := r.client.ApplicationAPI.GetApplicationsById(ctx, int32(application.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, applicationResourceName, err))
 
@@ -205,6 +206,7 @@ func (r *ApplicationResource) Read(ctx context.Context, req resource.ReadRequest
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Application
 
+	state.writeSensitive(application)
 	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
@@ -222,7 +224,7 @@ func (r *ApplicationResource) Update(ctx context.Context, req resource.UpdateReq
 	// Update Application
 	request := application.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.ApplicationApi.UpdateApplications(ctx, strconv.Itoa(int(request.GetId()))).ApplicationResource(*request).Execute()
+	response, _, err := r.client.ApplicationAPI.UpdateApplications(ctx, strconv.Itoa(int(request.GetId()))).ApplicationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, applicationResourceName, err))
 
@@ -234,6 +236,7 @@ func (r *ApplicationResource) Update(ctx context.Context, req resource.UpdateReq
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Application
 
+	state.writeSensitive(application)
 	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
@@ -248,7 +251,7 @@ func (r *ApplicationResource) Delete(ctx context.Context, req resource.DeleteReq
 	}
 
 	// Delete Application current value
-	_, err := r.client.ApplicationApi.DeleteApplications(ctx, int32(ID)).Execute()
+	_, err := r.client.ApplicationAPI.DeleteApplications(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationResourceName, err))
 
@@ -290,4 +293,11 @@ func (a *Application) read(ctx context.Context, diags *diag.Diagnostics) *prowla
 	application.SetFields(helpers.ReadFields(ctx, a, applicationFields))
 
 	return application
+}
+
+// writeSensitive copy sensitive data from another resource.
+func (a *Application) writeSensitive(application *Application) {
+	if !application.APIKey.IsUnknown() {
+		a.APIKey = application.APIKey
+	}
 }

@@ -42,9 +42,10 @@ func TestAccNotificationPushoverResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "prowlarr_notification_pushover.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "prowlarr_notification_pushover.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"api_key"},
 			},
 			// Delete testing automatically occurs in TestCase
 		},
@@ -56,10 +57,10 @@ func testAccNotificationPushoverResourceConfig(name string, priority int) string
 	resource "prowlarr_notification_pushover" "test" {
 		on_health_issue                    = false
 		on_application_update              = false
-	  
+
 		include_health_warnings = false
 		name                    = "%s"
-	  
+
 		api_key = "Key"
 		user_key = "Test"
 		priority = %d

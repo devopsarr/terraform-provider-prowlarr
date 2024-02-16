@@ -706,7 +706,7 @@ func (r *NotificationResource) Create(ctx context.Context, req resource.CreateRe
 	// Create new Notification
 	request := notification.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.NotificationApi.CreateNotification(ctx).NotificationResource(*request).Execute()
+	response, _, err := r.client.NotificationAPI.CreateNotification(ctx).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, notificationResourceName, err))
 
@@ -718,6 +718,7 @@ func (r *NotificationResource) Create(ctx context.Context, req resource.CreateRe
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Notification
 
+	state.writeSensitive(notification)
 	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
@@ -733,7 +734,7 @@ func (r *NotificationResource) Read(ctx context.Context, req resource.ReadReques
 	}
 
 	// Get Notification current value
-	response, _, err := r.client.NotificationApi.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
+	response, _, err := r.client.NotificationAPI.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationResourceName, err))
 
@@ -745,6 +746,7 @@ func (r *NotificationResource) Read(ctx context.Context, req resource.ReadReques
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Notification
 
+	state.writeSensitive(notification)
 	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
@@ -762,7 +764,7 @@ func (r *NotificationResource) Update(ctx context.Context, req resource.UpdateRe
 	// Update Notification
 	request := notification.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.NotificationApi.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
+	response, _, err := r.client.NotificationAPI.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, notificationResourceName, err))
 
@@ -774,6 +776,7 @@ func (r *NotificationResource) Update(ctx context.Context, req resource.UpdateRe
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Notification
 
+	state.writeSensitive(notification)
 	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
@@ -788,7 +791,7 @@ func (r *NotificationResource) Delete(ctx context.Context, req resource.DeleteRe
 	}
 
 	// Delete Notification current value
-	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(ID)).Execute()
+	_, err := r.client.NotificationAPI.DeleteNotification(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, notificationResourceName, err))
 
@@ -849,4 +852,51 @@ func (n *Notification) read(ctx context.Context, diags *diag.Diagnostics) *prowl
 	notification.SetFields(helpers.ReadFields(ctx, n, notificationFields))
 
 	return notification
+}
+
+// writeSensitive copy sensitive data from another resource.
+func (n *Notification) writeSensitive(notification *Notification) {
+	if !notification.Token.IsUnknown() {
+		n.Token = notification.Token
+	}
+
+	if !notification.APIKey.IsUnknown() {
+		n.APIKey = notification.APIKey
+	}
+
+	if !notification.Password.IsUnknown() {
+		n.Password = notification.Password
+	}
+
+	if !notification.AppToken.IsUnknown() {
+		n.AppToken = notification.AppToken
+	}
+
+	if !notification.BotToken.IsUnknown() {
+		n.BotToken = notification.BotToken
+	}
+
+	if !notification.AccessToken.IsUnknown() {
+		n.AccessToken = notification.AccessToken
+	}
+
+	if !notification.AccessTokenSecret.IsUnknown() {
+		n.AccessTokenSecret = notification.AccessTokenSecret
+	}
+
+	if !notification.ConsumerKey.IsUnknown() {
+		n.ConsumerKey = notification.ConsumerKey
+	}
+
+	if !notification.ConsumerSecret.IsUnknown() {
+		n.ConsumerSecret = notification.ConsumerSecret
+	}
+
+	if !notification.ConfigurationKey.IsUnknown() {
+		n.ConfigurationKey = notification.ConfigurationKey
+	}
+
+	if !notification.AuthPassword.IsUnknown() {
+		n.AuthPassword = notification.AuthPassword
+	}
 }

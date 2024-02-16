@@ -153,7 +153,7 @@ func (r *ApplicationLidarrResource) Create(ctx context.Context, req resource.Cre
 	// Create new ApplicationLidarr
 	request := application.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.ApplicationApi.CreateApplications(ctx).ApplicationResource(*request).Execute()
+	response, _, err := r.client.ApplicationAPI.CreateApplications(ctx).ApplicationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, applicationLidarrResourceName, err))
 
@@ -177,7 +177,7 @@ func (r *ApplicationLidarrResource) Read(ctx context.Context, req resource.ReadR
 	}
 
 	// Get ApplicationLidarr current value
-	response, _, err := r.client.ApplicationApi.GetApplicationsById(ctx, int32(application.ID.ValueInt64())).Execute()
+	response, _, err := r.client.ApplicationAPI.GetApplicationsById(ctx, int32(application.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, applicationLidarrResourceName, err))
 
@@ -203,7 +203,7 @@ func (r *ApplicationLidarrResource) Update(ctx context.Context, req resource.Upd
 	// Update ApplicationLidarr
 	request := application.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.ApplicationApi.UpdateApplications(ctx, strconv.Itoa(int(request.GetId()))).ApplicationResource(*request).Execute()
+	response, _, err := r.client.ApplicationAPI.UpdateApplications(ctx, strconv.Itoa(int(request.GetId()))).ApplicationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, applicationLidarrResourceName, err))
 
@@ -226,7 +226,7 @@ func (r *ApplicationLidarrResource) Delete(ctx context.Context, req resource.Del
 	}
 
 	// Delete ApplicationLidarr current value
-	_, err := r.client.ApplicationApi.DeleteApplications(ctx, int32(ID)).Execute()
+	_, err := r.client.ApplicationAPI.DeleteApplications(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationLidarrResourceName, err))
 

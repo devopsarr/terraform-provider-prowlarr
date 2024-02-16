@@ -83,8 +83,7 @@ func (r *IndexerResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 			},
 			"app_profile_id": schema.Int64Attribute{
 				MarkdownDescription: "Application profile ID.",
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 			},
 			"config_contract": schema.StringAttribute{
 				MarkdownDescription: "Indexer configuration template.",
@@ -128,7 +127,7 @@ func (r *IndexerResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 			},
 			"fields": schema.SetNestedAttribute{
 				Required:            true,
-				MarkdownDescription: "Set of configuration fields.",
+				MarkdownDescription: "Set of configuration fields. All non-empty fields must be specified.",
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: r.getFieldSchema().Attributes,
 				},
@@ -141,7 +140,7 @@ func (r IndexerResource) getFieldSchema() schema.Schema {
 	return schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"name": schema.StringAttribute{
-				MarkdownDescription: "Field name.",
+				MarkdownDescription: "Field name.\nIt must contain the whole field name comprehensive of its prefix (e.g. `baseSettings.`).",
 				Required:            true,
 			},
 			"text_value": schema.StringAttribute{
@@ -150,7 +149,7 @@ func (r IndexerResource) getFieldSchema() schema.Schema {
 				Computed:            true,
 			},
 			"sensitive_value": schema.StringAttribute{
-				MarkdownDescription: "Sensitive string value. Only one value must be filled out.",
+				MarkdownDescription: "Sensitive string value. Only one value must be filled out. This must be used instead of `text_value`, for sensitive fields.",
 				Optional:            true,
 				Computed:            true,
 				Sensitive:           true,
@@ -194,7 +193,7 @@ func (r *IndexerResource) Create(ctx context.Context, req resource.CreateRequest
 	// Create new Indexer
 	request := indexer.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.IndexerApi.CreateIndexer(ctx).IndexerResource(*request).Execute()
+	response, _, err := r.client.IndexerAPI.CreateIndexer(ctx).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, indexerResourceName, err))
 
@@ -218,7 +217,7 @@ func (r *IndexerResource) Read(ctx context.Context, req resource.ReadRequest, re
 	}
 
 	// Get Indexer current value
-	response, _, err := r.client.IndexerApi.GetIndexerById(ctx, int32(indexer.ID.ValueInt64())).Execute()
+	response, _, err := r.client.IndexerAPI.GetIndexerById(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerResourceName, err))
 
@@ -244,7 +243,7 @@ func (r *IndexerResource) Update(ctx context.Context, req resource.UpdateRequest
 	// Update Indexer
 	request := indexer.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.IndexerApi.UpdateIndexer(ctx, strconv.Itoa(int(request.GetId()))).IndexerResource(*request).Execute()
+	response, _, err := r.client.IndexerAPI.UpdateIndexer(ctx, strconv.Itoa(int(request.GetId()))).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, indexerResourceName, err))
 
@@ -267,7 +266,7 @@ func (r *IndexerResource) Delete(ctx context.Context, req resource.DeleteRequest
 	}
 
 	// Delete Indexer current value
-	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(ID)).Execute()
+	_, err := r.client.IndexerAPI.DeleteIndexer(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerResourceName, err))
 
@@ -306,7 +305,7 @@ func (i *Indexer) write(ctx context.Context, indexer *prowlarr.IndexerResource, 
 		if _, ok := f.GetValueOk(); ok {
 			var field Field
 
-			field.write(ctx, f, diags)
+			field.write(ctx, &f, i, diags)
 			fields = append(fields, field)
 		}
 	}
@@ -315,7 +314,7 @@ func (i *Indexer) write(ctx context.Context, indexer *prowlarr.IndexerResource, 
 	diags.Append(localDiag...)
 }
 
-func (f *Field) write(ctx context.Context, field *prowlarr.Field, diags *diag.Diagnostics) {
+func (f *Field) write(ctx context.Context, field *prowlarr.Field, indexer *Indexer, diags *diag.Diagnostics) {
 	var tempDiag diag.Diagnostics
 
 	f.Name = types.StringValue(field.GetName())
@@ -333,8 +332,8 @@ func (f *Field) write(ctx context.Context, field *prowlarr.Field, diags *diag.Di
 		case float64:
 			f.NumberValue = types.NumberValue(big.NewFloat(v))
 		case string:
-			if field.GetType() == "password" {
-				f.SensitiveValue = types.StringValue(v)
+			if v == helpers.SensitiveValue {
+				f.SensitiveValue = indexer.findSensitive(ctx, field.GetName(), diags)
 			} else {
 				f.TextValue = types.StringValue(v)
 			}
@@ -354,10 +353,23 @@ func (f *Field) write(ctx context.Context, field *prowlarr.Field, diags *diag.Di
 	}
 }
 
+func (i *Indexer) findSensitive(ctx context.Context, name string, diags *diag.Diagnostics) types.String {
+	fieldList := make([]Field, len(i.Fields.Elements()))
+	diags.Append(i.Fields.ElementsAs(ctx, &fieldList, true)...)
+
+	for _, f := range fieldList {
+		if f.Name.ValueString() == name {
+			return f.SensitiveValue
+		}
+	}
+
+	return types.StringValue("")
+}
+
 func (i *Indexer) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.IndexerResource {
 	fieldList := make([]Field, len(i.Fields.Elements()))
 	diags.Append(i.Fields.ElementsAs(ctx, &fieldList, true)...)
-	fields := make([]*prowlarr.Field, len(fieldList))
+	fields := make([]prowlarr.Field, len(fieldList))
 
 	for n, f := range fieldList {
 		fields[n] = f.read(ctx, diags)
@@ -378,7 +390,7 @@ func (i *Indexer) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.I
 	return indexer
 }
 
-func (f *Field) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.Field {
+func (f *Field) read(ctx context.Context, diags *diag.Diagnostics) prowlarr.Field {
 	field := prowlarr.NewField()
 	field.SetName(f.Name.ValueString())
 
@@ -404,5 +416,5 @@ func (f *Field) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.Fie
 		field.SetValue(set)
 	}
 
-	return field
+	return *field
 }

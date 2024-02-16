@@ -90,7 +90,7 @@ func (d *SyncProfilesDataSource) Configure(ctx context.Context, req datasource.C
 
 func (d *SyncProfilesDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get sync profiles current value
-	response, _, err := d.client.AppProfileApi.ListAppProfile(ctx).Execute()
+	response, _, err := d.client.AppProfileAPI.ListAppProfile(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, syncProfilesDataSourceName, err))
 
@@ -101,7 +101,7 @@ func (d *SyncProfilesDataSource) Read(ctx context.Context, _ datasource.ReadRequ
 	// Map response body to resource schema attribute
 	profiles := make([]SyncProfile, len(response))
 	for i, p := range response {
-		profiles[i].write(p)
+		profiles[i].write(&p)
 	}
 
 	profileList, diags := types.SetValueFrom(ctx, SyncProfile{}.getType(), profiles)

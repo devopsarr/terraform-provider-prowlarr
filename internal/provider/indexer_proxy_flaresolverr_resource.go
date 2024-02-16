@@ -124,7 +124,7 @@ func (r *IndexerProxyFlaresolverrResource) Create(ctx context.Context, req resou
 	// Create new IndexerProxyFlaresolverr
 	request := proxy.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.IndexerProxyApi.CreateIndexerProxy(ctx).IndexerProxyResource(*request).Execute()
+	response, _, err := r.client.IndexerProxyAPI.CreateIndexerProxy(ctx).IndexerProxyResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, indexerProxyFlaresolverrResourceName, err))
 
@@ -148,7 +148,7 @@ func (r *IndexerProxyFlaresolverrResource) Read(ctx context.Context, req resourc
 	}
 
 	// Get IndexerProxyFlaresolverr current value
-	response, _, err := r.client.IndexerProxyApi.GetIndexerProxyById(ctx, int32(proxy.ID.ValueInt64())).Execute()
+	response, _, err := r.client.IndexerProxyAPI.GetIndexerProxyById(ctx, int32(proxy.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerProxyFlaresolverrResourceName, err))
 
@@ -174,7 +174,7 @@ func (r *IndexerProxyFlaresolverrResource) Update(ctx context.Context, req resou
 	// Update IndexerProxyFlaresolverr
 	request := proxy.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.IndexerProxyApi.UpdateIndexerProxy(ctx, strconv.Itoa(int(request.GetId()))).IndexerProxyResource(*request).Execute()
+	response, _, err := r.client.IndexerProxyAPI.UpdateIndexerProxy(ctx, strconv.Itoa(int(request.GetId()))).IndexerProxyResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, indexerProxyFlaresolverrResourceName, err))
 
@@ -197,7 +197,7 @@ func (r *IndexerProxyFlaresolverrResource) Delete(ctx context.Context, req resou
 	}
 
 	// Delete IndexerProxyFlaresolverr current value
-	_, err := r.client.IndexerProxyApi.DeleteIndexerProxy(ctx, int32(ID)).Execute()
+	_, err := r.client.IndexerProxyAPI.DeleteIndexerProxy(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerProxyFlaresolverrResourceName, err))
 

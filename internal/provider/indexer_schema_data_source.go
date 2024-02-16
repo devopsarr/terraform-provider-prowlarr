@@ -150,7 +150,7 @@ func (d *IndexerSchemaDataSource) Read(ctx context.Context, req datasource.ReadR
 	}
 
 	// Get indexers current value
-	response, _, err := d.client.IndexerApi.ListIndexerSchema(ctx).Execute()
+	response, _, err := d.client.IndexerAPI.ListIndexerSchema(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerSchemaDataSourceName, err))
 
@@ -163,11 +163,11 @@ func (d *IndexerSchemaDataSource) Read(ctx context.Context, req datasource.ReadR
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (i *IndexerSchema) find(ctx context.Context, name string, schemas []*prowlarr.IndexerResource, diags *diag.Diagnostics) {
+func (i *IndexerSchema) find(ctx context.Context, name string, schemas []prowlarr.IndexerResource, diags *diag.Diagnostics) {
 	for id, indexer := range schemas {
 		if indexer.GetName() == name {
 			i.ID = types.Int64Value(int64(id))
-			i.write(ctx, indexer, diags)
+			i.write(ctx, &indexer, diags)
 
 			return
 		}
@@ -190,7 +190,7 @@ func (i *IndexerSchema) write(ctx context.Context, indexer *prowlarr.IndexerReso
 
 	fields := make([]SchemaField, len(indexer.GetFields()))
 	for n, f := range indexer.GetFields() {
-		fields[n].write(f)
+		fields[n].write(&f)
 	}
 
 	i.Fields, tempDiag = types.SetValueFrom(ctx, IndexerSchemaDataSource{}.getFieldSchema().Type(), fields)

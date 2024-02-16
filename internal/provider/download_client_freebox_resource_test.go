@@ -42,9 +42,10 @@ func TestAccDownloadClientFreeboxResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "prowlarr_download_client_freebox.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "prowlarr_download_client_freebox.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"app_token"},
 			},
 			// Delete testing automatically occurs in TestCase
 		},

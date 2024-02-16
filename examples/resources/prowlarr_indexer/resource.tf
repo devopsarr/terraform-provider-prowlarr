@@ -4,6 +4,7 @@ resource "prowlarr_indexer" "example" {
   implementation  = "HDBits"
   config_contract = "HDBitsSettings"
   protocol        = "torrent"
+  app_profile_id  = 1
   tags            = [1, 2, 5]
 
   fields = [

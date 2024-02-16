@@ -42,9 +42,10 @@ func TestAccApplicationLazyLibrarianResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "prowlarr_application_lazy_librarian.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "prowlarr_application_lazy_librarian.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"api_key"},
 			},
 			// Delete testing automatically occurs in TestCase
 		},

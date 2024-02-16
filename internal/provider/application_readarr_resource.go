@@ -153,7 +153,7 @@ func (r *ApplicationReadarrResource) Create(ctx context.Context, req resource.Cr
 	// Create new ApplicationReadarr
 	request := application.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.ApplicationApi.CreateApplications(ctx).ApplicationResource(*request).Execute()
+	response, _, err := r.client.ApplicationAPI.CreateApplications(ctx).ApplicationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, applicationReadarrResourceName, err))
 
@@ -177,7 +177,7 @@ func (r *ApplicationReadarrResource) Read(ctx context.Context, req resource.Read
 	}
 
 	// Get ApplicationReadarr current value
-	response, _, err := r.client.ApplicationApi.GetApplicationsById(ctx, int32(application.ID.ValueInt64())).Execute()
+	response, _, err := r.client.ApplicationAPI.GetApplicationsById(ctx, int32(application.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, applicationReadarrResourceName, err))
 
@@ -203,7 +203,7 @@ func (r *ApplicationReadarrResource) Update(ctx context.Context, req resource.Up
 	// Update ApplicationReadarr
 	request := application.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.ApplicationApi.UpdateApplications(ctx, strconv.Itoa(int(request.GetId()))).ApplicationResource(*request).Execute()
+	response, _, err := r.client.ApplicationAPI.UpdateApplications(ctx, strconv.Itoa(int(request.GetId()))).ApplicationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, applicationReadarrResourceName, err))
 
@@ -226,7 +226,7 @@ func (r *ApplicationReadarrResource) Delete(ctx context.Context, req resource.De
 	}
 
 	// Delete ApplicationReadarr current value
-	_, err := r.client.ApplicationApi.DeleteApplications(ctx, int32(ID)).Execute()
+	_, err := r.client.ApplicationAPI.DeleteApplications(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationReadarrResourceName, err))
 

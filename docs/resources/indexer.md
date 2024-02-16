@@ -21,6 +21,7 @@ resource "prowlarr_indexer" "example" {
   implementation  = "HDBits"
   config_contract = "HDBitsSettings"
   protocol        = "torrent"
+  app_profile_id  = 1
   tags            = [1, 2, 5]
 
   fields = [
@@ -57,15 +58,15 @@ resource "prowlarr_indexer" "example" {
 
 ### Required
 
+- `app_profile_id` (Number) Application profile ID.
 - `config_contract` (String) Indexer configuration template.
-- `fields` (Attributes Set) Set of configuration fields. (see [below for nested schema](#nestedatt--fields))
+- `fields` (Attributes Set) Set of configuration fields. All non-empty fields must be specified. (see [below for nested schema](#nestedatt--fields))
 - `implementation` (String) Indexer implementation name.
 - `name` (String) Indexer name.
 - `protocol` (String) Protocol. Valid values are 'usenet' and 'torrent'.
 
 ### Optional
 
-- `app_profile_id` (Number) Application profile ID.
 - `enable` (Boolean) Enable flag.
 - `priority` (Number) Priority.
 - `tags` (Set of Number) List of associated tags.
@@ -82,12 +83,13 @@ resource "prowlarr_indexer" "example" {
 Required:
 
 - `name` (String) Field name.
+It must contain the whole field name comprehensive of its prefix (e.g. `baseSettings.`).
 
 Optional:
 
 - `bool_value` (Boolean) Bool value. Only one value must be filled out.
 - `number_value` (Number) Number value. Only one value must be filled out.
-- `sensitive_value` (String, Sensitive) Sensitive string value. Only one value must be filled out.
+- `sensitive_value` (String, Sensitive) Sensitive string value. Only one value must be filled out. This must be used instead of `text_value`, for sensitive fields.
 - `set_value` (Set of Number) Set value. Only one value must be filled out.
 - `text_value` (String) Text value. Only one value must be filled out.
 
