@@ -29,9 +29,9 @@ var (
 )
 
 var notificationFields = helpers.Fields{
-	Bools:                  []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "requireEncryption", "sendSilently", "useSsl", "updateLibrary", "useEuEndpoint"},
+	Bools:                  []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "sendSilently", "useSsl", "updateLibrary", "useEuEndpoint"},
 	Strings:                []string{"authPassword", "authUsername", "statelessUrls", "configurationKey", "baseUrl", "accessToken", "accessTokenSecret", "apiKey", "aPIKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expires", "from", "host", "icon", "instanceName", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "webHookUrl", "serverUrl", "userName", "clickUrl", "mapFrom", "mapTo", "key", "event", "topicId", "senderNumber", "receiverId"},
-	Ints:                   []string{"displayTime", "port", "itemPriority", "retry", "expire", "method", "notificationType"},
+	Ints:                   []string{"displayTime", "port", "itemPriority", "retry", "expire", "method", "notificationType", "useEncryption"},
 	IntsExceptions:         []string{"priority"},
 	StringSlices:           []string{"recipients", "to", "cC", "bcc", "topics", "fieldTags", "channelTags", "deviceIds", "devices"},
 	StringSlicesExceptions: []string{"tags"},
@@ -118,6 +118,7 @@ type Notification struct {
 	Retry                 types.Int64  `tfsdk:"retry"`
 	Expire                types.Int64  `tfsdk:"expire"`
 	NotificationType      types.Int64  `tfsdk:"notification_type"`
+	UseEncryption         types.Int64  `tfsdk:"use_encryption"`
 	ID                    types.Int64  `tfsdk:"id"`
 	CleanLibrary          types.Bool   `tfsdk:"clean_library"`
 	SendSilently          types.Bool   `tfsdk:"send_silently"`
@@ -125,7 +126,6 @@ type Notification struct {
 	OnHealthIssue         types.Bool   `tfsdk:"on_health_issue"`
 	OnHealthRestored      types.Bool   `tfsdk:"on_health_restored"`
 	DirectMessage         types.Bool   `tfsdk:"direct_message"`
-	RequireEncryption     types.Bool   `tfsdk:"require_encryption"`
 	UseSSL                types.Bool   `tfsdk:"use_ssl"`
 	Notify                types.Bool   `tfsdk:"notify"`
 	UseEuEndpoint         types.Bool   `tfsdk:"use_eu_endpoint"`
@@ -208,6 +208,7 @@ func (n Notification) getType() attr.Type {
 			"retry":                   types.Int64Type,
 			"expire":                  types.Int64Type,
 			"notification_type":       types.Int64Type,
+			"use_encryption":          types.Int64Type,
 			"id":                      types.Int64Type,
 			"clean_library":           types.BoolType,
 			"send_silently":           types.BoolType,
@@ -215,7 +216,6 @@ func (n Notification) getType() attr.Type {
 			"on_health_issue":         types.BoolType,
 			"on_health_restored":      types.BoolType,
 			"direct_message":          types.BoolType,
-			"require_encryption":      types.BoolType,
 			"use_ssl":                 types.BoolType,
 			"notify":                  types.BoolType,
 			"use_eu_endpoint":         types.BoolType,
@@ -310,11 +310,6 @@ func (r *NotificationResource) Schema(_ context.Context, _ resource.SchemaReques
 				Optional:            true,
 				Computed:            true,
 			},
-			"require_encryption": schema.BoolAttribute{
-				MarkdownDescription: "Require encryption flag.",
-				Optional:            true,
-				Computed:            true,
-			},
 			"send_silently": schema.BoolAttribute{
 				MarkdownDescription: "Add silently flag.",
 				Optional:            true,
@@ -367,6 +362,14 @@ func (r *NotificationResource) Schema(_ context.Context, _ resource.SchemaReques
 				Computed:            true,
 				Validators: []validator.Int64{
 					int64validator.OneOf(0, 1, 2, 3),
+				},
+			},
+			"use_encryption": schema.Int64Attribute{
+				MarkdownDescription: "Use Encryption. `0` Preferred, `1` Always, `2` Never.",
+				Optional:            true,
+				Computed:            true,
+				Validators: []validator.Int64{
+					int64validator.OneOf(0, 1, 2),
 				},
 			},
 			"retry": schema.Int64Attribute{

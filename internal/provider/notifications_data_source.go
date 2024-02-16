@@ -113,8 +113,8 @@ func (d *NotificationsDataSource) Schema(_ context.Context, _ datasource.SchemaR
 							MarkdownDescription: "Notify flag.",
 							Computed:            true,
 						},
-						"require_encryption": schema.BoolAttribute{
-							MarkdownDescription: "Require encryption flag.",
+						"use_encryption": schema.Int64Attribute{
+							MarkdownDescription: "Use Encryption. `0` Preferred, `1` Always, `2` Never.",
 							Computed:            true,
 						},
 						"send_silently": schema.BoolAttribute{

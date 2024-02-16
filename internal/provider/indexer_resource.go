@@ -354,12 +354,14 @@ func (f *Field) write(ctx context.Context, field *prowlarr.Field, indexer *Index
 }
 
 func (i *Indexer) findSensitive(ctx context.Context, name string, diags *diag.Diagnostics) types.String {
-	fieldList := make([]Field, len(i.Fields.Elements()))
-	diags.Append(i.Fields.ElementsAs(ctx, &fieldList, true)...)
+	if dim := len(i.Fields.Elements()); dim > 0 {
+		fieldList := make([]Field, dim)
+		diags.Append(i.Fields.ElementsAs(ctx, &fieldList, true)...)
 
-	for _, f := range fieldList {
-		if f.Name.ValueString() == name {
-			return f.SensitiveValue
+		for _, f := range fieldList {
+			if f.Name.ValueString() == name {
+				return f.SensitiveValue
+			}
 		}
 	}
 
