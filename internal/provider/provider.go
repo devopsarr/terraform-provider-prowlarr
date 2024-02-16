@@ -206,7 +206,6 @@ func (p *ProwlarrProvider) Resources(_ context.Context) []func() resource.Resour
 		// Notifications
 		NewNotificationResource,
 		NewNotificationAppriseResource,
-		NewNotificationBoxcarResource,
 		NewNotificationCustomScriptResource,
 		NewNotificationDiscordResource,
 		NewNotificationEmailResource,
