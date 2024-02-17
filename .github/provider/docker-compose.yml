@@ -2,7 +2,7 @@
 version: "3.9"
 services:
   prowlarr:
-    image: hotio/prowlarr:testing-1.13.3.4273@sha256:b2b2e89a2633765f97e93cdc8b5f129a51901412ec5a22476efc9389d76fecd6
+    image: hotio/prowlarr:testing-1.13.3.4273@sha256:f8f75a4e7ed061b46c65e1e610c14fe0b5a110dedf34aacd4063ae3230a375a5
     container_name: prowlarr
     depends_on:
       - transmission
