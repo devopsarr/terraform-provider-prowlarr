@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.3.0](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v2.2.0...v2.3.0) (2024-02-17)
+
+
+### Features
+
+* **#197:** manage sensitive fields and align with go sdk ([af3637d](https://github.com/devopsarr/terraform-provider-prowlarr/commit/af3637df210330bb395cb9c81a0897f82265ad3c))
+* remove unsupported indexer boxcar ([361e0b1](https://github.com/devopsarr/terraform-provider-prowlarr/commit/361e0b12c2a57bdb434e69c46095c4ac864d360c))
+* update email notification fields ([31af028](https://github.com/devopsarr/terraform-provider-prowlarr/commit/31af0283eec89f8336ea7da1327bae08a5b9b8b0))
+
 ## [2.2.0](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v2.1.0...v2.2.0) (2024-01-30)
 
 
