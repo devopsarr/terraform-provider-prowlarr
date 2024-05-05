@@ -79,7 +79,7 @@ func (r *IndexerProxySocks5Resource) Metadata(_ context.Context, req resource.Me
 
 func (r *IndexerProxySocks5Resource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Indexer Proxies -->Indexer Proxy Socks5 resource.\nFor more information refer to [Indexer Proxy](https://wiki.servarr.com/prowlarr/settings#indexer-proxies) and [Socks5](https://wiki.servarr.com/prowlarr/supported#socks5).",
+		MarkdownDescription: "<!-- subcategory:Indexer Proxies -->\nIndexer Proxy Socks5 resource.\nFor more information refer to [Indexer Proxy](https://wiki.servarr.com/prowlarr/settings#indexer-proxies) and [Socks5](https://wiki.servarr.com/prowlarr/supported#socks5).",
 		Attributes: map[string]schema.Attribute{
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Indexer Proxy name.",

@@ -34,7 +34,7 @@ func (i *IndexerProxyDataSource) Metadata(_ context.Context, req datasource.Meta
 func (i *IndexerProxyDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "<!-- subcategory:Indexer Proxies -->Single [Indexer Proxy](../resources/indexer_proxy).",
+		MarkdownDescription: "<!-- subcategory:Indexer Proxies -->\nSingle [Indexer Proxy](../resources/indexer_proxy).",
 		Attributes: map[string]schema.Attribute{
 			"config_contract": schema.StringAttribute{
 				MarkdownDescription: "IndexerProxy configuration template.",

@@ -3,12 +3,15 @@
 page_title: "prowlarr_host Data Source - terraform-provider-prowlarr"
 subcategory: "System"
 description: |-
+  <!-- subcategory:System -->
+  
   Host ../resources/host.
 ---
 
 # prowlarr_host (Data Source)
 
-<!-- subcategory:System -->[Host](../resources/host).
+<!-- subcategory:System -->
+[Host](../resources/host).
 
 ## Example Usage
 

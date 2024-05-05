@@ -3,13 +3,16 @@
 page_title: "prowlarr_host Resource - terraform-provider-prowlarr"
 subcategory: "System"
 description: |-
+  <!-- subcategory:System -->
+  
   Host resource.
   For more information refer to Host https://wiki.servarr.com/prowlarr/settings#general documentation.
 ---
 
 # prowlarr_host (Resource)
 
-<!-- subcategory:System -->Host resource.
+<!-- subcategory:System -->
+Host resource.
 For more information refer to [Host](https://wiki.servarr.com/prowlarr/settings#general) documentation.
 
 ## Example Usage

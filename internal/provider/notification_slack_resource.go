@@ -90,7 +90,7 @@ func (r *NotificationSlackResource) Metadata(_ context.Context, req resource.Met
 
 func (r *NotificationSlackResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Slack resource.\nFor more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect) and [Slack](https://wiki.servarr.com/prowlarr/supported#slack).",
+		MarkdownDescription: "<!-- subcategory:Notifications -->\nNotification Slack resource.\nFor more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect) and [Slack](https://wiki.servarr.com/prowlarr/supported#slack).",
 		Attributes: map[string]schema.Attribute{
 			"on_health_issue": schema.BoolAttribute{
 				MarkdownDescription: "On health issue flag.",

@@ -69,7 +69,7 @@ func (r *IndexerResource) Metadata(_ context.Context, req resource.MetadataReque
 
 func (r *IndexerResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Indexers -->Generic Indexer resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/prowlarr/indexers) documentation.",
+		MarkdownDescription: "<!-- subcategory:Indexers -->\nGeneric Indexer resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/prowlarr/indexers) documentation.",
 		Attributes: map[string]schema.Attribute{
 			"enable": schema.BoolAttribute{
 				MarkdownDescription: "Enable flag.",

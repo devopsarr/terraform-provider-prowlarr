@@ -3,13 +3,16 @@
 page_title: "prowlarr_notification_pushover Resource - terraform-provider-prowlarr"
 subcategory: "Notifications"
 description: |-
+  <!-- subcategory:Notifications -->
+  
   Notification Pushover resource.
   For more information refer to Notification https://wiki.servarr.com/prowlarr/settings#connect and Pushover https://wiki.servarr.com/prowlarr/supported#pushover.
 ---
 
 # prowlarr_notification_pushover (Resource)
 
-<!-- subcategory:Notifications -->Notification Pushover resource.
+<!-- subcategory:Notifications -->
+Notification Pushover resource.
 For more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect) and [Pushover](https://wiki.servarr.com/prowlarr/supported#pushover).
 
 ## Example Usage

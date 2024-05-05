@@ -3,13 +3,16 @@
 page_title: "prowlarr_application_lidarr Resource - terraform-provider-prowlarr"
 subcategory: "Applications"
 description: |-
+  <!-- subcategory:Applications -->
+  
   Application Lidarr resource.
   For more information refer to Application https://wiki.servarr.com/prowlarr/settings#applications and Lidarr https://wiki.servarr.com/prowlarr/supported#lidarr.
 ---
 
 # prowlarr_application_lidarr (Resource)
 
-<!-- subcategory:Applications -->Application Lidarr resource.
+<!-- subcategory:Applications -->
+Application Lidarr resource.
 For more information refer to [Application](https://wiki.servarr.com/prowlarr/settings#applications) and [Lidarr](https://wiki.servarr.com/prowlarr/supported#lidarr).
 
 ## Example Usage

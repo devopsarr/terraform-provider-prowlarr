@@ -3,13 +3,16 @@
 page_title: "prowlarr_indexer_proxy Resource - terraform-provider-prowlarr"
 subcategory: "Indexer Proxies"
 description: |-
+  <!-- subcategory:Indexer Proxies -->
+  
   Generic Indexer Proxy resource. When possible use a specific resource instead.
   For more information refer to Indexer Proxy https://wiki.servarr.com/prowlarr/settings#indexer-proxies.
 ---
 
 # prowlarr_indexer_proxy (Resource)
 
-<!-- subcategory:Indexer Proxies -->Generic Indexer Proxy resource. When possible use a specific resource instead.
+<!-- subcategory:Indexer Proxies -->
+Generic Indexer Proxy resource. When possible use a specific resource instead.
 For more information refer to [Indexer Proxy](https://wiki.servarr.com/prowlarr/settings#indexer-proxies).
 
 ## Example Usage

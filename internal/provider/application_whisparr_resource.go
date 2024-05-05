@@ -84,7 +84,7 @@ func (r *ApplicationWhisparrResource) Metadata(_ context.Context, req resource.M
 
 func (r *ApplicationWhisparrResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Applications -->Application Whisparr resource.\nFor more information refer to [Application](https://wiki.servarr.com/prowlarr/settings#applications) and [Whisparr](https://wiki.servarr.com/prowlarr/supported#whisparr).",
+		MarkdownDescription: "<!-- subcategory:Applications -->\nApplication Whisparr resource.\nFor more information refer to [Application](https://wiki.servarr.com/prowlarr/settings#applications) and [Whisparr](https://wiki.servarr.com/prowlarr/supported#whisparr).",
 		Attributes: map[string]schema.Attribute{
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Application name.",

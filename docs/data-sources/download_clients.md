@@ -3,12 +3,15 @@
 page_title: "prowlarr_download_clients Data Source - terraform-provider-prowlarr"
 subcategory: "Download Clients"
 description: |-
+  <!-- subcategory:Download Clients -->
+  
   List all available Download Clients ../resources/download_client.
 ---
 
 # prowlarr_download_clients (Data Source)
 
-<!-- subcategory:Download Clients -->List all available [Download Clients](../resources/download_client).
+<!-- subcategory:Download Clients -->
+List all available [Download Clients](../resources/download_client).
 
 ## Example Usage
 

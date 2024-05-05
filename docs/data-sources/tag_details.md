@@ -3,12 +3,15 @@
 page_title: "prowlarr_tag_details Data Source - terraform-provider-prowlarr"
 subcategory: "Tag"
 description: |-
+  <!-- subcategory:Tag -->
+  
   Single Tag ../resources/tag with its associated resources.
 ---
 
 # prowlarr_tag_details (Data Source)
 
-<!-- subcategory:Tag -->Single [Tag](../resources/tag) with its associated resources.
+<!-- subcategory:Tag -->
+Single [Tag](../resources/tag) with its associated resources.
 
 ## Example Usage
 

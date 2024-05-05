@@ -3,12 +3,15 @@
 page_title: "prowlarr_indexer_schema Data Source - terraform-provider-prowlarr"
 subcategory: "Indexers"
 description: |-
+  <!-- subcategory:Indexers -->
+  
   Indexer schema definition.
 ---
 
 # prowlarr_indexer_schema (Data Source)
 
-<!-- subcategory:Indexers -->Indexer schema definition.
+<!-- subcategory:Indexers -->
+Indexer schema definition.
 
 ## Example Usage
 

@@ -3,13 +3,16 @@
 page_title: "prowlarr_application_lazy_librarian Resource - terraform-provider-prowlarr"
 subcategory: "Applications"
 description: |-
+  <!-- subcategory:Applications -->
+  
   Application LazyLibrarian resource.
   For more information refer to Application https://wiki.servarr.com/prowlarr/settings#applications and LazyLibrarian https://wiki.servarr.com/prowlarr/supported#lazylibrarian.
 ---
 
 # prowlarr_application_lazy_librarian (Resource)
 
-<!-- subcategory:Applications -->Application LazyLibrarian resource.
+<!-- subcategory:Applications -->
+Application LazyLibrarian resource.
 For more information refer to [Application](https://wiki.servarr.com/prowlarr/settings#applications) and [LazyLibrarian](https://wiki.servarr.com/prowlarr/supported#lazylibrarian).
 
 ## Example Usage

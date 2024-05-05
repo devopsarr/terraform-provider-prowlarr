@@ -3,13 +3,16 @@
 page_title: "prowlarr_download_client_deluge Resource - terraform-provider-prowlarr"
 subcategory: "Download Clients"
 description: |-
+  <!-- subcategory:Download Clients -->
+  
   Download Client Deluge resource.
   For more information refer to Download Client https://wiki.servarr.com/prowlarr/settings#download-clients and Deluge https://wiki.servarr.com/prowlarr/supported#deluge.
 ---
 
 # prowlarr_download_client_deluge (Resource)
 
-<!-- subcategory:Download Clients -->Download Client Deluge resource.
+<!-- subcategory:Download Clients -->
+Download Client Deluge resource.
 For more information refer to [Download Client](https://wiki.servarr.com/prowlarr/settings#download-clients) and [Deluge](https://wiki.servarr.com/prowlarr/supported#deluge).
 
 ## Example Usage

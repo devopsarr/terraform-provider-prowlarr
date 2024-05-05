@@ -3,13 +3,16 @@
 page_title: "prowlarr_download_client_nzbvortex Resource - terraform-provider-prowlarr"
 subcategory: "Download Clients"
 description: |-
+  <!-- subcategory:Download Clients -->
+  
   Download Client Nzbvortex resource.
   For more information refer to Download Client https://wiki.servarr.com/prowlarr/settings#download-clients and Nzbvortex https://wiki.servarr.com/prowlarr/supported#nzbvortex.
 ---
 
 # prowlarr_download_client_nzbvortex (Resource)
 
-<!-- subcategory:Download Clients -->Download Client Nzbvortex resource.
+<!-- subcategory:Download Clients -->
+Download Client Nzbvortex resource.
 For more information refer to [Download Client](https://wiki.servarr.com/prowlarr/settings#download-clients) and [Nzbvortex](https://wiki.servarr.com/prowlarr/supported#nzbvortex).
 
 ## Example Usage

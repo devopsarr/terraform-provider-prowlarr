@@ -99,7 +99,7 @@ func (r *NotificationWebhookResource) Metadata(_ context.Context, req resource.M
 
 func (r *NotificationWebhookResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Webhook resource.\nFor more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect) and [Webhook](https://wiki.servarr.com/prowlarr/supported#webhook).",
+		MarkdownDescription: "<!-- subcategory:Notifications -->\nNotification Webhook resource.\nFor more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect) and [Webhook](https://wiki.servarr.com/prowlarr/supported#webhook).",
 		Attributes: map[string]schema.Attribute{
 			"on_health_issue": schema.BoolAttribute{
 				MarkdownDescription: "On health issue flag.",

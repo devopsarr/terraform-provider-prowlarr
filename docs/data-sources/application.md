@@ -3,12 +3,15 @@
 page_title: "prowlarr_application Data Source - terraform-provider-prowlarr"
 subcategory: "Applications"
 description: |-
+  <!-- subcategory:Applications -->
+  
   Single Application ../resources/application.
 ---
 
 # prowlarr_application (Data Source)
 
-<!-- subcategory:Applications -->Single [Application](../resources/application).
+<!-- subcategory:Applications -->
+Single [Application](../resources/application).
 
 ## Example Usage
 

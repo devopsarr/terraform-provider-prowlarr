@@ -3,13 +3,16 @@
 page_title: "prowlarr_download_client_torrent_download_station Resource - terraform-provider-prowlarr"
 subcategory: "Download Clients"
 description: |-
+  <!-- subcategory:Download Clients -->
+  
   Download Client TorrentDownloadStation resource.
   For more information refer to Download Client https://wiki.servarr.com/prowlarr/settings#download-clients and TorrentDownloadStation https://wiki.servarr.com/prowlarr/supported#torrentdownloadstation.
 ---
 
 # prowlarr_download_client_torrent_download_station (Resource)
 
-<!-- subcategory:Download Clients -->Download Client TorrentDownloadStation resource.
+<!-- subcategory:Download Clients -->
+Download Client TorrentDownloadStation resource.
 For more information refer to [Download Client](https://wiki.servarr.com/prowlarr/settings#download-clients) and [TorrentDownloadStation](https://wiki.servarr.com/prowlarr/supported#torrentdownloadstation).
 
 ## Example Usage

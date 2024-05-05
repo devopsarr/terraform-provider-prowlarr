@@ -33,7 +33,7 @@ func (d *SyncProfileDataSource) Metadata(_ context.Context, req datasource.Metad
 func (d *SyncProfileDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "<!-- subcategory:Applications -->Single [Sync Profile](../resources/sync_profile).",
+		MarkdownDescription: "<!-- subcategory:Applications -->\nSingle [Sync Profile](../resources/sync_profile).",
 		Attributes: map[string]schema.Attribute{
 			"enable_rss": schema.BoolAttribute{
 				MarkdownDescription: "Enable RSS flag.",

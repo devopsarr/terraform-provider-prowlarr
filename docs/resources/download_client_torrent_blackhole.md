@@ -3,13 +3,16 @@
 page_title: "prowlarr_download_client_torrent_blackhole Resource - terraform-provider-prowlarr"
 subcategory: "Download Clients"
 description: |-
+  <!-- subcategory:Download Clients -->
+  
   Download Client Torrent Blackhole resource.
   For more information refer to Download Client https://wiki.servarr.com/prowlarr/settings#download-clients and TorrentBlackhole https://wiki.servarr.com/prowlarr/supported#torrentblackhole.
 ---
 
 # prowlarr_download_client_torrent_blackhole (Resource)
 
-<!-- subcategory:Download Clients -->Download Client Torrent Blackhole resource.
+<!-- subcategory:Download Clients -->
+Download Client Torrent Blackhole resource.
 For more information refer to [Download Client](https://wiki.servarr.com/prowlarr/settings#download-clients) and [TorrentBlackhole](https://wiki.servarr.com/prowlarr/supported#torrentblackhole).
 
 ## Example Usage

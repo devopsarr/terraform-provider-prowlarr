@@ -3,13 +3,16 @@
 page_title: "prowlarr_application_radarr Resource - terraform-provider-prowlarr"
 subcategory: "Applications"
 description: |-
+  <!-- subcategory:Applications -->
+  
   Application Radarr resource.
   For more information refer to Application https://wiki.servarr.com/prowlarr/settings#applications and Radarr https://wiki.servarr.com/prowlarr/supported#radarr.
 ---
 
 # prowlarr_application_radarr (Resource)
 
-<!-- subcategory:Applications -->Application Radarr resource.
+<!-- subcategory:Applications -->
+Application Radarr resource.
 For more information refer to [Application](https://wiki.servarr.com/prowlarr/settings#applications) and [Radarr](https://wiki.servarr.com/prowlarr/supported#radarr).
 
 ## Example Usage

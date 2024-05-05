@@ -3,13 +3,16 @@
 page_title: "prowlarr_notification_prowl Resource - terraform-provider-prowlarr"
 subcategory: "Notifications"
 description: |-
+  <!-- subcategory:Notifications -->
+  
   Notification Prowl resource.
   For more information refer to Notification https://wiki.servarr.com/prowlarr/settings#connect and Prowl https://wiki.servarr.com/prowlarr/supported#prowl.
 ---
 
 # prowlarr_notification_prowl (Resource)
 
-<!-- subcategory:Notifications -->Notification Prowl resource.
+<!-- subcategory:Notifications -->
+Notification Prowl resource.
 For more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect) and [Prowl](https://wiki.servarr.com/prowlarr/supported#prowl).
 
 ## Example Usage

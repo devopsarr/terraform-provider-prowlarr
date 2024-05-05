@@ -3,13 +3,16 @@
 page_title: "prowlarr_notification Resource - terraform-provider-prowlarr"
 subcategory: "Notifications"
 description: |-
+  <!-- subcategory:Notifications -->
+  
   Generic Notification resource. When possible use a specific resource instead.
   For more information refer to Notification https://wiki.servarr.com/prowlarr/settings#connect.
 ---
 
 # prowlarr_notification (Resource)
 
-<!-- subcategory:Notifications -->Generic Notification resource. When possible use a specific resource instead.
+<!-- subcategory:Notifications -->
+Generic Notification resource. When possible use a specific resource instead.
 For more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect).
 
 ## Example Usage

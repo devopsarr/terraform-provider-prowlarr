@@ -3,13 +3,16 @@
 page_title: "prowlarr_notification_notifiarr Resource - terraform-provider-prowlarr"
 subcategory: "Notifications"
 description: |-
+  <!-- subcategory:Notifications -->
+  
   Notification Notifiarr resource.
   For more information refer to Notification https://wiki.servarr.com/prowlarr/settings#connect and Notifiarr https://wiki.servarr.com/prowlarr/supported#notifiarr.
 ---
 
 # prowlarr_notification_notifiarr (Resource)
 
-<!-- subcategory:Notifications -->Notification Notifiarr resource.
+<!-- subcategory:Notifications -->
+Notification Notifiarr resource.
 For more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect) and [Notifiarr](https://wiki.servarr.com/prowlarr/supported#notifiarr).
 
 ## Example Usage

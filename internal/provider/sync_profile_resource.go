@@ -62,7 +62,7 @@ func (r *SyncProfileResource) Metadata(_ context.Context, req resource.MetadataR
 
 func (r *SyncProfileResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Applications -->Sync Profile resource.\nFor more information refer to [Sync Profiles](https://wiki.servarr.com/prowlarr/settings#sync-profiles) documentation.",
+		MarkdownDescription: "<!-- subcategory:Applications -->\nSync Profile resource.\nFor more information refer to [Sync Profiles](https://wiki.servarr.com/prowlarr/settings#sync-profiles) documentation.",
 		Attributes: map[string]schema.Attribute{
 			"enable_rss": schema.BoolAttribute{
 				MarkdownDescription: "Enable RSS flag.",

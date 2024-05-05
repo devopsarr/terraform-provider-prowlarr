@@ -3,13 +3,16 @@
 page_title: "prowlarr_application_whisparr Resource - terraform-provider-prowlarr"
 subcategory: "Applications"
 description: |-
+  <!-- subcategory:Applications -->
+  
   Application Whisparr resource.
   For more information refer to Application https://wiki.servarr.com/prowlarr/settings#applications and Whisparr https://wiki.servarr.com/prowlarr/supported#whisparr.
 ---
 
 # prowlarr_application_whisparr (Resource)
 
-<!-- subcategory:Applications -->Application Whisparr resource.
+<!-- subcategory:Applications -->
+Application Whisparr resource.
 For more information refer to [Application](https://wiki.servarr.com/prowlarr/settings#applications) and [Whisparr](https://wiki.servarr.com/prowlarr/supported#whisparr).
 
 ## Example Usage

@@ -3,13 +3,16 @@
 page_title: "prowlarr_notification_apprise Resource - terraform-provider-prowlarr"
 subcategory: "Notifications"
 description: |-
+  <!-- subcategory:Notifications -->
+  
   Notification Apprise resource.
   For more information refer to Notification https://wiki.servarr.com/prowlarr/settings#connect and Apprise https://wiki.servarr.com/prowlarr/supported#apprise.
 ---
 
 # prowlarr_notification_apprise (Resource)
 
-<!-- subcategory:Notifications -->Notification Apprise resource.
+<!-- subcategory:Notifications -->
+Notification Apprise resource.
 For more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect) and [Apprise](https://wiki.servarr.com/prowlarr/supported#apprise).
 
 ## Example Usage

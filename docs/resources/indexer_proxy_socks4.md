@@ -3,13 +3,16 @@
 page_title: "prowlarr_indexer_proxy_socks4 Resource - terraform-provider-prowlarr"
 subcategory: "Indexer Proxies"
 description: |-
+  <!-- subcategory:Indexer Proxies -->
+  
   Indexer Proxy Socks4 resource.
   For more information refer to Indexer Proxy https://wiki.servarr.com/prowlarr/settings#indexer-proxies and Socks4 https://wiki.servarr.com/prowlarr/supported#socks4.
 ---
 
 # prowlarr_indexer_proxy_socks4 (Resource)
 
-<!-- subcategory:Indexer Proxies -->Indexer Proxy Socks4 resource.
+<!-- subcategory:Indexer Proxies -->
+Indexer Proxy Socks4 resource.
 For more information refer to [Indexer Proxy](https://wiki.servarr.com/prowlarr/settings#indexer-proxies) and [Socks4](https://wiki.servarr.com/prowlarr/supported#socks4).
 
 ## Example Usage

@@ -3,13 +3,16 @@
 page_title: "prowlarr_download_client Resource - terraform-provider-prowlarr"
 subcategory: "Download Clients"
 description: |-
+  <!-- subcategory:Download Clients -->
+  
   Generic Download Client resource. When possible use a specific resource instead.
   For more information refer to Download Client https://wiki.servarr.com/prowlarr/settings#download-clients.
 ---
 
 # prowlarr_download_client (Resource)
 
-<!-- subcategory:Download Clients -->Generic Download Client resource. When possible use a specific resource instead.
+<!-- subcategory:Download Clients -->
+Generic Download Client resource. When possible use a specific resource instead.
 For more information refer to [Download Client](https://wiki.servarr.com/prowlarr/settings#download-clients).
 
 ## Example Usage

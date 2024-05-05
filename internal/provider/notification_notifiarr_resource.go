@@ -87,7 +87,7 @@ func (r *NotificationNotifiarrResource) Metadata(_ context.Context, req resource
 
 func (r *NotificationNotifiarrResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Notifiarr resource.\nFor more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect) and [Notifiarr](https://wiki.servarr.com/prowlarr/supported#notifiarr).",
+		MarkdownDescription: "<!-- subcategory:Notifications -->\nNotification Notifiarr resource.\nFor more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect) and [Notifiarr](https://wiki.servarr.com/prowlarr/supported#notifiarr).",
 		Attributes: map[string]schema.Attribute{
 			"on_health_issue": schema.BoolAttribute{
 				MarkdownDescription: "On health issue flag.",
