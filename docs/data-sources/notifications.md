@@ -3,12 +3,15 @@
 page_title: "prowlarr_notifications Data Source - terraform-provider-prowlarr"
 subcategory: "Notifications"
 description: |-
+  <!-- subcategory:Notifications -->
+  
   List all available Notifications ../resources/notification.
 ---
 
 # prowlarr_notifications (Data Source)
 
-<!-- subcategory:Notifications -->List all available [Notifications](../resources/notification).
+<!-- subcategory:Notifications -->
+List all available [Notifications](../resources/notification).
 
 ## Example Usage
 

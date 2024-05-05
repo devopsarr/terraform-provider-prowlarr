@@ -84,7 +84,7 @@ func (r *ApplicationMylarResource) Metadata(_ context.Context, req resource.Meta
 
 func (r *ApplicationMylarResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Applications -->Application Mylar resource.\nFor more information refer to [Application](https://wiki.servarr.com/prowlarr/settings#applications) and [Mylar](https://wiki.servarr.com/prowlarr/supported#mylar).",
+		MarkdownDescription: "<!-- subcategory:Applications -->\nApplication Mylar resource.\nFor more information refer to [Application](https://wiki.servarr.com/prowlarr/settings#applications) and [Mylar](https://wiki.servarr.com/prowlarr/supported#mylar).",
 		Attributes: map[string]schema.Attribute{
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Application name.",

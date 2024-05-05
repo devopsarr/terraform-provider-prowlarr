@@ -3,13 +3,16 @@
 page_title: "prowlarr_notification_telegram Resource - terraform-provider-prowlarr"
 subcategory: "Notifications"
 description: |-
+  <!-- subcategory:Notifications -->
+  
   Notification Telegram resource.
   For more information refer to Notification https://wiki.servarr.com/prowlarr/settings#connect and Telegram https://wiki.servarr.com/prowlarr/supported#telegram.
 ---
 
 # prowlarr_notification_telegram (Resource)
 
-<!-- subcategory:Notifications -->Notification Telegram resource.
+<!-- subcategory:Notifications -->
+Notification Telegram resource.
 For more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect) and [Telegram](https://wiki.servarr.com/prowlarr/supported#telegram).
 
 ## Example Usage

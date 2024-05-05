@@ -3,13 +3,16 @@
 page_title: "prowlarr_sync_profile Resource - terraform-provider-prowlarr"
 subcategory: "Applications"
 description: |-
+  <!-- subcategory:Applications -->
+  
   Sync Profile resource.
   For more information refer to Sync Profiles https://wiki.servarr.com/prowlarr/settings#sync-profiles documentation.
 ---
 
 # prowlarr_sync_profile (Resource)
 
-<!-- subcategory:Applications -->Sync Profile resource.
+<!-- subcategory:Applications -->
+Sync Profile resource.
 For more information refer to [Sync Profiles](https://wiki.servarr.com/prowlarr/settings#sync-profiles) documentation.
 
 ## Example Usage

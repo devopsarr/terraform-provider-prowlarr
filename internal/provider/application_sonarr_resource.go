@@ -87,7 +87,7 @@ func (r *ApplicationSonarrResource) Metadata(_ context.Context, req resource.Met
 
 func (r *ApplicationSonarrResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Applications -->Application Sonarr resource.\nFor more information refer to [Application](https://wiki.servarr.com/prowlarr/settings#applications) and [Sonarr](https://wiki.servarr.com/prowlarr/supported#sonarr).",
+		MarkdownDescription: "<!-- subcategory:Applications -->\nApplication Sonarr resource.\nFor more information refer to [Application](https://wiki.servarr.com/prowlarr/settings#applications) and [Sonarr](https://wiki.servarr.com/prowlarr/supported#sonarr).",
 		Attributes: map[string]schema.Attribute{
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Application name.",

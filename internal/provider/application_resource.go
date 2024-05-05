@@ -80,7 +80,7 @@ func (r *ApplicationResource) Metadata(_ context.Context, req resource.MetadataR
 
 func (r *ApplicationResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Applications -->Generic Application resource. When possible use a specific resource instead.\nFor more information refer to [Application](https://wiki.servarr.com/prowlarr/settings#applications).",
+		MarkdownDescription: "<!-- subcategory:Applications -->\nGeneric Application resource. When possible use a specific resource instead.\nFor more information refer to [Application](https://wiki.servarr.com/prowlarr/settings#applications).",
 		Attributes: map[string]schema.Attribute{
 			"config_contract": schema.StringAttribute{
 				MarkdownDescription: "Application configuration template.",

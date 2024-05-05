@@ -39,7 +39,7 @@ func (d *IndexerSchemasDataSource) Metadata(_ context.Context, req datasource.Me
 func (d *IndexerSchemasDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "<!-- subcategory:Indexers -->List all available [Indexer Schemas](../data-sources/indexer_schema).",
+		MarkdownDescription: "<!-- subcategory:Indexers -->\nList all available [Indexer Schemas](../data-sources/indexer_schema).",
 		Attributes: map[string]schema.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": schema.StringAttribute{

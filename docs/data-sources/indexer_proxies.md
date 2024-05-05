@@ -3,12 +3,15 @@
 page_title: "prowlarr_indexer_proxies Data Source - terraform-provider-prowlarr"
 subcategory: "Indexer Proxies"
 description: |-
+  <!-- subcategory:Indexer Proxies -->
+  
   List all available Indexer Proxies ../resources/indexer_proxy.
 ---
 
 # prowlarr_indexer_proxies (Data Source)
 
-<!-- subcategory:Indexer Proxies -->List all available [Indexer Proxies](../resources/indexer_proxy).
+<!-- subcategory:Indexer Proxies -->
+List all available [Indexer Proxies](../resources/indexer_proxy).
 
 ## Example Usage
 

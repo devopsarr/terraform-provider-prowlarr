@@ -105,7 +105,7 @@ func (r *NotificationSignalResource) Metadata(_ context.Context, req resource.Me
 
 func (r *NotificationSignalResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Signal resource.\nFor more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect) and [Signal](https://wiki.servarr.com/prowlarr/supported#signal).",
+		MarkdownDescription: "<!-- subcategory:Notifications -->\nNotification Signal resource.\nFor more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect) and [Signal](https://wiki.servarr.com/prowlarr/supported#signal).",
 		Attributes: map[string]schema.Attribute{
 			"on_health_issue": schema.BoolAttribute{
 				MarkdownDescription: "On health issue flag.",

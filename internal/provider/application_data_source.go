@@ -34,7 +34,7 @@ func (d *ApplicationDataSource) Metadata(_ context.Context, req datasource.Metad
 func (d *ApplicationDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "<!-- subcategory:Applications -->Single [Application](../resources/application).",
+		MarkdownDescription: "<!-- subcategory:Applications -->\nSingle [Application](../resources/application).",
 		Attributes: map[string]schema.Attribute{
 			"config_contract": schema.StringAttribute{
 				MarkdownDescription: "Application configuration template.",

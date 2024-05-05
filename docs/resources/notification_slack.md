@@ -3,13 +3,16 @@
 page_title: "prowlarr_notification_slack Resource - terraform-provider-prowlarr"
 subcategory: "Notifications"
 description: |-
+  <!-- subcategory:Notifications -->
+  
   Notification Slack resource.
   For more information refer to Notification https://wiki.servarr.com/prowlarr/settings#connect and Slack https://wiki.servarr.com/prowlarr/supported#slack.
 ---
 
 # prowlarr_notification_slack (Resource)
 
-<!-- subcategory:Notifications -->Notification Slack resource.
+<!-- subcategory:Notifications -->
+Notification Slack resource.
 For more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect) and [Slack](https://wiki.servarr.com/prowlarr/supported#slack).
 
 ## Example Usage

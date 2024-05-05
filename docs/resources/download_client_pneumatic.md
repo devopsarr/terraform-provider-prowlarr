@@ -3,13 +3,16 @@
 page_title: "prowlarr_download_client_pneumatic Resource - terraform-provider-prowlarr"
 subcategory: "Download Clients"
 description: |-
+  <!-- subcategory:Download Clients -->
+  
   Download Client Pneumatic resource.
   For more information refer to Download Client https://wiki.servarr.com/prowlarr/settings#download-clients and Pneumatic https://wiki.servarr.com/prowlarr/supported#pneumatic.
 ---
 
 # prowlarr_download_client_pneumatic (Resource)
 
-<!-- subcategory:Download Clients -->Download Client Pneumatic resource.
+<!-- subcategory:Download Clients -->
+Download Client Pneumatic resource.
 For more information refer to [Download Client](https://wiki.servarr.com/prowlarr/settings#download-clients) and [Pneumatic](https://wiki.servarr.com/prowlarr/supported#pneumatic).
 
 ## Example Usage

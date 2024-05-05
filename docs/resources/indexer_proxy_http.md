@@ -3,13 +3,16 @@
 page_title: "prowlarr_indexer_proxy_http Resource - terraform-provider-prowlarr"
 subcategory: "Indexer Proxies"
 description: |-
+  <!-- subcategory:Indexer Proxies -->
+  
   Indexer Proxy HTTP resource.
   For more information refer to Indexer Proxy https://wiki.servarr.com/prowlarr/settings#indexer-proxies and HTTP https://wiki.servarr.com/prowlarr/supported#http.
 ---
 
 # prowlarr_indexer_proxy_http (Resource)
 
-<!-- subcategory:Indexer Proxies -->Indexer Proxy HTTP resource.
+<!-- subcategory:Indexer Proxies -->
+Indexer Proxy HTTP resource.
 For more information refer to [Indexer Proxy](https://wiki.servarr.com/prowlarr/settings#indexer-proxies) and [HTTP](https://wiki.servarr.com/prowlarr/supported#http).
 
 ## Example Usage

@@ -84,7 +84,7 @@ func (r *ApplicationReadarrResource) Metadata(_ context.Context, req resource.Me
 
 func (r *ApplicationReadarrResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Applications -->Application Readarr resource.\nFor more information refer to [Application](https://wiki.servarr.com/prowlarr/settings#applications) and [Readarr](https://wiki.servarr.com/prowlarr/supported#readarr).",
+		MarkdownDescription: "<!-- subcategory:Applications -->\nApplication Readarr resource.\nFor more information refer to [Application](https://wiki.servarr.com/prowlarr/settings#applications) and [Readarr](https://wiki.servarr.com/prowlarr/supported#readarr).",
 		Attributes: map[string]schema.Attribute{
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Application name.",

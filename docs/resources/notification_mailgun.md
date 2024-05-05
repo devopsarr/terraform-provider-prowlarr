@@ -3,13 +3,16 @@
 page_title: "prowlarr_notification_mailgun Resource - terraform-provider-prowlarr"
 subcategory: "Notifications"
 description: |-
+  <!-- subcategory:Notifications -->
+  
   Notification Mailgun resource.
   For more information refer to Notification https://wiki.servarr.com/prowlarr/settings#connect and Mailgun https://wiki.servarr.com/prowlarr/supported#mailgun.
 ---
 
 # prowlarr_notification_mailgun (Resource)
 
-<!-- subcategory:Notifications -->Notification Mailgun resource.
+<!-- subcategory:Notifications -->
+Notification Mailgun resource.
 For more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect) and [Mailgun](https://wiki.servarr.com/prowlarr/supported#mailgun).
 
 ## Example Usage

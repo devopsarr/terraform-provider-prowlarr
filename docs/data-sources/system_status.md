@@ -3,13 +3,16 @@
 page_title: "prowlarr_system_status Data Source - terraform-provider-prowlarr"
 subcategory: "System"
 description: |-
+  <!-- subcategory:System -->
+  
   System Status resource. User must have rights to read config.xml.
   For more information refer to System Status https://wiki.servarr.com/prowlarr/system#status documentation.
 ---
 
 # prowlarr_system_status (Data Source)
 
-<!-- subcategory:System -->System Status resource. User must have rights to read `config.xml`.
+<!-- subcategory:System -->
+System Status resource. User must have rights to read `config.xml`.
 For more information refer to [System Status](https://wiki.servarr.com/prowlarr/system#status) documentation.
 
 ## Example Usage

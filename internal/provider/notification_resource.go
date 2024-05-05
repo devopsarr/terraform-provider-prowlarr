@@ -54,7 +54,7 @@ type Notification struct {
 	ChannelTags           types.Set    `tfsdk:"channel_tags"`
 	Topics                types.Set    `tfsdk:"topics"`
 	GrabFields            types.Set    `tfsdk:"grab_fields"`
-	DeviceIds             types.Set    `tfsdk:"device_ids"`
+	DeviceIDs             types.Set    `tfsdk:"device_ids"`
 	Devices               types.Set    `tfsdk:"devices"`
 	To                    types.Set    `tfsdk:"to"`
 	Cc                    types.Set    `tfsdk:"cc"`
@@ -233,7 +233,7 @@ func (r *NotificationResource) Metadata(_ context.Context, req resource.Metadata
 
 func (r *NotificationResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Notifications -->Generic Notification resource. When possible use a specific resource instead.\nFor more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect).",
+		MarkdownDescription: "<!-- subcategory:Notifications -->\nGeneric Notification resource. When possible use a specific resource instead.\nFor more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect).",
 		Attributes: map[string]schema.Attribute{
 			"on_health_issue": schema.BoolAttribute{
 				MarkdownDescription: "On health issue flag.",
@@ -828,7 +828,7 @@ func (n *Notification) write(ctx context.Context, notification *prowlarr.Notific
 	n.ConfigContract = types.StringValue(notification.GetConfigContract())
 	n.GrabFields = types.SetValueMust(types.Int64Type, nil)
 	n.ChannelTags = types.SetValueMust(types.StringType, nil)
-	n.DeviceIds = types.SetValueMust(types.Int64Type, nil)
+	n.DeviceIDs = types.SetValueMust(types.Int64Type, nil)
 	n.Topics = types.SetValueMust(types.StringType, nil)
 	n.Devices = types.SetValueMust(types.StringType, nil)
 	n.Recipients = types.SetValueMust(types.StringType, nil)

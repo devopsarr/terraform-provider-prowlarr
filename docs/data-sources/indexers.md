@@ -3,12 +3,15 @@
 page_title: "prowlarr_indexers Data Source - terraform-provider-prowlarr"
 subcategory: "Indexers"
 description: |-
+  <!-- subcategory:Indexers -->
+  
   List all available Indexers ../resources/indexer.
 ---
 
 # prowlarr_indexers (Data Source)
 
-<!-- subcategory:Indexers -->List all available [Indexers](../resources/indexer).
+<!-- subcategory:Indexers -->
+List all available [Indexers](../resources/indexer).
 
 ## Example Usage
 

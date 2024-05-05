@@ -3,13 +3,16 @@
 page_title: "prowlarr_application Resource - terraform-provider-prowlarr"
 subcategory: "Applications"
 description: |-
+  <!-- subcategory:Applications -->
+  
   Generic Application resource. When possible use a specific resource instead.
   For more information refer to Application https://wiki.servarr.com/prowlarr/settings#applications.
 ---
 
 # prowlarr_application (Resource)
 
-<!-- subcategory:Applications -->Generic Application resource. When possible use a specific resource instead.
+<!-- subcategory:Applications -->
+Generic Application resource. When possible use a specific resource instead.
 For more information refer to [Application](https://wiki.servarr.com/prowlarr/settings#applications).
 
 ## Example Usage

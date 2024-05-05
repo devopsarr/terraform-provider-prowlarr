@@ -3,13 +3,16 @@
 page_title: "prowlarr_download_client_sabnzbd Resource - terraform-provider-prowlarr"
 subcategory: "Download Clients"
 description: |-
+  <!-- subcategory:Download Clients -->
+  
   Download Client Sabnzbd resource.
   For more information refer to Download Client https://wiki.servarr.com/prowlarr/settings#download-clients and Sabnzbd https://wiki.servarr.com/prowlarr/supported#sabnzbd.
 ---
 
 # prowlarr_download_client_sabnzbd (Resource)
 
-<!-- subcategory:Download Clients -->Download Client Sabnzbd resource.
+<!-- subcategory:Download Clients -->
+Download Client Sabnzbd resource.
 For more information refer to [Download Client](https://wiki.servarr.com/prowlarr/settings#download-clients) and [Sabnzbd](https://wiki.servarr.com/prowlarr/supported#sabnzbd).
 
 ## Example Usage

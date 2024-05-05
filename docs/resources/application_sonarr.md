@@ -3,13 +3,16 @@
 page_title: "prowlarr_application_sonarr Resource - terraform-provider-prowlarr"
 subcategory: "Applications"
 description: |-
+  <!-- subcategory:Applications -->
+  
   Application Sonarr resource.
   For more information refer to Application https://wiki.servarr.com/prowlarr/settings#applications and Sonarr https://wiki.servarr.com/prowlarr/supported#sonarr.
 ---
 
 # prowlarr_application_sonarr (Resource)
 
-<!-- subcategory:Applications -->Application Sonarr resource.
+<!-- subcategory:Applications -->
+Application Sonarr resource.
 For more information refer to [Application](https://wiki.servarr.com/prowlarr/settings#applications) and [Sonarr](https://wiki.servarr.com/prowlarr/supported#sonarr).
 
 ## Example Usage

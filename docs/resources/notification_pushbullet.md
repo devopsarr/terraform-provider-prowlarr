@@ -3,13 +3,16 @@
 page_title: "prowlarr_notification_pushbullet Resource - terraform-provider-prowlarr"
 subcategory: "Notifications"
 description: |-
+  <!-- subcategory:Notifications -->
+  
   Notification Pushbullet resource.
   For more information refer to Notification https://wiki.servarr.com/prowlarr/settings#connect and Pushbullet https://wiki.servarr.com/prowlarr/supported#pushbullet.
 ---
 
 # prowlarr_notification_pushbullet (Resource)
 
-<!-- subcategory:Notifications -->Notification Pushbullet resource.
+<!-- subcategory:Notifications -->
+Notification Pushbullet resource.
 For more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect) and [Pushbullet](https://wiki.servarr.com/prowlarr/supported#pushbullet).
 
 ## Example Usage

@@ -84,7 +84,7 @@ func (r *ApplicationLidarrResource) Metadata(_ context.Context, req resource.Met
 
 func (r *ApplicationLidarrResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Applications -->Application Lidarr resource.\nFor more information refer to [Application](https://wiki.servarr.com/prowlarr/settings#applications) and [Lidarr](https://wiki.servarr.com/prowlarr/supported#lidarr).",
+		MarkdownDescription: "<!-- subcategory:Applications -->\nApplication Lidarr resource.\nFor more information refer to [Application](https://wiki.servarr.com/prowlarr/settings#applications) and [Lidarr](https://wiki.servarr.com/prowlarr/supported#lidarr).",
 		Attributes: map[string]schema.Attribute{
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Application name.",

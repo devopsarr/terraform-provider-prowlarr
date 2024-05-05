@@ -33,7 +33,7 @@ func (d *IndexerDataSource) Metadata(_ context.Context, req datasource.MetadataR
 func (d *IndexerDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "<!-- subcategory:Indexers -->Single [Indexer](../resources/indexer).",
+		MarkdownDescription: "<!-- subcategory:Indexers -->\nSingle [Indexer](../resources/indexer).",
 		Attributes: map[string]schema.Attribute{
 			"enable": schema.BoolAttribute{
 				MarkdownDescription: "Enable RSS flag.",

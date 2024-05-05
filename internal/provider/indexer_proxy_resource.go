@@ -76,7 +76,7 @@ func (r *IndexerProxyResource) Metadata(_ context.Context, req resource.Metadata
 
 func (r *IndexerProxyResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Indexer Proxies -->Generic Indexer Proxy resource. When possible use a specific resource instead.\nFor more information refer to [Indexer Proxy](https://wiki.servarr.com/prowlarr/settings#indexer-proxies).",
+		MarkdownDescription: "<!-- subcategory:Indexer Proxies -->\nGeneric Indexer Proxy resource. When possible use a specific resource instead.\nFor more information refer to [Indexer Proxy](https://wiki.servarr.com/prowlarr/settings#indexer-proxies).",
 		Attributes: map[string]schema.Attribute{
 			"config_contract": schema.StringAttribute{
 				MarkdownDescription: "IndexerProxy configuration template.",

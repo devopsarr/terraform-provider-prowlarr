@@ -56,7 +56,7 @@ func (d *IndexerSchemaDataSource) Metadata(_ context.Context, req datasource.Met
 func (d *IndexerSchemaDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "<!-- subcategory:Indexers -->Indexer schema definition.",
+		MarkdownDescription: "<!-- subcategory:Indexers -->\nIndexer schema definition.",
 		Attributes: map[string]schema.Attribute{
 			"config_contract": schema.StringAttribute{
 				MarkdownDescription: "Indexer configuration template.",

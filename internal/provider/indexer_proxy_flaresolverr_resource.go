@@ -73,7 +73,7 @@ func (r *IndexerProxyFlaresolverrResource) Metadata(_ context.Context, req resou
 
 func (r *IndexerProxyFlaresolverrResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Indexer Proxies -->Indexer Proxy Flaresolverr resource.\nFor more information refer to [Indexer Proxy](https://wiki.servarr.com/prowlarr/settings#indexer-proxies) and [Flaresolverr](https://wiki.servarr.com/prowlarr/supported#flaresolverr).",
+		MarkdownDescription: "<!-- subcategory:Indexer Proxies -->\nIndexer Proxy Flaresolverr resource.\nFor more information refer to [Indexer Proxy](https://wiki.servarr.com/prowlarr/settings#indexer-proxies) and [Flaresolverr](https://wiki.servarr.com/prowlarr/supported#flaresolverr).",
 		Attributes: map[string]schema.Attribute{
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Indexer Proxy name.",

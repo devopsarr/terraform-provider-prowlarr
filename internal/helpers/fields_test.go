@@ -46,11 +46,13 @@ func TestWriteStringField(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+
 			field := prowlarr.NewField()
-			field.SetName("str")
 			if test.value != nil {
 				field.SetValue(*test.value)
 			}
+
+			field.SetName("str")
 			writeStringField(field, &test.written)
 			assert.Equal(t, test.expected, test.written)
 		})
@@ -83,11 +85,13 @@ func TestWriteBoolField(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+
 			field := prowlarr.NewField()
-			field.SetName("boo")
 			if test.value != nil {
 				field.SetValue(*test.value)
 			}
+
+			field.SetName("boo")
 			writeBoolField(field, &test.written)
 			assert.Equal(t, test.expected, test.written)
 		})
@@ -130,11 +134,13 @@ func TestWriteIntField(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+
 			field := prowlarr.NewField()
-			field.SetName(test.name)
 			if test.value != nil {
 				field.SetValue(*test.value)
 			}
+
+			field.SetName(test.name)
 			writeIntField(field, &test.written)
 			assert.Equal(t, test.expected, test.written)
 		})
@@ -163,11 +169,13 @@ func TestWriteFloatField(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+
 			field := prowlarr.NewField()
-			field.SetName("fl")
 			if test.value != nil {
 				field.SetValue(*test.value)
 			}
+
+			field.SetName("fl")
 			writeFloatField(field, &test.written)
 			assert.Equal(t, test.expected, test.written)
 		})
@@ -270,6 +278,7 @@ func TestReadStringField(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+
 			field := readStringField(test.name, &test.fieldCase)
 			assert.Equal(t, test.expected, field)
 		})
@@ -319,6 +328,7 @@ func TestReadIntField(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+
 			field := readIntField(test.tfName, &test.fieldCase)
 			assert.Equal(t, expected, field)
 		})
@@ -355,6 +365,7 @@ func TestReadBoolField(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+
 			field := readBoolField(test.name, &test.fieldCase)
 			assert.Equal(t, test.expected, field)
 		})
@@ -391,6 +402,7 @@ func TestReadFloatField(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+
 			field := readFloatField(test.name, &test.fieldCase)
 			assert.Equal(t, test.expected, field)
 		})

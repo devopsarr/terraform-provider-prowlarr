@@ -3,13 +3,16 @@
 page_title: "prowlarr_tag Resource - terraform-provider-prowlarr"
 subcategory: "Tags"
 description: |-
+  <!-- subcategory:Tags -->
+  
   Tag resource.
   For more information refer to Tags https://wiki.servarr.com/prowlarr/settings#tags documentation.
 ---
 
 # prowlarr_tag (Resource)
 
-<!-- subcategory:Tags -->Tag resource.
+<!-- subcategory:Tags -->
+Tag resource.
 For more information refer to [Tags](https://wiki.servarr.com/prowlarr/settings#tags) documentation.
 
 ## Example Usage

@@ -3,13 +3,16 @@
 page_title: "prowlarr_notification_ntfy Resource - terraform-provider-prowlarr"
 subcategory: "Notifications"
 description: |-
+  <!-- subcategory:Notifications -->
+  
   Notification Ntfy resource.
   For more information refer to Notification https://wiki.servarr.com/prowlarr/settings#connect and Ntfy https://wiki.servarr.com/prowlarr/supported#ntfy.
 ---
 
 # prowlarr_notification_ntfy (Resource)
 
-<!-- subcategory:Notifications -->Notification Ntfy resource.
+<!-- subcategory:Notifications -->
+Notification Ntfy resource.
 For more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect) and [Ntfy](https://wiki.servarr.com/prowlarr/supported#ntfy).
 
 ## Example Usage

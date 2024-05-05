@@ -3,13 +3,16 @@
 page_title: "prowlarr_notification_join Resource - terraform-provider-prowlarr"
 subcategory: "Notifications"
 description: |-
+  <!-- subcategory:Notifications -->
+  
   Notification Join resource.
   For more information refer to Notification https://wiki.servarr.com/prowlarr/settings#connect and Join https://wiki.servarr.com/prowlarr/supported#join.
 ---
 
 # prowlarr_notification_join (Resource)
 
-<!-- subcategory:Notifications -->Notification Join resource.
+<!-- subcategory:Notifications -->
+Notification Join resource.
 For more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect) and [Join](https://wiki.servarr.com/prowlarr/supported#join).
 
 ## Example Usage

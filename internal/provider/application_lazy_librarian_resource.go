@@ -84,7 +84,7 @@ func (r *ApplicationLazyLibrarianResource) Metadata(_ context.Context, req resou
 
 func (r *ApplicationLazyLibrarianResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Applications -->Application LazyLibrarian resource.\nFor more information refer to [Application](https://wiki.servarr.com/prowlarr/settings#applications) and [LazyLibrarian](https://wiki.servarr.com/prowlarr/supported#lazylibrarian).",
+		MarkdownDescription: "<!-- subcategory:Applications -->\nApplication LazyLibrarian resource.\nFor more information refer to [Application](https://wiki.servarr.com/prowlarr/settings#applications) and [LazyLibrarian](https://wiki.servarr.com/prowlarr/supported#lazylibrarian).",
 		Attributes: map[string]schema.Attribute{
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Application name.",

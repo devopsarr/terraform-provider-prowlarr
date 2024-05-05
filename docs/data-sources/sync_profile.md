@@ -3,12 +3,15 @@
 page_title: "prowlarr_sync_profile Data Source - terraform-provider-prowlarr"
 subcategory: "Applications"
 description: |-
+  <!-- subcategory:Applications -->
+  
   Single Sync Profile ../resources/sync_profile.
 ---
 
 # prowlarr_sync_profile (Data Source)
 
-<!-- subcategory:Applications -->Single [Sync Profile](../resources/sync_profile).
+<!-- subcategory:Applications -->
+Single [Sync Profile](../resources/sync_profile).
 
 ## Example Usage
 

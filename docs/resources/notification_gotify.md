@@ -3,13 +3,16 @@
 page_title: "prowlarr_notification_gotify Resource - terraform-provider-prowlarr"
 subcategory: "Notifications"
 description: |-
+  <!-- subcategory:Notifications -->
+  
   Notification Gotify resource.
   For more information refer to Notification https://wiki.servarr.com/prowlarr/settings#connect and Gotify https://wiki.servarr.com/prowlarr/supported#gotify.
 ---
 
 # prowlarr_notification_gotify (Resource)
 
-<!-- subcategory:Notifications -->Notification Gotify resource.
+<!-- subcategory:Notifications -->
+Notification Gotify resource.
 For more information refer to [Notification](https://wiki.servarr.com/prowlarr/settings#connect) and [Gotify](https://wiki.servarr.com/prowlarr/supported#gotify).
 
 ## Example Usage

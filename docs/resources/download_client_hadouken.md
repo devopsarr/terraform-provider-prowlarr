@@ -3,13 +3,16 @@
 page_title: "prowlarr_download_client_hadouken Resource - terraform-provider-prowlarr"
 subcategory: "Download Clients"
 description: |-
+  <!-- subcategory:Download Clients -->
+  
   Download Client Hadouken resource.
   For more information refer to Download Client https://wiki.servarr.com/prowlarr/settings#download-clients and Hadouken https://wiki.servarr.com/prowlarr/supported#hadouken.
 ---
 
 # prowlarr_download_client_hadouken (Resource)
 
-<!-- subcategory:Download Clients -->Download Client Hadouken resource.
+<!-- subcategory:Download Clients -->
+Download Client Hadouken resource.
 For more information refer to [Download Client](https://wiki.servarr.com/prowlarr/settings#download-clients) and [Hadouken](https://wiki.servarr.com/prowlarr/supported#hadouken).
 
 ## Example Usage

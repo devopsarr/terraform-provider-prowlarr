@@ -3,13 +3,16 @@
 page_title: "prowlarr_download_client_utorrent Resource - terraform-provider-prowlarr"
 subcategory: "Download Clients"
 description: |-
+  <!-- subcategory:Download Clients -->
+  
   Download Client uTorrent resource.
   For more information refer to Download Client https://wiki.servarr.com/prowlarr/settings#download-clients and uTorrent https://wiki.servarr.com/prowlarr/supported#utorrent.
 ---
 
 # prowlarr_download_client_utorrent (Resource)
 
-<!-- subcategory:Download Clients -->Download Client uTorrent resource.
+<!-- subcategory:Download Clients -->
+Download Client uTorrent resource.
 For more information refer to [Download Client](https://wiki.servarr.com/prowlarr/settings#download-clients) and [uTorrent](https://wiki.servarr.com/prowlarr/supported#utorrent).
 
 ## Example Usage
