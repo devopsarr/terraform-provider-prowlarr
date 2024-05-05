@@ -25,13 +25,14 @@ func NewIndexerProxyDataSource() datasource.DataSource {
 // IndexerProxyDataSource defines the indexer_proxy implementation.
 type IndexerProxyDataSource struct {
 	client *prowlarr.APIClient
+	auth   context.Context
 }
 
-func (i *IndexerProxyDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *IndexerProxyDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + indexerProxyDataSourceName
 }
 
-func (i *IndexerProxyDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *IndexerProxyDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Indexer Proxies -->\nSingle [Indexer Proxy](../resources/indexer_proxy).",
@@ -83,13 +84,14 @@ func (i *IndexerProxyDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 	}
 }
 
-func (i *IndexerProxyDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
-		i.client = client
+func (d *IndexerProxyDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
+		d.client = client
+		d.auth = auth
 	}
 }
 
-func (i *IndexerProxyDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *IndexerProxyDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data *IndexerProxy
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
@@ -98,7 +100,7 @@ func (i *IndexerProxyDataSource) Read(ctx context.Context, req datasource.ReadRe
 		return
 	}
 	// Get indexerProxy current value
-	response, _, err := i.client.IndexerProxyAPI.ListIndexerProxy(ctx).Execute()
+	response, _, err := d.client.IndexerProxyAPI.ListIndexerProxy(d.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerProxyDataSourceName, err))
 
@@ -111,10 +113,10 @@ func (i *IndexerProxyDataSource) Read(ctx context.Context, req datasource.ReadRe
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (i *IndexerProxy) find(ctx context.Context, name string, indexerProxies []prowlarr.IndexerProxyResource, diags *diag.Diagnostics) {
+func (d *IndexerProxy) find(ctx context.Context, name string, indexerProxies []prowlarr.IndexerProxyResource, diags *diag.Diagnostics) {
 	for _, proxy := range indexerProxies {
 		if proxy.GetName() == name {
-			i.write(ctx, &proxy, diags)
+			d.write(ctx, &proxy, diags)
 
 			return
 		}

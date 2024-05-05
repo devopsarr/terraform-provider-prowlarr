@@ -24,6 +24,7 @@ func NewIndexerSchemasDataSource() datasource.DataSource {
 // IndexerSchemasDataSource defines the indexers implementation.
 type IndexerSchemasDataSource struct {
 	client *prowlarr.APIClient
+	auth   context.Context
 }
 
 // IndexerSchemas describes the indexers data model.
@@ -55,14 +56,15 @@ func (d *IndexerSchemasDataSource) Schema(_ context.Context, _ datasource.Schema
 }
 
 func (d *IndexerSchemasDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 
 func (d *IndexerSchemasDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get indexers current value
-	response, _, err := d.client.IndexerAPI.ListIndexerSchema(ctx).Execute()
+	response, _, err := d.client.IndexerAPI.ListIndexerSchema(d.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerSchemasDataSourceName, err))
 

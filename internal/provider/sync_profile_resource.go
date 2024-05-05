@@ -32,6 +32,7 @@ func NewSyncProfileResource() resource.Resource {
 // SyncProfileResource defines the sync profile implementation.
 type SyncProfileResource struct {
 	client *prowlarr.APIClient
+	auth   context.Context
 }
 
 // SyncProfile describes the sync profile data model.
@@ -96,8 +97,9 @@ func (r *SyncProfileResource) Schema(_ context.Context, _ resource.SchemaRequest
 }
 
 func (r *SyncProfileResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -114,7 +116,7 @@ func (r *SyncProfileResource) Create(ctx context.Context, req resource.CreateReq
 	// Create new Sync Profile
 	request := profile.read()
 
-	response, _, err := r.client.AppProfileAPI.CreateAppProfile(ctx).AppProfileResource(*request).Execute()
+	response, _, err := r.client.AppProfileAPI.CreateAppProfile(r.auth).AppProfileResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, syncProfileResourceName, err))
 
@@ -138,7 +140,7 @@ func (r *SyncProfileResource) Read(ctx context.Context, req resource.ReadRequest
 	}
 
 	// Get sync profile current value
-	response, _, err := r.client.AppProfileAPI.GetAppProfileById(ctx, int32(profile.ID.ValueInt64())).Execute()
+	response, _, err := r.client.AppProfileAPI.GetAppProfileById(r.auth, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, syncProfileResourceName, err))
 
@@ -164,7 +166,7 @@ func (r *SyncProfileResource) Update(ctx context.Context, req resource.UpdateReq
 	// Update SyncProfile
 	request := profile.read()
 
-	response, _, err := r.client.AppProfileAPI.UpdateAppProfile(ctx, fmt.Sprint(request.GetId())).AppProfileResource(*request).Execute()
+	response, _, err := r.client.AppProfileAPI.UpdateAppProfile(r.auth, fmt.Sprint(request.GetId())).AppProfileResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, syncProfileResourceName, err))
 
@@ -187,7 +189,7 @@ func (r *SyncProfileResource) Delete(ctx context.Context, req resource.DeleteReq
 	}
 
 	// Delete sync profile current value
-	_, err := r.client.AppProfileAPI.DeleteAppProfile(ctx, int32(ID)).Execute()
+	_, err := r.client.AppProfileAPI.DeleteAppProfile(r.auth, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, syncProfileResourceName, err))
 

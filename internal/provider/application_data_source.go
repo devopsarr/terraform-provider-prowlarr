@@ -25,6 +25,7 @@ func NewApplicationDataSource() datasource.DataSource {
 // ApplicationDataSource defines the application implementation.
 type ApplicationDataSource struct {
 	client *prowlarr.APIClient
+	auth   context.Context
 }
 
 func (d *ApplicationDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -90,8 +91,9 @@ func (d *ApplicationDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 }
 
 func (d *ApplicationDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 
@@ -104,7 +106,7 @@ func (d *ApplicationDataSource) Read(ctx context.Context, req datasource.ReadReq
 		return
 	}
 	// Get application current value
-	response, _, err := d.client.ApplicationAPI.ListApplications(ctx).Execute()
+	response, _, err := d.client.ApplicationAPI.ListApplications(d.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, applicationDataSourceName, err))
 

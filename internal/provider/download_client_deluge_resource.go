@@ -38,6 +38,7 @@ func NewDownloadClientDelugeResource() resource.Resource {
 // DownloadClientDelugeResource defines the download client implementation.
 type DownloadClientDelugeResource struct {
 	client *prowlarr.APIClient
+	auth   context.Context
 }
 
 // DownloadClientDeluge describes the download client data model.
@@ -190,8 +191,9 @@ func (r *DownloadClientDelugeResource) Schema(_ context.Context, _ resource.Sche
 }
 
 func (r *DownloadClientDelugeResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -208,7 +210,7 @@ func (r *DownloadClientDelugeResource) Create(ctx context.Context, req resource.
 	// Create new DownloadClientDeluge
 	request := client.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.DownloadClientAPI.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
+	response, _, err := r.client.DownloadClientAPI.CreateDownloadClient(r.auth).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, downloadClientDelugeResourceName, err))
 
@@ -232,7 +234,7 @@ func (r *DownloadClientDelugeResource) Read(ctx context.Context, req resource.Re
 	}
 
 	// Get DownloadClientDeluge current value
-	response, _, err := r.client.DownloadClientAPI.GetDownloadClientById(ctx, int32(client.ID.ValueInt64())).Execute()
+	response, _, err := r.client.DownloadClientAPI.GetDownloadClientById(r.auth, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientDelugeResourceName, err))
 
@@ -258,7 +260,7 @@ func (r *DownloadClientDelugeResource) Update(ctx context.Context, req resource.
 	// Update DownloadClientDeluge
 	request := client.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.DownloadClientAPI.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
+	response, _, err := r.client.DownloadClientAPI.UpdateDownloadClient(r.auth, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, downloadClientDelugeResourceName, err))
 
@@ -281,7 +283,7 @@ func (r *DownloadClientDelugeResource) Delete(ctx context.Context, req resource.
 	}
 
 	// Delete DownloadClientDeluge current value
-	_, err := r.client.DownloadClientAPI.DeleteDownloadClient(ctx, int32(ID)).Execute()
+	_, err := r.client.DownloadClientAPI.DeleteDownloadClient(r.auth, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientDelugeResourceName, err))
 

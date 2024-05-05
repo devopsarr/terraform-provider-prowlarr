@@ -32,5 +32,11 @@ const testUnauthorizedProvider = `
 provider "prowlarr" {
 	url = "http://localhost:9696"
 	api_key = "ErrorAPIKey"
+	extra_headers = [
+		{
+			name = "testName"
+			value = "testValue"
+		}
+	]
   }
 `

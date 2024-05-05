@@ -25,6 +25,7 @@ func NewTagDetailsDataSource() datasource.DataSource {
 // TagDetailsDataSource defines the tag details implementation.
 type TagDetailsDataSource struct {
 	client *prowlarr.APIClient
+	auth   context.Context
 }
 
 // Tag describes the tag data model.
@@ -91,8 +92,9 @@ func (d *TagDetailsDataSource) Schema(_ context.Context, _ datasource.SchemaRequ
 }
 
 func (d *TagDetailsDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 
@@ -106,7 +108,7 @@ func (d *TagDetailsDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	}
 
 	// Get tags current value
-	response, _, err := d.client.TagDetailsAPI.ListTagDetail(ctx).Execute()
+	response, _, err := d.client.TagDetailsAPI.ListTagDetail(d.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, tagDetailsDataSourceName, err))
 

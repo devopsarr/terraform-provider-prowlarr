@@ -24,6 +24,7 @@ func NewSystemStatusDataSource() datasource.DataSource {
 // SystemStatusDataSource defines the system status implementation.
 type SystemStatusDataSource struct {
 	client *prowlarr.APIClient
+	auth   context.Context
 }
 
 // SystemStatus describes the system status data model.
@@ -205,14 +206,15 @@ func (d *SystemStatusDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 }
 
 func (d *SystemStatusDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 
 func (d *SystemStatusDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get system status current value
-	response, _, err := d.client.SystemAPI.GetSystemStatus(ctx).Execute()
+	response, _, err := d.client.SystemAPI.GetSystemStatus(d.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, systemStatusDataSourceName, err))
 

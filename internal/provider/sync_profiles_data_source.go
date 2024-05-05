@@ -25,6 +25,7 @@ func NewSyncProfilesDataSource() datasource.DataSource {
 // SyncProfilesDataSource defines the sync profiles implementation.
 type SyncProfilesDataSource struct {
 	client *prowlarr.APIClient
+	auth   context.Context
 }
 
 // SyncProfiles describes the sync profiles data model.
@@ -83,14 +84,15 @@ func (d *SyncProfilesDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 }
 
 func (d *SyncProfilesDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 
 func (d *SyncProfilesDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get sync profiles current value
-	response, _, err := d.client.AppProfileAPI.ListAppProfile(ctx).Execute()
+	response, _, err := d.client.AppProfileAPI.ListAppProfile(d.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, syncProfilesDataSourceName, err))
 
