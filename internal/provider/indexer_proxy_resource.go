@@ -38,6 +38,7 @@ func NewIndexerProxyResource() resource.Resource {
 // IndexerProxyResource defines the indexer proxy implementation.
 type IndexerProxyResource struct {
 	client *prowlarr.APIClient
+	auth   context.Context
 }
 
 // IndexerProxy describes the indexer proxy data model.
@@ -135,8 +136,9 @@ func (r *IndexerProxyResource) Schema(_ context.Context, _ resource.SchemaReques
 }
 
 func (r *IndexerProxyResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -153,7 +155,7 @@ func (r *IndexerProxyResource) Create(ctx context.Context, req resource.CreateRe
 	// Create new IndexerProxy
 	request := proxy.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.IndexerProxyAPI.CreateIndexerProxy(ctx).IndexerProxyResource(*request).Execute()
+	response, _, err := r.client.IndexerProxyAPI.CreateIndexerProxy(r.auth).IndexerProxyResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, indexerProxyResourceName, err))
 
@@ -181,7 +183,7 @@ func (r *IndexerProxyResource) Read(ctx context.Context, req resource.ReadReques
 	}
 
 	// Get IndexerProxy current value
-	response, _, err := r.client.IndexerProxyAPI.GetIndexerProxyById(ctx, int32(proxy.ID.ValueInt64())).Execute()
+	response, _, err := r.client.IndexerProxyAPI.GetIndexerProxyById(r.auth, int32(proxy.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerProxyResourceName, err))
 
@@ -211,7 +213,7 @@ func (r *IndexerProxyResource) Update(ctx context.Context, req resource.UpdateRe
 	// Update IndexerProxy
 	request := proxy.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.IndexerProxyAPI.UpdateIndexerProxy(ctx, strconv.Itoa(int(request.GetId()))).IndexerProxyResource(*request).Execute()
+	response, _, err := r.client.IndexerProxyAPI.UpdateIndexerProxy(r.auth, strconv.Itoa(int(request.GetId()))).IndexerProxyResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, indexerProxyResourceName, err))
 
@@ -238,7 +240,7 @@ func (r *IndexerProxyResource) Delete(ctx context.Context, req resource.DeleteRe
 	}
 
 	// Delete IndexerProxy current value
-	_, err := r.client.IndexerProxyAPI.DeleteIndexerProxy(ctx, int32(ID)).Execute()
+	_, err := r.client.IndexerProxyAPI.DeleteIndexerProxy(r.auth, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerProxyResourceName, err))
 

@@ -38,6 +38,7 @@ func NewApplicationMylarResource() resource.Resource {
 // ApplicationMylarResource defines the application implementation.
 type ApplicationMylarResource struct {
 	client *prowlarr.APIClient
+	auth   context.Context
 }
 
 // ApplicationMylar describes the application data model.
@@ -135,8 +136,9 @@ func (r *ApplicationMylarResource) Schema(_ context.Context, _ resource.SchemaRe
 }
 
 func (r *ApplicationMylarResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -153,7 +155,7 @@ func (r *ApplicationMylarResource) Create(ctx context.Context, req resource.Crea
 	// Create new ApplicationMylar
 	request := application.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.ApplicationAPI.CreateApplications(ctx).ApplicationResource(*request).Execute()
+	response, _, err := r.client.ApplicationAPI.CreateApplications(r.auth).ApplicationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, applicationMylarResourceName, err))
 
@@ -177,7 +179,7 @@ func (r *ApplicationMylarResource) Read(ctx context.Context, req resource.ReadRe
 	}
 
 	// Get ApplicationMylar current value
-	response, _, err := r.client.ApplicationAPI.GetApplicationsById(ctx, int32(application.ID.ValueInt64())).Execute()
+	response, _, err := r.client.ApplicationAPI.GetApplicationsById(r.auth, int32(application.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, applicationMylarResourceName, err))
 
@@ -203,7 +205,7 @@ func (r *ApplicationMylarResource) Update(ctx context.Context, req resource.Upda
 	// Update ApplicationMylar
 	request := application.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.ApplicationAPI.UpdateApplications(ctx, strconv.Itoa(int(request.GetId()))).ApplicationResource(*request).Execute()
+	response, _, err := r.client.ApplicationAPI.UpdateApplications(r.auth, strconv.Itoa(int(request.GetId()))).ApplicationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, applicationMylarResourceName, err))
 
@@ -226,7 +228,7 @@ func (r *ApplicationMylarResource) Delete(ctx context.Context, req resource.Dele
 	}
 
 	// Delete ApplicationMylar current value
-	_, err := r.client.ApplicationAPI.DeleteApplications(ctx, int32(ID)).Execute()
+	_, err := r.client.ApplicationAPI.DeleteApplications(r.auth, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationMylarResourceName, err))
 

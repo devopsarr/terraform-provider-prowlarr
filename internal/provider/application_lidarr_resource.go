@@ -38,6 +38,7 @@ func NewApplicationLidarrResource() resource.Resource {
 // ApplicationLidarrResource defines the application implementation.
 type ApplicationLidarrResource struct {
 	client *prowlarr.APIClient
+	auth   context.Context
 }
 
 // ApplicationLidarr describes the application data model.
@@ -135,8 +136,9 @@ func (r *ApplicationLidarrResource) Schema(_ context.Context, _ resource.SchemaR
 }
 
 func (r *ApplicationLidarrResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -153,7 +155,7 @@ func (r *ApplicationLidarrResource) Create(ctx context.Context, req resource.Cre
 	// Create new ApplicationLidarr
 	request := application.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.ApplicationAPI.CreateApplications(ctx).ApplicationResource(*request).Execute()
+	response, _, err := r.client.ApplicationAPI.CreateApplications(r.auth).ApplicationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, applicationLidarrResourceName, err))
 
@@ -177,7 +179,7 @@ func (r *ApplicationLidarrResource) Read(ctx context.Context, req resource.ReadR
 	}
 
 	// Get ApplicationLidarr current value
-	response, _, err := r.client.ApplicationAPI.GetApplicationsById(ctx, int32(application.ID.ValueInt64())).Execute()
+	response, _, err := r.client.ApplicationAPI.GetApplicationsById(r.auth, int32(application.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, applicationLidarrResourceName, err))
 
@@ -203,7 +205,7 @@ func (r *ApplicationLidarrResource) Update(ctx context.Context, req resource.Upd
 	// Update ApplicationLidarr
 	request := application.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.ApplicationAPI.UpdateApplications(ctx, strconv.Itoa(int(request.GetId()))).ApplicationResource(*request).Execute()
+	response, _, err := r.client.ApplicationAPI.UpdateApplications(r.auth, strconv.Itoa(int(request.GetId()))).ApplicationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, applicationLidarrResourceName, err))
 
@@ -226,7 +228,7 @@ func (r *ApplicationLidarrResource) Delete(ctx context.Context, req resource.Del
 	}
 
 	// Delete ApplicationLidarr current value
-	_, err := r.client.ApplicationAPI.DeleteApplications(ctx, int32(ID)).Execute()
+	_, err := r.client.ApplicationAPI.DeleteApplications(r.auth, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationLidarrResourceName, err))
 

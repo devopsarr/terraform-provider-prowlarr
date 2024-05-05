@@ -35,6 +35,7 @@ func NewNotificationSendgridResource() resource.Resource {
 // NotificationSendgridResource defines the notification implementation.
 type NotificationSendgridResource struct {
 	client *prowlarr.APIClient
+	auth   context.Context
 }
 
 // NotificationSendgrid describes the notification data model.
@@ -163,8 +164,9 @@ func (r *NotificationSendgridResource) Schema(_ context.Context, _ resource.Sche
 }
 
 func (r *NotificationSendgridResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -181,7 +183,7 @@ func (r *NotificationSendgridResource) Create(ctx context.Context, req resource.
 	// Create new NotificationSendgrid
 	request := notification.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.NotificationAPI.CreateNotification(ctx).NotificationResource(*request).Execute()
+	response, _, err := r.client.NotificationAPI.CreateNotification(r.auth).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, notificationSendgridResourceName, err))
 
@@ -205,7 +207,7 @@ func (r *NotificationSendgridResource) Read(ctx context.Context, req resource.Re
 	}
 
 	// Get NotificationSendgrid current value
-	response, _, err := r.client.NotificationAPI.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
+	response, _, err := r.client.NotificationAPI.GetNotificationById(r.auth, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationSendgridResourceName, err))
 
@@ -231,7 +233,7 @@ func (r *NotificationSendgridResource) Update(ctx context.Context, req resource.
 	// Update NotificationSendgrid
 	request := notification.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.NotificationAPI.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
+	response, _, err := r.client.NotificationAPI.UpdateNotification(r.auth, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, notificationSendgridResourceName, err))
 
@@ -254,7 +256,7 @@ func (r *NotificationSendgridResource) Delete(ctx context.Context, req resource.
 	}
 
 	// Delete NotificationSendgrid current value
-	_, err := r.client.NotificationAPI.DeleteNotification(ctx, int32(ID)).Execute()
+	_, err := r.client.NotificationAPI.DeleteNotification(r.auth, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, notificationSendgridResourceName, err))
 

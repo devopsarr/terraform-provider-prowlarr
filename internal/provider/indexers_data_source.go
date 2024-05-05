@@ -25,6 +25,7 @@ func NewIndexersDataSource() datasource.DataSource {
 // IndexersDataSource defines the indexers implementation.
 type IndexersDataSource struct {
 	client *prowlarr.APIClient
+	auth   context.Context
 }
 
 // Indexers describes the indexers data model.
@@ -138,8 +139,9 @@ func (d *IndexersDataSource) Schema(_ context.Context, _ datasource.SchemaReques
 }
 
 func (d *IndexersDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 
@@ -153,7 +155,7 @@ func (d *IndexersDataSource) Read(ctx context.Context, req datasource.ReadReques
 	}
 
 	// Get indexers current value
-	response, _, err := d.client.IndexerAPI.ListIndexer(ctx).Execute()
+	response, _, err := d.client.IndexerAPI.ListIndexer(d.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexersDataSourceName, err))
 

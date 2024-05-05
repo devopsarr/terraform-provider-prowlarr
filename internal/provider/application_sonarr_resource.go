@@ -38,6 +38,7 @@ func NewApplicationSonarrResource() resource.Resource {
 // ApplicationSonarrResource defines the application implementation.
 type ApplicationSonarrResource struct {
 	client *prowlarr.APIClient
+	auth   context.Context
 }
 
 // ApplicationSonarr describes the application data model.
@@ -144,8 +145,9 @@ func (r *ApplicationSonarrResource) Schema(_ context.Context, _ resource.SchemaR
 }
 
 func (r *ApplicationSonarrResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -162,7 +164,7 @@ func (r *ApplicationSonarrResource) Create(ctx context.Context, req resource.Cre
 	// Create new ApplicationSonarr
 	request := application.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.ApplicationAPI.CreateApplications(ctx).ApplicationResource(*request).Execute()
+	response, _, err := r.client.ApplicationAPI.CreateApplications(r.auth).ApplicationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, applicationSonarrResourceName, err))
 
@@ -186,7 +188,7 @@ func (r *ApplicationSonarrResource) Read(ctx context.Context, req resource.ReadR
 	}
 
 	// Get ApplicationSonarr current value
-	response, _, err := r.client.ApplicationAPI.GetApplicationsById(ctx, int32(application.ID.ValueInt64())).Execute()
+	response, _, err := r.client.ApplicationAPI.GetApplicationsById(r.auth, int32(application.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, applicationSonarrResourceName, err))
 
@@ -212,7 +214,7 @@ func (r *ApplicationSonarrResource) Update(ctx context.Context, req resource.Upd
 	// Update ApplicationSonarr
 	request := application.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.ApplicationAPI.UpdateApplications(ctx, strconv.Itoa(int(request.GetId()))).ApplicationResource(*request).Execute()
+	response, _, err := r.client.ApplicationAPI.UpdateApplications(r.auth, strconv.Itoa(int(request.GetId()))).ApplicationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, applicationSonarrResourceName, err))
 
@@ -235,7 +237,7 @@ func (r *ApplicationSonarrResource) Delete(ctx context.Context, req resource.Del
 	}
 
 	// Delete ApplicationSonarr current value
-	_, err := r.client.ApplicationAPI.DeleteApplications(ctx, int32(ID)).Execute()
+	_, err := r.client.ApplicationAPI.DeleteApplications(r.auth, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationSonarrResourceName, err))
 

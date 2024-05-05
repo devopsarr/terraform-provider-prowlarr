@@ -36,6 +36,7 @@ func NewDownloadClientTorrentDownloadStationResource() resource.Resource {
 // DownloadClientTorrentDownloadStationResource defines the download client implementation.
 type DownloadClientTorrentDownloadStationResource struct {
 	client *prowlarr.APIClient
+	auth   context.Context
 }
 
 // DownloadClientTorrentDownloadStation describes the download client data model.
@@ -176,8 +177,9 @@ func (r *DownloadClientTorrentDownloadStationResource) Schema(_ context.Context,
 }
 
 func (r *DownloadClientTorrentDownloadStationResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -194,7 +196,7 @@ func (r *DownloadClientTorrentDownloadStationResource) Create(ctx context.Contex
 	// Create new DownloadClientTorrentDownloadStation
 	request := client.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.DownloadClientAPI.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
+	response, _, err := r.client.DownloadClientAPI.CreateDownloadClient(r.auth).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, downloadClientTorrentDownloadStationResourceName, err))
 
@@ -218,7 +220,7 @@ func (r *DownloadClientTorrentDownloadStationResource) Read(ctx context.Context,
 	}
 
 	// Get DownloadClientTorrentDownloadStation current value
-	response, _, err := r.client.DownloadClientAPI.GetDownloadClientById(ctx, int32(client.ID.ValueInt64())).Execute()
+	response, _, err := r.client.DownloadClientAPI.GetDownloadClientById(r.auth, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientTorrentDownloadStationResourceName, err))
 
@@ -244,7 +246,7 @@ func (r *DownloadClientTorrentDownloadStationResource) Update(ctx context.Contex
 	// Update DownloadClientTorrentDownloadStation
 	request := client.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.DownloadClientAPI.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
+	response, _, err := r.client.DownloadClientAPI.UpdateDownloadClient(r.auth, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, downloadClientTorrentDownloadStationResourceName, err))
 
@@ -267,7 +269,7 @@ func (r *DownloadClientTorrentDownloadStationResource) Delete(ctx context.Contex
 	}
 
 	// Delete DownloadClientTorrentDownloadStation current value
-	_, err := r.client.DownloadClientAPI.DeleteDownloadClient(ctx, int32(ID)).Execute()
+	_, err := r.client.DownloadClientAPI.DeleteDownloadClient(r.auth, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientTorrentDownloadStationResourceName, err))
 

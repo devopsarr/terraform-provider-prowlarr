@@ -40,6 +40,7 @@ func NewApplicationResource() resource.Resource {
 // ApplicationResource defines the application implementation.
 type ApplicationResource struct {
 	client *prowlarr.APIClient
+	auth   context.Context
 }
 
 // Application describes the application data model.
@@ -148,8 +149,9 @@ func (r *ApplicationResource) Schema(_ context.Context, _ resource.SchemaRequest
 }
 
 func (r *ApplicationResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -166,7 +168,7 @@ func (r *ApplicationResource) Create(ctx context.Context, req resource.CreateReq
 	// Create new Application
 	request := application.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.ApplicationAPI.CreateApplications(ctx).ApplicationResource(*request).Execute()
+	response, _, err := r.client.ApplicationAPI.CreateApplications(r.auth).ApplicationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, applicationResourceName, err))
 
@@ -194,7 +196,7 @@ func (r *ApplicationResource) Read(ctx context.Context, req resource.ReadRequest
 	}
 
 	// Get Application current value
-	response, _, err := r.client.ApplicationAPI.GetApplicationsById(ctx, int32(application.ID.ValueInt64())).Execute()
+	response, _, err := r.client.ApplicationAPI.GetApplicationsById(r.auth, int32(application.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, applicationResourceName, err))
 
@@ -224,7 +226,7 @@ func (r *ApplicationResource) Update(ctx context.Context, req resource.UpdateReq
 	// Update Application
 	request := application.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.ApplicationAPI.UpdateApplications(ctx, strconv.Itoa(int(request.GetId()))).ApplicationResource(*request).Execute()
+	response, _, err := r.client.ApplicationAPI.UpdateApplications(r.auth, strconv.Itoa(int(request.GetId()))).ApplicationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, applicationResourceName, err))
 
@@ -251,7 +253,7 @@ func (r *ApplicationResource) Delete(ctx context.Context, req resource.DeleteReq
 	}
 
 	// Delete Application current value
-	_, err := r.client.ApplicationAPI.DeleteApplications(ctx, int32(ID)).Execute()
+	_, err := r.client.ApplicationAPI.DeleteApplications(r.auth, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationResourceName, err))
 

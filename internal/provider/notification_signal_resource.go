@@ -35,6 +35,7 @@ func NewNotificationSignalResource() resource.Resource {
 // NotificationSignalResource defines the notification implementation.
 type NotificationSignalResource struct {
 	client *prowlarr.APIClient
+	auth   context.Context
 }
 
 // NotificationSignal describes the notification data model.
@@ -194,8 +195,9 @@ func (r *NotificationSignalResource) Schema(_ context.Context, _ resource.Schema
 }
 
 func (r *NotificationSignalResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -212,7 +214,7 @@ func (r *NotificationSignalResource) Create(ctx context.Context, req resource.Cr
 	// Create new NotificationSignal
 	request := notification.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.NotificationAPI.CreateNotification(ctx).NotificationResource(*request).Execute()
+	response, _, err := r.client.NotificationAPI.CreateNotification(r.auth).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, notificationSignalResourceName, err))
 
@@ -236,7 +238,7 @@ func (r *NotificationSignalResource) Read(ctx context.Context, req resource.Read
 	}
 
 	// Get NotificationSignal current value
-	response, _, err := r.client.NotificationAPI.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
+	response, _, err := r.client.NotificationAPI.GetNotificationById(r.auth, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationSignalResourceName, err))
 
@@ -262,7 +264,7 @@ func (r *NotificationSignalResource) Update(ctx context.Context, req resource.Up
 	// Update NotificationSignal
 	request := notification.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.NotificationAPI.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
+	response, _, err := r.client.NotificationAPI.UpdateNotification(r.auth, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, notificationSignalResourceName, err))
 
@@ -285,7 +287,7 @@ func (r *NotificationSignalResource) Delete(ctx context.Context, req resource.De
 	}
 
 	// Delete NotificationSignal current value
-	_, err := r.client.NotificationAPI.DeleteNotification(ctx, int32(ID)).Execute()
+	_, err := r.client.NotificationAPI.DeleteNotification(r.auth, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, notificationSignalResourceName, err))
 

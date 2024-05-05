@@ -38,6 +38,7 @@ func NewApplicationWhisparrResource() resource.Resource {
 // ApplicationWhisparrResource defines the application implementation.
 type ApplicationWhisparrResource struct {
 	client *prowlarr.APIClient
+	auth   context.Context
 }
 
 // ApplicationWhisparr describes the application data model.
@@ -135,8 +136,9 @@ func (r *ApplicationWhisparrResource) Schema(_ context.Context, _ resource.Schem
 }
 
 func (r *ApplicationWhisparrResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -153,7 +155,7 @@ func (r *ApplicationWhisparrResource) Create(ctx context.Context, req resource.C
 	// Create new ApplicationWhisparr
 	request := application.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.ApplicationAPI.CreateApplications(ctx).ApplicationResource(*request).Execute()
+	response, _, err := r.client.ApplicationAPI.CreateApplications(r.auth).ApplicationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, applicationWhisparrResourceName, err))
 
@@ -177,7 +179,7 @@ func (r *ApplicationWhisparrResource) Read(ctx context.Context, req resource.Rea
 	}
 
 	// Get ApplicationWhisparr current value
-	response, _, err := r.client.ApplicationAPI.GetApplicationsById(ctx, int32(application.ID.ValueInt64())).Execute()
+	response, _, err := r.client.ApplicationAPI.GetApplicationsById(r.auth, int32(application.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, applicationWhisparrResourceName, err))
 
@@ -203,7 +205,7 @@ func (r *ApplicationWhisparrResource) Update(ctx context.Context, req resource.U
 	// Update ApplicationWhisparr
 	request := application.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.ApplicationAPI.UpdateApplications(ctx, strconv.Itoa(int(request.GetId()))).ApplicationResource(*request).Execute()
+	response, _, err := r.client.ApplicationAPI.UpdateApplications(r.auth, strconv.Itoa(int(request.GetId()))).ApplicationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, applicationWhisparrResourceName, err))
 
@@ -226,7 +228,7 @@ func (r *ApplicationWhisparrResource) Delete(ctx context.Context, req resource.D
 	}
 
 	// Delete ApplicationWhisparr current value
-	_, err := r.client.ApplicationAPI.DeleteApplications(ctx, int32(ID)).Execute()
+	_, err := r.client.ApplicationAPI.DeleteApplications(r.auth, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationWhisparrResourceName, err))
 

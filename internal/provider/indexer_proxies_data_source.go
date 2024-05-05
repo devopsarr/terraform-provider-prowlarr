@@ -25,6 +25,7 @@ func NewIndexerProxiesDataSource() datasource.DataSource {
 // IndexerProxiesDataSource defines the indexer proxies implementation.
 type IndexerProxiesDataSource struct {
 	client *prowlarr.APIClient
+	auth   context.Context
 }
 
 // IndexerProxies describes the indexer proxies data model.
@@ -102,14 +103,15 @@ func (d *IndexerProxiesDataSource) Schema(_ context.Context, _ datasource.Schema
 }
 
 func (d *IndexerProxiesDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 
 func (d *IndexerProxiesDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get indexer proxies current value
-	response, _, err := d.client.IndexerProxyAPI.ListIndexerProxy(ctx).Execute()
+	response, _, err := d.client.IndexerProxyAPI.ListIndexerProxy(d.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerProxiesDataSourceName, err))
 
