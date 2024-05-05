@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.0](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v2.3.0...v2.4.0) (2024-05-05)
+
+
+### Features
+
+* move to context based authentication and add extra headers ([0f3414f](https://github.com/devopsarr/terraform-provider-prowlarr/commit/0f3414f1db0763eced21d2789d0440dafa133a14))
+
 ## [2.3.0](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v2.2.0...v2.3.0) (2024-02-17)
 
 
