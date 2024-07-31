@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.1](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v2.4.0...v2.4.1) (2024-07-31)
+
+
+### Bug Fixes
+
+* update doc description to remove subcategory ([34c9221](https://github.com/devopsarr/terraform-provider-prowlarr/commit/34c92218fca692742cbbb294cf7e75b4e1c6f931))
+
 ## [2.4.0](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v2.3.0...v2.4.0) (2024-05-05)
 
 
