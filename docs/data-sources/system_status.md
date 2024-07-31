@@ -3,8 +3,6 @@
 page_title: "prowlarr_system_status Data Source - terraform-provider-prowlarr"
 subcategory: "System"
 description: |-
-  <!-- subcategory:System -->
-  
   System Status resource. User must have rights to read config.xml.
   For more information refer to System Status https://wiki.servarr.com/prowlarr/system#status documentation.
 ---
@@ -59,5 +57,3 @@ data "prowlarr_system_status" "example" {
 - `startup_path` (String) Startup path.
 - `url_base` (String) Base URL.
 - `version` (String) Version.
-
-

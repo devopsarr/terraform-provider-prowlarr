@@ -3,8 +3,6 @@
 page_title: "prowlarr_download_client Data Source - terraform-provider-prowlarr"
 subcategory: "Download Clients"
 description: |-
-  <!-- subcategory:Download Clients -->
-  
   Single Download Client ../resources/download_client.
 ---
 
@@ -79,5 +77,3 @@ Read-Only:
 
 - `categories` (Set of Number) List of categories.
 - `name` (String) Name of client category.
-
-

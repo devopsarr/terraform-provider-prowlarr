@@ -3,8 +3,6 @@
 page_title: "prowlarr_notification Data Source - terraform-provider-prowlarr"
 subcategory: "Notifications"
 description: |-
-  <!-- subcategory:Notifications -->
-  
   Single Notification ../resources/notification.
 ---
 
@@ -114,5 +112,3 @@ data "prowlarr_notification" "example" {
 - `user_key` (String) User key.
 - `username` (String) Username.
 - `web_hook_url` (String) Web hook url.
-
-

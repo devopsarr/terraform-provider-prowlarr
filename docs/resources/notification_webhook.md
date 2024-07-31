@@ -3,8 +3,6 @@
 page_title: "prowlarr_notification_webhook Resource - terraform-provider-prowlarr"
 subcategory: "Notifications"
 description: |-
-  <!-- subcategory:Notifications -->
-  
   Notification Webhook resource.
   For more information refer to Notification https://wiki.servarr.com/prowlarr/settings#connect and Webhook https://wiki.servarr.com/prowlarr/supported#webhook.
 ---

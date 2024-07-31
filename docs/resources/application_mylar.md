@@ -3,8 +3,6 @@
 page_title: "prowlarr_application_mylar Resource - terraform-provider-prowlarr"
 subcategory: "Applications"
 description: |-
-  <!-- subcategory:Applications -->
-  
   Application Mylar resource.
   For more information refer to Application https://wiki.servarr.com/prowlarr/settings#applications and Mylar https://wiki.servarr.com/prowlarr/supported#mylar.
 ---

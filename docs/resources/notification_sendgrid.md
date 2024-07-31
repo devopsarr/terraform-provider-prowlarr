@@ -3,8 +3,6 @@
 page_title: "prowlarr_notification_sendgrid Resource - terraform-provider-prowlarr"
 subcategory: "Notifications"
 description: |-
-  <!-- subcategory:Notifications -->
-  
   Notification Sendgrid resource.
   For more information refer to Notification https://wiki.servarr.com/prowlarr/settings#connect and Sendgrid https://wiki.servarr.com/prowlarr/supported#sendgrid.
 ---

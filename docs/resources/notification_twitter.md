@@ -3,8 +3,6 @@
 page_title: "prowlarr_notification_twitter Resource - terraform-provider-prowlarr"
 subcategory: "Notifications"
 description: |-
-  <!-- subcategory:Notifications -->
-  
   Notification Twitter resource.
   For more information refer to Notification https://wiki.servarr.com/prowlarr/settings#connect and Twitter https://wiki.servarr.com/prowlarr/supported#twitter.
 ---

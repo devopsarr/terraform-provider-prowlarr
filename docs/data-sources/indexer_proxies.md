@@ -3,8 +3,6 @@
 page_title: "prowlarr_indexer_proxies Data Source - terraform-provider-prowlarr"
 subcategory: "Indexer Proxies"
 description: |-
-  <!-- subcategory:Indexer Proxies -->
-  
   List all available Indexer Proxies ../resources/indexer_proxy.
 ---
 
@@ -43,5 +41,3 @@ Read-Only:
 - `request_timeout` (Number) Request timeout.
 - `tags` (Set of Number) List of associated tags.
 - `username` (String) Username.
-
-

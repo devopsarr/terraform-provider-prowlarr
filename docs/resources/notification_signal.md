@@ -3,8 +3,6 @@
 page_title: "prowlarr_notification_signal Resource - terraform-provider-prowlarr"
 subcategory: "Notifications"
 description: |-
-  <!-- subcategory:Notifications -->
-  
   Notification Signal resource.
   For more information refer to Notification https://wiki.servarr.com/prowlarr/settings#connect and Signal https://wiki.servarr.com/prowlarr/supported#signal.
 ---

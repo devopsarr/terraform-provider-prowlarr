@@ -3,8 +3,6 @@
 page_title: "prowlarr_notification_simplepush Resource - terraform-provider-prowlarr"
 subcategory: "Notifications"
 description: |-
-  <!-- subcategory:Notifications -->
-  
   Notification Simplepush resource.
   For more information refer to Notification https://wiki.servarr.com/prowlarr/settings#connect and Simplepush https://wiki.servarr.com/prowlarr/supported#simplepush.
 ---

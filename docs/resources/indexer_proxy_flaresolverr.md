@@ -3,8 +3,6 @@
 page_title: "prowlarr_indexer_proxy_flaresolverr Resource - terraform-provider-prowlarr"
 subcategory: "Indexer Proxies"
 description: |-
-  <!-- subcategory:Indexer Proxies -->
-  
   Indexer Proxy Flaresolverr resource.
   For more information refer to Indexer Proxy https://wiki.servarr.com/prowlarr/settings#indexer-proxies and Flaresolverr https://wiki.servarr.com/prowlarr/supported#flaresolverr.
 ---
@@ -33,5 +31,3 @@ For more information refer to [Indexer Proxy](https://wiki.servarr.com/prowlarr/
 ### Read-Only
 
 - `id` (Number) Indexer Proxy ID.
-
-

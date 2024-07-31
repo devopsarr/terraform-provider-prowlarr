@@ -3,8 +3,6 @@
 page_title: "prowlarr_notification_discord Resource - terraform-provider-prowlarr"
 subcategory: "Notifications"
 description: |-
-  <!-- subcategory:Notifications -->
-  
   Notification Discord resource.
   For more information refer to Notification https://wiki.servarr.com/prowlarr/settings#connect and Discord https://wiki.servarr.com/prowlarr/supported#discord.
 ---

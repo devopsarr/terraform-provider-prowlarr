@@ -3,8 +3,6 @@
 page_title: "prowlarr_download_client_nzbget Resource - terraform-provider-prowlarr"
 subcategory: "Download Clients"
 description: |-
-  <!-- subcategory:Download Clients -->
-  
   Download Client NZBGet resource.
   For more information refer to Download Client https://wiki.servarr.com/prowlarr/settings#download-clients and NZBGet https://wiki.servarr.com/prowlarr/supported#nzbget.
 ---

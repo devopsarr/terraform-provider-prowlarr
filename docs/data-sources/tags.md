@@ -3,8 +3,6 @@
 page_title: "prowlarr_tags Data Source - terraform-provider-prowlarr"
 subcategory: "Tags"
 description: |-
-  <!-- subcategory:Tags -->
-  
   List all available Tags ../resources/tag.
 ---
 
@@ -35,5 +33,3 @@ Read-Only:
 
 - `id` (Number) Tag ID.
 - `label` (String) Tag label.
-
-
