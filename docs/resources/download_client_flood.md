@@ -3,8 +3,6 @@
 page_title: "prowlarr_download_client_flood Resource - terraform-provider-prowlarr"
 subcategory: "Download Clients"
 description: |-
-  <!-- subcategory:Download Clients -->
-  
   Download Client Flood resource.
   For more information refer to Download Client https://wiki.servarr.com/prowlarr/settings#download-clients and Flood https://wiki.servarr.com/prowlarr/supported#flood.
 ---

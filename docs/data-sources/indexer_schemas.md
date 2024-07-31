@@ -3,8 +3,6 @@
 page_title: "prowlarr_indexer_schemas Data Source - terraform-provider-prowlarr"
 subcategory: "Indexers"
 description: |-
-  <!-- subcategory:Indexers -->
-  
   List all available Indexer Schemas ../data-sources/indexer_schema.
 ---
 
@@ -27,5 +25,3 @@ data "prowlarr_indexer_schemas" "example" {
 
 - `id` (String) The ID of this resource.
 - `indexer_schemas` (List of String) Indexer name list.
-
-

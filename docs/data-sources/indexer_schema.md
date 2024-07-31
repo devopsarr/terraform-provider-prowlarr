@@ -3,8 +3,6 @@
 page_title: "prowlarr_indexer_schema Data Source - terraform-provider-prowlarr"
 subcategory: "Indexers"
 description: |-
-  <!-- subcategory:Indexers -->
-  
   Indexer schema definition.
 ---
 
@@ -50,5 +48,3 @@ Read-Only:
 - `description` (String) Field description.
 - `name` (String) Field name.
 - `type` (String) Field type.
-
-

@@ -3,8 +3,6 @@
 page_title: "prowlarr_tags_details Data Source - terraform-provider-prowlarr"
 subcategory: "Tag"
 description: |-
-  <!-- subcategory:Tag -->
-  
   Tag ../resources/tag list with their associated resources.
 ---
 
@@ -42,5 +40,3 @@ Read-Only:
 - `indexer_ids` (Set of Number) List of associated indexers.
 - `indexer_proxy_ids` (Set of Number) List of associated indexer proxies.
 - `notification_ids` (Set of Number) List of associated notifications.
-
-

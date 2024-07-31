@@ -3,8 +3,6 @@
 page_title: "prowlarr_indexer Resource - terraform-provider-prowlarr"
 subcategory: "Indexers"
 description: |-
-  <!-- subcategory:Indexers -->
-  
   Generic Indexer resource.
   For more information refer to Indexer https://wiki.servarr.com/prowlarr/indexers documentation.
 ---

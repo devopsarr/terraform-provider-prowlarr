@@ -3,8 +3,6 @@
 page_title: "prowlarr_application_readarr Resource - terraform-provider-prowlarr"
 subcategory: "Applications"
 description: |-
-  <!-- subcategory:Applications -->
-  
   Application Readarr resource.
   For more information refer to Application https://wiki.servarr.com/prowlarr/settings#applications and Readarr https://wiki.servarr.com/prowlarr/supported#readarr.
 ---

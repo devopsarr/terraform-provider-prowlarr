@@ -3,8 +3,6 @@
 page_title: "prowlarr_sync_profiles Data Source - terraform-provider-prowlarr"
 subcategory: "Applications"
 description: |-
-  <!-- subcategory:Applications -->
-  
   List all available Sync Profiles ../resources/sync_profile.
 ---
 
@@ -39,5 +37,3 @@ Read-Only:
 - `id` (Number) Sync Profile ID.
 - `minimum_seeders` (Number) Minimum seeders.
 - `name` (String) Name.
-
-

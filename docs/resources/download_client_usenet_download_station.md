@@ -3,8 +3,6 @@
 page_title: "prowlarr_download_client_usenet_download_station Resource - terraform-provider-prowlarr"
 subcategory: "Download Clients"
 description: |-
-  <!-- subcategory:Download Clients -->
-  
   Download Client UsenetDownloadStation resource.
   For more information refer to Download Client https://wiki.servarr.com/prowlarr/settings#download-clients and UsenetDownloadStation https://wiki.servarr.com/prowlarr/supported#usenetdownloadstation.
 ---

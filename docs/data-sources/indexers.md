@@ -3,8 +3,6 @@
 page_title: "prowlarr_indexers Data Source - terraform-provider-prowlarr"
 subcategory: "Indexers"
 description: |-
-  <!-- subcategory:Indexers -->
-  
   List all available Indexers ../resources/indexer.
 ---
 
@@ -57,5 +55,3 @@ Read-Only:
 - `sensitive_value` (String, Sensitive) Sensitive string value.
 - `set_value` (Set of Number) Set value.
 - `text_value` (String) Text value.
-
-

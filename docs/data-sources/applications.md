@@ -3,8 +3,6 @@
 page_title: "prowlarr_applications Data Source - terraform-provider-prowlarr"
 subcategory: "Applications"
 description: |-
-  <!-- subcategory:Applications -->
-  
   List all available Applications ../resources/application.
 ---
 
@@ -44,5 +42,3 @@ Read-Only:
 - `sync_categories` (Set of Number) Sync categories.
 - `sync_level` (String) Sync level.
 - `tags` (Set of Number) List of associated tags.
-
-

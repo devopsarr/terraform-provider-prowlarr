@@ -3,8 +3,6 @@
 page_title: "prowlarr_download_client_vuze Resource - terraform-provider-prowlarr"
 subcategory: "Download Clients"
 description: |-
-  <!-- subcategory:Download Clients -->
-  
   Download Client Vuze resource.
   For more information refer to Download Client https://wiki.servarr.com/prowlarr/settings#download-clients and Vuze https://wiki.servarr.com/prowlarr/supported#vuze.
 ---

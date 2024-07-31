@@ -3,8 +3,6 @@
 page_title: "prowlarr_tag_details Data Source - terraform-provider-prowlarr"
 subcategory: "Tag"
 description: |-
-  <!-- subcategory:Tag -->
-  
   Single Tag ../resources/tag with its associated resources.
 ---
 
@@ -35,5 +33,3 @@ data "prowlarr_tag_details" "example" {
 - `indexer_ids` (Set of Number) List of associated indexers.
 - `indexer_proxy_ids` (Set of Number) List of associated indexer proxies.
 - `notification_ids` (Set of Number) List of associated notifications.
-
-

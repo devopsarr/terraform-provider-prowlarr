@@ -3,8 +3,6 @@
 page_title: "prowlarr_notification_email Resource - terraform-provider-prowlarr"
 subcategory: "Notifications"
 description: |-
-  <!-- subcategory:Notifications -->
-  
   Notification Email resource.
   For more information refer to Notification https://wiki.servarr.com/prowlarr/settings#connect and Email https://wiki.servarr.com/prowlarr/supported#email.
 ---

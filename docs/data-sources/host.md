@@ -3,8 +3,6 @@
 page_title: "prowlarr_host Data Source - terraform-provider-prowlarr"
 subcategory: "System"
 description: |-
-  <!-- subcategory:System -->
-  
   Host ../resources/host.
 ---
 
@@ -107,5 +105,3 @@ Read-Only:
 - `mechanism` (String) Update mechanism.
 - `script_path` (String) Script path.
 - `update_automatically` (Boolean) Update automatically flag.
-
-

@@ -3,8 +3,6 @@
 page_title: "prowlarr_notifications Data Source - terraform-provider-prowlarr"
 subcategory: "Notifications"
 description: |-
-  <!-- subcategory:Notifications -->
-  
   List all available Notifications ../resources/notification.
 ---
 
@@ -118,5 +116,3 @@ Read-Only:
 - `user_key` (String) User key.
 - `username` (String) Username.
 - `web_hook_url` (String) Web hook url.
-
-
