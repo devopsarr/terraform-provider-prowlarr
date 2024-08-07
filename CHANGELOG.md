@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.4.2](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v2.4.1...v2.4.2) (2024-08-07)
+
+
+### Bug Fixes
+
+* bump golangci-lint ([2c2b736](https://github.com/devopsarr/terraform-provider-prowlarr/commit/2c2b73621fd1202c859ee81639ea8e0913e36d2e))
+* correct goreleaser syntax ([a90cd47](https://github.com/devopsarr/terraform-provider-prowlarr/commit/a90cd47e78d397bc8a332eda2970317279e8c19a))
+
 ## [2.4.1](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v2.4.0...v2.4.1) (2024-07-31)
 
 
