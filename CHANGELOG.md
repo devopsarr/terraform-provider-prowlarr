@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.4.3](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v2.4.2...v2.4.3) (2024-10-16)
+
+
+### Bug Fixes
+
+* add host log level config ([4f62eb8](https://github.com/devopsarr/terraform-provider-prowlarr/commit/4f62eb86e0bc0ac8db988ce3af4e327599adb6ca))
+* **deps:** update module github.com/devopsarr/prowlarr-go to v1.1.1 ([93b4a0c](https://github.com/devopsarr/terraform-provider-prowlarr/commit/93b4a0cf9420799ef2acb4a2c9d75b5439331277))
+* **deps:** update terraform-framework ([52da8ff](https://github.com/devopsarr/terraform-provider-prowlarr/commit/52da8ff4a5f4f2f91cf03ee878122ef114a00bab))
+
 ## [2.4.2](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v2.4.1...v2.4.2) (2024-08-07)
 
 
