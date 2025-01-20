@@ -304,6 +304,10 @@ func (i *Indexer) write(ctx context.Context, indexer *prowlarr.IndexerResource, 
 	var fields []Field
 
 	for _, f := range indexer.GetFields() {
+		if t, ok := f.GetTypeOk(); ok && *t == "info" {
+			continue
+		}
+
 		if _, ok := f.GetValueOk(); ok {
 			var field Field
 
