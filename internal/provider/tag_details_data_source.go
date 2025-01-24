@@ -57,7 +57,7 @@ func (d *TagDetailsDataSource) Metadata(_ context.Context, req datasource.Metada
 func (d *TagDetailsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "<!-- subcategory:Tag -->\nSingle [Tag](../resources/tag) with its associated resources.",
+		MarkdownDescription: "<!-- subcategory:Tags -->\nSingle [Tag](../resources/tag) with its associated resources.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				MarkdownDescription: "Tag ID.",

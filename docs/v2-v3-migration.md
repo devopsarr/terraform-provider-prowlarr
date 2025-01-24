@@ -1,3 +1,9 @@
+---
+page_title: "V2 to V3 Migration"
+description: |-
+  Key points while migrating from v2 to v3
+---
+
 # Migrating from provider V2 to V3
 
 ## Breaking Changes in Indexer Resource Configuration
