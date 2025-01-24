@@ -83,6 +83,10 @@ func testAccIndexerResourceConfig(name, url string) string {
 			{
 				name = "torrentBaseSettings.seedRatio"
 				number_value = 0.5
+			},
+			{
+				name = "torrentBaseSettings.preferMagnetUrl"
+				bool_value = false
 			}
 		]
 	}
@@ -128,6 +132,10 @@ func testAccIndexerResourceConfig(name, url string) string {
 			{
 				name = "torrentBaseSettings.seedTime"
 				number_value = 5
+			},
+			{
+				name = "torrentBaseSettings.preferMagnetUrl"
+				bool_value = false
 			},
 			{
 				name = "freeleechOnly"
