@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v3.0.0...v3.0.1) (2025-01-24)
+
+
+### Bug Fixes
+
+* missing doc head ([2a42942](https://github.com/devopsarr/terraform-provider-prowlarr/commit/2a42942a13130a6fb7f2a627ebe4f865720f21ce))
+
 ## [3.0.0](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v2.4.3...v3.0.0) (2025-01-24)
 
 
