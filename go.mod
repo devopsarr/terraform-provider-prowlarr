@@ -1,6 +1,6 @@
 module github.com/devopsarr/terraform-provider-prowlarr
 
-go 1.21
+go 1.22.0
 
 require (
 	github.com/devopsarr/prowlarr-go v1.2.0
@@ -25,7 +25,7 @@ require (
 	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/bgentry/speakeasy v0.1.0 // indirect
 	github.com/bmatcuk/doublestar/v4 v4.6.1 // indirect
-	github.com/cloudflare/circl v1.3.7 // indirect
+	github.com/cloudflare/circl v1.6.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
