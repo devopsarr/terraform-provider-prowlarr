@@ -61,6 +61,7 @@ func testAccIndexerResourceConfig(name, url string) string {
     	config_contract = "CardigannSettings"
 		protocol = "torrent"
 		app_profile_id = 1
+		priority = 1
 		tags = []
 
 		fields = [
@@ -98,6 +99,7 @@ func testAccIndexerResourceConfig(name, url string) string {
     	config_contract = "HDBitsSettings"
 		protocol = "torrent"
 		app_profile_id = 1
+		priority = 2
 		tags = []
 
 		fields = [
