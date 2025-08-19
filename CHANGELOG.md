@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.3](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v3.0.2...v3.0.3) (2025-08-19)
+
+
+### Bug Fixes
+
+* **deps:** update ghcr.io/hotio/prowlarr docker tag to release-1.37.0.5076 ([9974549](https://github.com/devopsarr/terraform-provider-prowlarr/commit/9974549f5342efa1388f9aab508bbb97dbcfade1))
+
 ## [3.0.2](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v3.0.1...v3.0.2) (2025-01-24)
 
 
