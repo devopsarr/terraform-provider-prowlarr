@@ -40,6 +40,10 @@ func (d *IndexerDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 				MarkdownDescription: "Enable RSS flag.",
 				Computed:            true,
 			},
+			"redirect": schema.BoolAttribute{
+				MarkdownDescription: "Redirect download request from client to indexer instead of proxying via Prowlarr.",
+				Computed:            true,
+			},
 			"priority": schema.Int64Attribute{
 				MarkdownDescription: "Priority.",
 				Computed:            true,

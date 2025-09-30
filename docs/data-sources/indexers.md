@@ -42,6 +42,7 @@ Read-Only:
 - `priority` (Number) Priority.
 - `privacy` (String) Privacy.
 - `protocol` (String) Protocol. Valid values are 'usenet' and 'torrent'.
+- `redirect` (Boolean) Redirect download request from client to indexer instead of proxying via Prowlarr.
 - `tags` (Set of Number) List of associated tags.
 
 <a id="nestedatt--indexers--fields"></a>
