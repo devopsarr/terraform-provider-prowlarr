@@ -52,6 +52,7 @@ type Indexer struct {
 	Priority       types.Int64  `tfsdk:"priority"`
 	ID             types.Int64  `tfsdk:"id"`
 	Enable         types.Bool   `tfsdk:"enable"`
+	Redirect       types.Bool   `tfsdk:"redirect"`
 }
 
 // Field is part of Indexer.
@@ -74,6 +75,11 @@ func (r *IndexerResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 		Attributes: map[string]schema.Attribute{
 			"enable": schema.BoolAttribute{
 				MarkdownDescription: "Enable flag.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"redirect": schema.BoolAttribute{
+				MarkdownDescription: "Redirect download request from client to indexer instead of proxying via Prowlarr.",
 				Optional:            true,
 				Computed:            true,
 			},
@@ -291,6 +297,7 @@ func (i *Indexer) write(ctx context.Context, indexer *prowlarr.IndexerResource, 
 	diags.Append(localDiag...)
 
 	i.Enable = types.BoolValue(indexer.GetEnable())
+	i.Redirect = types.BoolValue(indexer.GetRedirect())
 	i.Priority = types.Int64Value(int64(indexer.GetPriority()))
 	i.AppProfileID = types.Int64Value(int64(indexer.GetAppProfileId()))
 	i.ID = types.Int64Value(int64(indexer.GetId()))
@@ -385,6 +392,7 @@ func (i *Indexer) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.I
 
 	indexer := prowlarr.NewIndexerResource()
 	indexer.SetEnable(i.Enable.ValueBool())
+	indexer.SetRedirect(i.Redirect.ValueBool())
 	indexer.SetPriority(int32(i.Priority.ValueInt64()))
 	indexer.SetAppProfileId(int32(i.AppProfileID.ValueInt64()))
 	indexer.SetId(int32(i.ID.ValueInt64()))

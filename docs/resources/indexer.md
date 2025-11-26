@@ -71,6 +71,7 @@ resource "prowlarr_indexer" "example" {
 
 - `enable` (Boolean) Enable flag.
 - `priority` (Number) Priority.
+- `redirect` (Boolean) Redirect download request from client to indexer instead of proxying via Prowlarr.
 - `tags` (Set of Number) List of associated tags.
 
 ### Read-Only
