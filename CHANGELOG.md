@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.2.0](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v3.1.0...v3.2.0) (2026-01-07)
+
+
+### Features
+
+* Writable categories in download clients ([96e0ce6](https://github.com/devopsarr/terraform-provider-prowlarr/commit/96e0ce69bef9d111fce3d0932805f1b2dbade420))
+
+
+### Bug Fixes
+
+* **deps:** update ghcr.io/hotio/prowlarr:release-2.3.0.5236 docker digest to 84acdfc ([03ba11d](https://github.com/devopsarr/terraform-provider-prowlarr/commit/03ba11d03d62b1844279c131dfe49a1b1a28199c))
+
 ## [3.1.0](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v3.0.2...v3.1.0) (2025-11-26)
 
 
