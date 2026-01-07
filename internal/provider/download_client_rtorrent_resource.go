@@ -134,6 +134,7 @@ func (r *DownloadClientRtorrentResource) Schema(_ context.Context, _ resource.Sc
 			},
 			"categories": schema.SetNestedAttribute{
 				MarkdownDescription: "List of mapped categories.",
+				Optional:            true,
 				Computed:            true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: DownloadClientResource{}.getClientCategorySchema().Attributes,

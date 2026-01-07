@@ -134,6 +134,7 @@ func (r *DownloadClientFreeboxResource) Schema(_ context.Context, _ resource.Sch
 			},
 			"categories": schema.SetNestedAttribute{
 				MarkdownDescription: "List of mapped categories.",
+				Optional:            true,
 				Computed:            true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: DownloadClientResource{}.getClientCategorySchema().Attributes,

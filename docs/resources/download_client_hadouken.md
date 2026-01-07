@@ -39,6 +39,7 @@ resource "prowlarr_download_client_hadouken" "example" {
 
 ### Optional
 
+- `categories` (Attributes Set) List of mapped categories. (see [below for nested schema](#nestedatt--categories))
 - `category` (String) Category.
 - `enable` (Boolean) Enable flag.
 - `host` (String) host.
@@ -50,7 +51,6 @@ resource "prowlarr_download_client_hadouken" "example" {
 
 ### Read-Only
 
-- `categories` (Attributes Set) List of mapped categories. (see [below for nested schema](#nestedatt--categories))
 - `id` (Number) Download Client ID.
 
 <a id="nestedatt--categories"></a>

@@ -63,5 +63,11 @@ func testAccDownloadClientSabnzbdResourceConfig(name, host string) string {
 		url_base = "/sabnzbd/"
 		port = 8080
 		api_key = "testAPIkey"
+		categories = [
+			{
+				name = "test"
+				categories = [1000]
+			}
+		]
 	}`, name, host)
 }

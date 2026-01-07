@@ -36,6 +36,7 @@ resource "prowlarr_download_client_rtorrent" "example" {
 ### Optional
 
 - `add_stopped` (Boolean) Add stopped flag.
+- `categories` (Attributes Set) List of mapped categories. (see [below for nested schema](#nestedatt--categories))
 - `category` (String) Category.
 - `directory` (String) Directory.
 - `enable` (Boolean) Enable flag.
@@ -51,7 +52,6 @@ resource "prowlarr_download_client_rtorrent" "example" {
 
 ### Read-Only
 
-- `categories` (Attributes Set) List of mapped categories. (see [below for nested schema](#nestedatt--categories))
 - `id` (Number) Download Client ID.
 
 <a id="nestedatt--categories"></a>

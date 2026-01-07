@@ -61,5 +61,11 @@ func testAccDownloadClientRtorrentResourceConfig(name, host string) string {
 		host = "%s"
 		url_base = "/rtorrent/"
 		port = 9091
+		categories = [
+			{
+				name = "test"
+				categories = [1000]
+			}
+		]
 	}`, name, host)
 }

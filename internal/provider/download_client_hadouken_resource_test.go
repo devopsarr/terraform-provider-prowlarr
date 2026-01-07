@@ -65,5 +65,11 @@ func testAccDownloadClientHadoukenResourceConfig(name, host string) string {
 		category = "prowlarr-tv"
 		username = "username"
 		password = "password"
+		categories = [
+			{
+				name = "test"
+				categories = [1000]
+			}
+		]
 	}`, name, host)
 }
