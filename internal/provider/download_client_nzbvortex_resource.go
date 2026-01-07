@@ -122,6 +122,7 @@ func (r *DownloadClientNzbvortexResource) Schema(_ context.Context, _ resource.S
 			},
 			"categories": schema.SetNestedAttribute{
 				MarkdownDescription: "List of mapped categories.",
+				Optional:            true,
 				Computed:            true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: DownloadClientResource{}.getClientCategorySchema().Attributes,

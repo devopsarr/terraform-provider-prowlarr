@@ -43,6 +43,7 @@ resource "prowlarr_download_client_freebox" "example" {
 ### Optional
 
 - `add_paused` (Boolean) Add paused flag.
+- `categories` (Attributes Set) List of mapped categories. (see [below for nested schema](#nestedatt--categories))
 - `category` (String) category.
 - `destination_directory` (String) Movie directory.
 - `enable` (Boolean) Enable flag.
@@ -53,7 +54,6 @@ resource "prowlarr_download_client_freebox" "example" {
 
 ### Read-Only
 
-- `categories` (Attributes Set) List of mapped categories. (see [below for nested schema](#nestedatt--categories))
 - `id` (Number) Download Client ID.
 
 <a id="nestedatt--categories"></a>

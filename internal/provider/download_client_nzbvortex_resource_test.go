@@ -63,5 +63,11 @@ func testAccDownloadClientNzbvortexResourceConfig(name, host string) string {
 		url_base = "/nzbvortex/"
 		port = 4321
 		api_key = "testAPIkey"
+		categories = [
+			{
+				name = "test"
+				categories = [1000]
+			}
+		]
 	}`, name, host)
 }

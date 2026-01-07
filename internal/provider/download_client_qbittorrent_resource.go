@@ -133,6 +133,7 @@ func (r *DownloadClientQbittorrentResource) Schema(_ context.Context, _ resource
 			},
 			"categories": schema.SetNestedAttribute{
 				MarkdownDescription: "List of mapped categories.",
+				Optional:            true,
 				Computed:            true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: DownloadClientResource{}.getClientCategorySchema().Attributes,

@@ -62,5 +62,11 @@ func testAccDownloadClientQbittorrentResourceConfig(name, host string) string {
 		url_base = "/qbittorrent/"
 		port = 9091
 		category = "tv-prowlarr"
+		categories = [
+			{
+				name = "test"
+				categories = [1000]
+			}
+		]
 	}`, name, host)
 }

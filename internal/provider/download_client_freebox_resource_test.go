@@ -63,5 +63,11 @@ func testAccDownloadClientFreeboxResourceConfig(name, token string) string {
 		port = 443
 		app_id = "test"
 		app_token = "%s"
+		categories = [
+			{
+				name = "test"
+				categories = [1000]
+			}
+		]
 	}`, name, token)
 }
