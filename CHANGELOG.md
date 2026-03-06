@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.1](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v3.2.0...v3.2.1) (2026-03-06)
+
+
+### Bug Fixes
+
+* update hostpath to include URL path in configuration when needed ([a494dfb](https://github.com/devopsarr/terraform-provider-prowlarr/commit/a494dfbb183e1753e6759598ac5e2de7bce9ed43))
+
 ## [3.2.0](https://github.com/devopsarr/terraform-provider-prowlarr/compare/v3.1.0...v3.2.0) (2026-01-07)
 
 
