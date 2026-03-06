@@ -158,7 +158,7 @@ func (p *ProwlarrProvider) Configure(ctx context.Context, req provider.Configure
 	)
 	auth = context.WithValue(auth, prowlarr.ContextServerVariables, map[string]string{
 		"protocol": parsedAPIURL.Scheme,
-		"hostpath": parsedAPIURL.Host,
+		"hostpath": parsedAPIURL.Host + parsedAPIURL.Path,
 	})
 
 	prowlarrData := ProwlarrData{
