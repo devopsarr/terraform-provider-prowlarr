@@ -188,8 +188,15 @@ func (r *ApplicationSonarrResource) Read(ctx context.Context, req resource.ReadR
 	}
 
 	// Get ApplicationSonarr current value
-	response, _, err := r.client.ApplicationAPI.GetApplicationsById(r.auth, int32(application.ID.ValueInt64())).Execute()
+	response, httpResp, err := r.client.ApplicationAPI.GetApplicationsById(r.auth, int32(application.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(httpResp) {
+			tflog.Warn(ctx, "removing "+applicationSonarrResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, applicationSonarrResourceName, err))
 
 		return
@@ -237,8 +244,8 @@ func (r *ApplicationSonarrResource) Delete(ctx context.Context, req resource.Del
 	}
 
 	// Delete ApplicationSonarr current value
-	_, err := r.client.ApplicationAPI.DeleteApplications(r.auth, int32(ID)).Execute()
-	if err != nil {
+	httpResp, err := r.client.ApplicationAPI.DeleteApplications(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(httpResp) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationSonarrResourceName, err))
 
 		return

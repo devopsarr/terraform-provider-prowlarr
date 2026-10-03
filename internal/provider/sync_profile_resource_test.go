@@ -1,10 +1,13 @@
 package provider
 
 import (
+	"context"
 	"fmt"
+	"net/http"
 	"regexp"
 	"testing"
 
+	"github.com/devopsarr/prowlarr-go/prowlarr"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
@@ -61,4 +64,29 @@ func testAccSyncProfileResourceConfig(name, rss string) string {
 			enable_interactive_search = true
 		}
 	`, name, rss)
+}
+
+//nolint:paralleltest // deletes an object outside Terraform, a parallel test could otherwise take over its freed ID
+func TestAccSyncProfileResourceDisappears(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			// Create, then delete outside Terraform: Read removes it from state instead of failing the plan
+			{
+				Config: testAccSyncProfileResourceConfig("ResourceTest", "false"),
+				Check: testAccCheckResourceDisappears("prowlarr_sync_profile.test", func(client *prowlarr.APIClient, id int32) (*http.Response, error) {
+					return client.AppProfileAPI.DeleteAppProfile(context.TODO(), id).Execute()
+				}),
+				ExpectNonEmptyPlan: true,
+			},
+			// Create again after the deletion outside Terraform
+			{
+				Config: testAccSyncProfileResourceConfig("ResourceTest", "false"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrSet("prowlarr_sync_profile.test", "id"),
+				),
+			},
+		},
+	})
 }

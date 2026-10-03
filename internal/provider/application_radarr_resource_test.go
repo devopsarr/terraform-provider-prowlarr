@@ -1,10 +1,13 @@
 package provider
 
 import (
+	"context"
 	"fmt"
+	"net/http"
 	"regexp"
 	"testing"
 
+	"github.com/devopsarr/prowlarr-go/prowlarr"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
@@ -63,4 +66,29 @@ func testAccApplicationRadarrResourceConfig(name, prowlarr string) string {
 		api_key = "APIKey"
 		sync_categories = [2010, 2020]
 	}`, name, prowlarr)
+}
+
+//nolint:paralleltest // deletes an object outside Terraform, a parallel test could otherwise take over its freed ID
+func TestAccApplicationRadarrResourceDisappears(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			// Create, then delete outside Terraform: Read removes it from state instead of failing the plan
+			{
+				Config: testAccApplicationRadarrResourceConfig("resourceRadarrTest", "true"),
+				Check: testAccCheckResourceDisappears("prowlarr_application_radarr.test", func(client *prowlarr.APIClient, id int32) (*http.Response, error) {
+					return client.ApplicationAPI.DeleteApplications(context.TODO(), id).Execute()
+				}),
+				ExpectNonEmptyPlan: true,
+			},
+			// Create again after the deletion outside Terraform
+			{
+				Config: testAccApplicationRadarrResourceConfig("resourceRadarrTest", "true"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrSet("prowlarr_application_radarr.test", "id"),
+				),
+			},
+		},
+	})
 }

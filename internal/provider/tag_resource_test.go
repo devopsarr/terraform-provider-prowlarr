@@ -1,10 +1,13 @@
 package provider
 
 import (
+	"context"
 	"fmt"
+	"net/http"
 	"regexp"
 	"testing"
 
+	"github.com/devopsarr/prowlarr-go/prowlarr"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
@@ -57,4 +60,29 @@ func testAccTagResourceConfig(name, label string) string {
   			label = "%s"
 		}
 	`, name, label)
+}
+
+//nolint:paralleltest // deletes an object outside Terraform, a parallel test could otherwise take over its freed ID
+func TestAccTagResourceDisappears(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			// Create, then delete outside Terraform: Read removes it from state instead of failing the plan
+			{
+				Config: testAccTagResourceConfig("test", "nzb"),
+				Check: testAccCheckResourceDisappears("prowlarr_tag.test", func(client *prowlarr.APIClient, id int32) (*http.Response, error) {
+					return client.TagAPI.DeleteTag(context.TODO(), id).Execute()
+				}),
+				ExpectNonEmptyPlan: true,
+			},
+			// Create again after the deletion outside Terraform
+			{
+				Config: testAccTagResourceConfig("test", "nzb"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrSet("prowlarr_tag.test", "id"),
+				),
+			},
+		},
+	})
 }

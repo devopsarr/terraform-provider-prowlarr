@@ -196,8 +196,15 @@ func (r *ApplicationResource) Read(ctx context.Context, req resource.ReadRequest
 	}
 
 	// Get Application current value
-	response, _, err := r.client.ApplicationAPI.GetApplicationsById(r.auth, int32(application.ID.ValueInt64())).Execute()
+	response, httpResp, err := r.client.ApplicationAPI.GetApplicationsById(r.auth, int32(application.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(httpResp) {
+			tflog.Warn(ctx, "removing "+applicationResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, applicationResourceName, err))
 
 		return
@@ -253,8 +260,8 @@ func (r *ApplicationResource) Delete(ctx context.Context, req resource.DeleteReq
 	}
 
 	// Delete Application current value
-	_, err := r.client.ApplicationAPI.DeleteApplications(r.auth, int32(ID)).Execute()
-	if err != nil {
+	httpResp, err := r.client.ApplicationAPI.DeleteApplications(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(httpResp) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationResourceName, err))
 
 		return

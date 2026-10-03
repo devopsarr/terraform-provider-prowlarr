@@ -165,8 +165,15 @@ func (r *IndexerProxyHTTPResource) Read(ctx context.Context, req resource.ReadRe
 	}
 
 	// Get IndexerProxyHTTP current value
-	response, _, err := r.client.IndexerProxyAPI.GetIndexerProxyById(r.auth, int32(proxy.ID.ValueInt64())).Execute()
+	response, httpResp, err := r.client.IndexerProxyAPI.GetIndexerProxyById(r.auth, int32(proxy.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(httpResp) {
+			tflog.Warn(ctx, "removing "+indexerProxyHTTPResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerProxyHTTPResourceName, err))
 
 		return
@@ -214,8 +221,8 @@ func (r *IndexerProxyHTTPResource) Delete(ctx context.Context, req resource.Dele
 	}
 
 	// Delete IndexerProxyHTTP current value
-	_, err := r.client.IndexerProxyAPI.DeleteIndexerProxy(r.auth, int32(ID)).Execute()
-	if err != nil {
+	httpResp, err := r.client.IndexerProxyAPI.DeleteIndexerProxy(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(httpResp) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerProxyHTTPResourceName, err))
 
 		return
