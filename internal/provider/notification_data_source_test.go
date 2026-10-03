@@ -32,6 +32,12 @@ func TestAccNotificationDataSource(t *testing.T) {
 					resource.TestCheckResourceAttrSet("data.prowlarr_notification.test", "id"),
 					resource.TestCheckResourceAttr("data.prowlarr_notification.test", "path", "/scripts/test.sh")),
 			},
+			// Read testing with device IDs
+			{
+				Config: testAccNotificationPushbulletResourceConfig("notificationDataDeviceIDs", "Key") + testAccNotificationDataSourceConfig("prowlarr_notification_pushbullet.test.name"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckTypeSetElemAttr("data.prowlarr_notification.test", "device_ids.*", "test")),
+			},
 		},
 	})
 }

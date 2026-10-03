@@ -360,7 +360,7 @@ func (d *NotificationsDataSource) Schema(_ context.Context, _ datasource.SchemaR
 						"device_ids": schema.SetAttribute{
 							MarkdownDescription: "Device IDs.",
 							Computed:            true,
-							ElementType:         types.Int64Type,
+							ElementType:         types.StringType,
 						},
 						"channel_tags": schema.SetAttribute{
 							MarkdownDescription: "Channel tags.",
