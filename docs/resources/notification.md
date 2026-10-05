@@ -66,7 +66,7 @@ resource "prowlarr_notification" "example" {
 - `configuration_key` (String, Sensitive) Configuration key.
 - `consumer_key` (String) Consumer key.
 - `consumer_secret` (String) Consumer secret.
-- `device_ids` (Set of Number) Device IDs.
+- `device_ids` (Set of String) Device IDs.
 - `device_names` (String) Device names.
 - `devices` (Set of String) Devices.
 - `direct_message` (Boolean) Direct message flag.

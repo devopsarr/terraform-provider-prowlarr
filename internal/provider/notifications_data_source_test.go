@@ -21,13 +21,14 @@ func TestAccNotificationsDataSource(t *testing.T) {
 			},
 			// Create a resource to have a value to check
 			{
-				Config: testAccNotificationResourceConfig("datasourceTest", "true"),
+				Config: testAccNotificationResourceConfig("datasourceTest", "true") + testAccNotificationPushbulletResourceConfig("datasourceDeviceIDsTest", "Key"),
 			},
 			// Read testing
 			{
 				Config: testAccNotificationsDataSourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckTypeSetElemNestedAttrs("data.prowlarr_notifications.test", "notifications.*", map[string]string{"path": "/scripts/test.sh"}),
+					resource.TestCheckTypeSetElemNestedAttrs("data.prowlarr_notifications.test", "notifications.*", map[string]string{"name": "datasourceDeviceIDsTest", "device_ids.#": "1"}),
 				),
 			},
 		},

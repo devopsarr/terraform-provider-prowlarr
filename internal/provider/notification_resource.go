@@ -142,7 +142,7 @@ func (n Notification) getType() attr.Type {
 		map[string]attr.Type{
 			"tags":                    types.SetType{}.WithElementType(types.Int64Type),
 			"grab_fields":             types.SetType{}.WithElementType(types.Int64Type),
-			"device_ids":              types.SetType{}.WithElementType(types.Int64Type),
+			"device_ids":              types.SetType{}.WithElementType(types.StringType),
 			"field_tags":              types.SetType{}.WithElementType(types.StringType),
 			"recipients":              types.SetType{}.WithElementType(types.StringType),
 			"devices":                 types.SetType{}.WithElementType(types.StringType),
@@ -631,7 +631,7 @@ func (r *NotificationResource) Schema(_ context.Context, _ resource.SchemaReques
 				MarkdownDescription: "Device IDs.",
 				Optional:            true,
 				Computed:            true,
-				ElementType:         types.Int64Type,
+				ElementType:         types.StringType,
 			},
 			"channel_tags": schema.SetAttribute{
 				MarkdownDescription: "Channel tags.",
@@ -830,7 +830,7 @@ func (n *Notification) write(ctx context.Context, notification *prowlarr.Notific
 	n.ConfigContract = types.StringValue(notification.GetConfigContract())
 	n.GrabFields = types.SetValueMust(types.Int64Type, nil)
 	n.ChannelTags = types.SetValueMust(types.StringType, nil)
-	n.DeviceIDs = types.SetValueMust(types.Int64Type, nil)
+	n.DeviceIDs = types.SetValueMust(types.StringType, nil)
 	n.Topics = types.SetValueMust(types.StringType, nil)
 	n.Devices = types.SetValueMust(types.StringType, nil)
 	n.Recipients = types.SetValueMust(types.StringType, nil)

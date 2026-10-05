@@ -51,6 +51,40 @@ func TestAccNotificationResource(t *testing.T) {
 	})
 }
 
+func TestAccNotificationResourceDeviceIDs(t *testing.T) {
+	t.Parallel()
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			// Create and Read testing
+			{
+				Config: testAccNotificationResourceDeviceIDsConfig("resourceDeviceIDsTest", "first"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckTypeSetElemAttr("prowlarr_notification.test", "device_ids.*", "first"),
+					resource.TestCheckResourceAttrSet("prowlarr_notification.test", "id"),
+				),
+			},
+			// Update and Read testing
+			{
+				Config: testAccNotificationResourceDeviceIDsConfig("resourceDeviceIDsTest", "second"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckTypeSetElemAttr("prowlarr_notification.test", "device_ids.*", "second"),
+				),
+			},
+			// ImportState testing
+			{
+				ResourceName:            "prowlarr_notification.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"api_key"},
+			},
+			// Delete testing automatically occurs in TestCase
+		},
+	})
+}
+
 func testAccNotificationResourceConfig(name, upgrade string) string {
 	return fmt.Sprintf(`
 	resource "prowlarr_notification" "test" {
@@ -65,4 +99,21 @@ func testAccNotificationResourceConfig(name, upgrade string) string {
 	  
 		path = "/scripts/test.sh"
 	}`, upgrade, name)
+}
+
+func testAccNotificationResourceDeviceIDsConfig(name, device string) string {
+	return fmt.Sprintf(`
+	resource "prowlarr_notification" "test" {
+		on_health_issue                    = false
+		on_application_update              = false
+
+		include_health_warnings = false
+		name                    = "%s"
+
+		implementation  = "PushBullet"
+		config_contract = "PushBulletSettings"
+
+		api_key = "Key"
+		device_ids = ["%s"]
+	}`, name, device)
 }
