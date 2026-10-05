@@ -17,12 +17,12 @@ func TestAccApplicationSonarrResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Unauthorized Create
 			{
-				Config:      testAccApplicationSonarrResourceConfig("resourceSonarrTest", "false") + testUnauthorizedProvider,
+				Config:      testAccApplicationSonarrResourceConfig("resourceSonarrTest", "false", "[5070]") + testUnauthorizedProvider,
 				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Create and Read testing
 			{
-				Config: testAccApplicationSonarrResourceConfig("resourceSonarrTest", "false"),
+				Config: testAccApplicationSonarrResourceConfig("resourceSonarrTest", "false", "[5070]"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("prowlarr_application_sonarr.test", "prowlarr_url", "false"),
 					resource.TestCheckResourceAttrSet("prowlarr_application_sonarr.test", "id"),
@@ -30,14 +30,21 @@ func TestAccApplicationSonarrResource(t *testing.T) {
 			},
 			// Unauthorized Read
 			{
-				Config:      testAccApplicationSonarrResourceConfig("resourceSonarrTest", "false") + testUnauthorizedProvider,
+				Config:      testAccApplicationSonarrResourceConfig("resourceSonarrTest", "false", "[5070]") + testUnauthorizedProvider,
 				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{
-				Config: testAccApplicationSonarrResourceConfig("resourceSonarrTest", "true"),
+				Config: testAccApplicationSonarrResourceConfig("resourceSonarrTest", "true", "[5070]"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("prowlarr_application_sonarr.test", "prowlarr_url", "true"),
+				),
+			},
+			// Update to an empty set and Read testing
+			{
+				Config: testAccApplicationSonarrResourceConfig("resourceSonarrTest", "true", "[]"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("prowlarr_application_sonarr.test", "anime_sync_categories.#", "0"),
 				),
 			},
 			// ImportState testing
@@ -52,7 +59,7 @@ func TestAccApplicationSonarrResource(t *testing.T) {
 	})
 }
 
-func testAccApplicationSonarrResourceConfig(name, prowlarr string) string {
+func testAccApplicationSonarrResourceConfig(name, prowlarr, animeCategories string) string {
 	return fmt.Sprintf(`
 	resource "prowlarr_application_sonarr" "test" {
 		name = "%s"
@@ -62,6 +69,6 @@ func testAccApplicationSonarrResourceConfig(name, prowlarr string) string {
 		prowlarr_url = "%s"
 		api_key = "APIKey"
 		sync_categories = [5010, 5020]
-		anime_sync_categories = [5070]
-	}`, name, prowlarr)
+		anime_sync_categories = %s
+	}`, name, prowlarr, animeCategories)
 }
