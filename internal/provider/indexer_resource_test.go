@@ -1,10 +1,13 @@
 package provider
 
 import (
+	"context"
 	"fmt"
+	"net/http"
 	"regexp"
 	"testing"
 
+	"github.com/devopsarr/prowlarr-go/prowlarr"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
@@ -154,4 +157,29 @@ func testAccIndexerResourceConfig(name, url string) string {
 		]
 	}
 	`, name, url, name)
+}
+
+//nolint:paralleltest // deletes an object outside Terraform, a parallel test could otherwise take over its freed ID
+func TestAccIndexerResourceDisappears(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			// Create, then delete outside Terraform: Read removes it from state instead of failing the plan
+			{
+				Config: testAccIndexerResourceConfig("resourceTest", "https://13mag.net/"),
+				Check: testAccCheckResourceDisappears("prowlarr_indexer.test", func(client *prowlarr.APIClient, id int32) (*http.Response, error) {
+					return client.IndexerAPI.DeleteIndexer(context.TODO(), id).Execute()
+				}),
+				ExpectNonEmptyPlan: true,
+			},
+			// Create again after the deletion outside Terraform
+			{
+				Config: testAccIndexerResourceConfig("resourceTest", "https://13mag.net/"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrSet("prowlarr_indexer.test", "id"),
+				),
+			},
+		},
+	})
 }

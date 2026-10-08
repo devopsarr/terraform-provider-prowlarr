@@ -152,6 +152,13 @@ func (r *IndexerProxyFlaresolverrResource) Read(ctx context.Context, req resourc
 	// Get IndexerProxyFlaresolverr current value
 	response, _, err := r.client.IndexerProxyAPI.GetIndexerProxyById(r.auth, int32(proxy.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(err) {
+			tflog.Warn(ctx, "removing "+indexerProxyFlaresolverrResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerProxyFlaresolverrResourceName, err))
 
 		return
@@ -200,7 +207,7 @@ func (r *IndexerProxyFlaresolverrResource) Delete(ctx context.Context, req resou
 
 	// Delete IndexerProxyFlaresolverr current value
 	_, err := r.client.IndexerProxyAPI.DeleteIndexerProxy(r.auth, int32(ID)).Execute()
-	if err != nil {
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerProxyFlaresolverrResourceName, err))
 
 		return

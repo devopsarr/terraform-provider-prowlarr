@@ -167,6 +167,13 @@ func (r *IndexerProxySocks4Resource) Read(ctx context.Context, req resource.Read
 	// Get IndexerProxySocks4 current value
 	response, _, err := r.client.IndexerProxyAPI.GetIndexerProxyById(r.auth, int32(proxy.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(err) {
+			tflog.Warn(ctx, "removing "+indexerProxySocks4ResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerProxySocks4ResourceName, err))
 
 		return
@@ -215,7 +222,7 @@ func (r *IndexerProxySocks4Resource) Delete(ctx context.Context, req resource.De
 
 	// Delete IndexerProxySocks4 current value
 	_, err := r.client.IndexerProxyAPI.DeleteIndexerProxy(r.auth, int32(ID)).Execute()
-	if err != nil {
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerProxySocks4ResourceName, err))
 
 		return

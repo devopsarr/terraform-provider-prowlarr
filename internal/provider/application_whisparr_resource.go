@@ -181,6 +181,13 @@ func (r *ApplicationWhisparrResource) Read(ctx context.Context, req resource.Rea
 	// Get ApplicationWhisparr current value
 	response, _, err := r.client.ApplicationAPI.GetApplicationsById(r.auth, int32(application.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(err) {
+			tflog.Warn(ctx, "removing "+applicationWhisparrResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, applicationWhisparrResourceName, err))
 
 		return
@@ -229,7 +236,7 @@ func (r *ApplicationWhisparrResource) Delete(ctx context.Context, req resource.D
 
 	// Delete ApplicationWhisparr current value
 	_, err := r.client.ApplicationAPI.DeleteApplications(r.auth, int32(ID)).Execute()
-	if err != nil {
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationWhisparrResourceName, err))
 
 		return

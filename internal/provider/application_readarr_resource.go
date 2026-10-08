@@ -181,6 +181,13 @@ func (r *ApplicationReadarrResource) Read(ctx context.Context, req resource.Read
 	// Get ApplicationReadarr current value
 	response, _, err := r.client.ApplicationAPI.GetApplicationsById(r.auth, int32(application.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(err) {
+			tflog.Warn(ctx, "removing "+applicationReadarrResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, applicationReadarrResourceName, err))
 
 		return
@@ -229,7 +236,7 @@ func (r *ApplicationReadarrResource) Delete(ctx context.Context, req resource.De
 
 	// Delete ApplicationReadarr current value
 	_, err := r.client.ApplicationAPI.DeleteApplications(r.auth, int32(ID)).Execute()
-	if err != nil {
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationReadarrResourceName, err))
 
 		return
