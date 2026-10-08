@@ -179,9 +179,9 @@ func (r *ApplicationRadarrResource) Read(ctx context.Context, req resource.ReadR
 	}
 
 	// Get ApplicationRadarr current value
-	response, httpResp, err := r.client.ApplicationAPI.GetApplicationsById(r.auth, int32(application.ID.ValueInt64())).Execute()
+	response, _, err := r.client.ApplicationAPI.GetApplicationsById(r.auth, int32(application.ID.ValueInt64())).Execute()
 	if err != nil {
-		if helpers.IsNotFound(httpResp) {
+		if helpers.IsNotFound(err) {
 			tflog.Warn(ctx, "removing "+applicationRadarrResourceName+" from state, not found")
 			resp.State.RemoveResource(ctx)
 
@@ -235,8 +235,8 @@ func (r *ApplicationRadarrResource) Delete(ctx context.Context, req resource.Del
 	}
 
 	// Delete ApplicationRadarr current value
-	httpResp, err := r.client.ApplicationAPI.DeleteApplications(r.auth, int32(ID)).Execute()
-	if err != nil && !helpers.IsNotFound(httpResp) {
+	_, err := r.client.ApplicationAPI.DeleteApplications(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationRadarrResourceName, err))
 
 		return

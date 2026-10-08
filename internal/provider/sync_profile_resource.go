@@ -140,9 +140,9 @@ func (r *SyncProfileResource) Read(ctx context.Context, req resource.ReadRequest
 	}
 
 	// Get sync profile current value
-	response, httpResp, err := r.client.AppProfileAPI.GetAppProfileById(r.auth, int32(profile.ID.ValueInt64())).Execute()
+	response, _, err := r.client.AppProfileAPI.GetAppProfileById(r.auth, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
-		if helpers.IsNotFound(httpResp) {
+		if helpers.IsNotFound(err) {
 			tflog.Warn(ctx, "removing "+syncProfileResourceName+" from state, not found")
 			resp.State.RemoveResource(ctx)
 
@@ -196,8 +196,8 @@ func (r *SyncProfileResource) Delete(ctx context.Context, req resource.DeleteReq
 	}
 
 	// Delete sync profile current value
-	httpResp, err := r.client.AppProfileAPI.DeleteAppProfile(r.auth, int32(ID)).Execute()
-	if err != nil && !helpers.IsNotFound(httpResp) {
+	_, err := r.client.AppProfileAPI.DeleteAppProfile(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, syncProfileResourceName, err))
 
 		return

@@ -179,9 +179,9 @@ func (r *ApplicationMylarResource) Read(ctx context.Context, req resource.ReadRe
 	}
 
 	// Get ApplicationMylar current value
-	response, httpResp, err := r.client.ApplicationAPI.GetApplicationsById(r.auth, int32(application.ID.ValueInt64())).Execute()
+	response, _, err := r.client.ApplicationAPI.GetApplicationsById(r.auth, int32(application.ID.ValueInt64())).Execute()
 	if err != nil {
-		if helpers.IsNotFound(httpResp) {
+		if helpers.IsNotFound(err) {
 			tflog.Warn(ctx, "removing "+applicationMylarResourceName+" from state, not found")
 			resp.State.RemoveResource(ctx)
 
@@ -235,8 +235,8 @@ func (r *ApplicationMylarResource) Delete(ctx context.Context, req resource.Dele
 	}
 
 	// Delete ApplicationMylar current value
-	httpResp, err := r.client.ApplicationAPI.DeleteApplications(r.auth, int32(ID)).Execute()
-	if err != nil && !helpers.IsNotFound(httpResp) {
+	_, err := r.client.ApplicationAPI.DeleteApplications(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, applicationMylarResourceName, err))
 
 		return
