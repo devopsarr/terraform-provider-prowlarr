@@ -5,6 +5,7 @@ resource "prowlarr_host" "test" {
   bind_address    = "*"
   application_url = ""
   instance_name   = "Prowlarr"
+  allowed_hosts   = ["localhost", "prowlarr"]
   proxy = {
     enabled = false
   }
