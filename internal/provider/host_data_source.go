@@ -55,6 +55,20 @@ func (d *HostDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 				MarkdownDescription: "Bind address.",
 				Computed:            true,
 			},
+			"allowed_hosts": schema.SetAttribute{
+				MarkdownDescription: "Hostnames allowed to access the application.",
+				Computed:            true,
+				ElementType:         types.StringType,
+			},
+			"trusted_networks": schema.SetAttribute{
+				MarkdownDescription: "IP addresses or CIDR ranges treated as local addresses.",
+				Computed:            true,
+				ElementType:         types.StringType,
+			},
+			"history_cleanup_days": schema.Int64Attribute{
+				MarkdownDescription: "Days of history to keep, `0` disables the cleanup.",
+				Computed:            true,
+			},
 			"application_url": schema.StringAttribute{
 				MarkdownDescription: "Application URL.",
 				Computed:            true,

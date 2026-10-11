@@ -3,7 +3,9 @@ package provider
 import (
 	"context"
 	"fmt"
+	"sort"
 	"strconv"
+	"strings"
 
 	"github.com/devopsarr/prowlarr-go/prowlarr"
 	"github.com/devopsarr/terraform-provider-prowlarr/internal/helpers"
@@ -16,6 +18,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -44,19 +47,22 @@ type HostResource struct {
 
 // Host describes the host data model.
 type Host struct {
-	ProxyConfig    types.Object `tfsdk:"proxy"`
-	SSLConfig      types.Object `tfsdk:"ssl"`
-	AuthConfig     types.Object `tfsdk:"authentication"`
-	BackupConfig   types.Object `tfsdk:"backup"`
-	UpdateConfig   types.Object `tfsdk:"update"`
-	LoggingConfig  types.Object `tfsdk:"logging"`
-	InstanceName   types.String `tfsdk:"instance_name"`
-	ApplicationURL types.String `tfsdk:"application_url"`
-	BindAddress    types.String `tfsdk:"bind_address"`
-	URLBase        types.String `tfsdk:"url_base"`
-	ID             types.Int64  `tfsdk:"id"`
-	Port           types.Int64  `tfsdk:"port"`
-	LaunchBrowser  types.Bool   `tfsdk:"launch_browser"`
+	ProxyConfig        types.Object `tfsdk:"proxy"`
+	SSLConfig          types.Object `tfsdk:"ssl"`
+	AuthConfig         types.Object `tfsdk:"authentication"`
+	BackupConfig       types.Object `tfsdk:"backup"`
+	UpdateConfig       types.Object `tfsdk:"update"`
+	LoggingConfig      types.Object `tfsdk:"logging"`
+	InstanceName       types.String `tfsdk:"instance_name"`
+	ApplicationURL     types.String `tfsdk:"application_url"`
+	BindAddress        types.String `tfsdk:"bind_address"`
+	URLBase            types.String `tfsdk:"url_base"`
+	AllowedHosts       types.Set    `tfsdk:"allowed_hosts"`
+	TrustedNetworks    types.Set    `tfsdk:"trusted_networks"`
+	HistoryCleanupDays types.Int64  `tfsdk:"history_cleanup_days"`
+	ID                 types.Int64  `tfsdk:"id"`
+	Port               types.Int64  `tfsdk:"port"`
+	LaunchBrowser      types.Bool   `tfsdk:"launch_browser"`
 }
 
 // ProxyConfig is part of Host.
@@ -209,6 +215,32 @@ func (r *HostResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 			"bind_address": schema.StringAttribute{
 				MarkdownDescription: "Bind address.",
 				Required:            true,
+			},
+			"allowed_hosts": schema.SetAttribute{
+				MarkdownDescription: "Hostnames allowed to access the application. Required unless `authentication.required` is `enabled`. Defaults to the current value.",
+				Optional:            true,
+				Computed:            true,
+				ElementType:         types.StringType,
+				PlanModifiers: []planmodifier.Set{
+					setplanmodifier.UseStateForUnknown(),
+				},
+			},
+			"trusted_networks": schema.SetAttribute{
+				MarkdownDescription: "IP addresses or CIDR ranges treated as local addresses. Defaults to the current value.",
+				Optional:            true,
+				Computed:            true,
+				ElementType:         types.StringType,
+				PlanModifiers: []planmodifier.Set{
+					setplanmodifier.UseStateForUnknown(),
+				},
+			},
+			"history_cleanup_days": schema.Int64Attribute{
+				MarkdownDescription: "Days of history to keep, `0` disables the cleanup. Defaults to the current value.",
+				Optional:            true,
+				Computed:            true,
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
+				},
 			},
 			"application_url": schema.StringAttribute{
 				MarkdownDescription: "Application URL.",
@@ -424,6 +456,29 @@ func (r *HostResource) Create(ctx context.Context, req resource.CreateRequest, r
 	request := host.read(ctx, &resp.Diagnostics)
 	request.SetId(1)
 
+	// Unset values must keep the current ones, since the API rejects empty allowed hosts
+	// and resets any field missing from the request
+	if !request.AllowedHosts.IsSet() || !request.TrustedNetworks.IsSet() || !request.HasHistoryCleanupDays() {
+		current, _, err := r.client.HostConfigAPI.GetHostConfig(r.auth).Execute()
+		if err != nil {
+			resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, hostResourceName, err))
+
+			return
+		}
+
+		if !request.AllowedHosts.IsSet() {
+			request.SetAllowedHosts(current.GetAllowedHosts())
+		}
+
+		if !request.TrustedNetworks.IsSet() {
+			request.SetTrustedNetworks(current.GetTrustedNetworks())
+		}
+
+		if !request.HasHistoryCleanupDays() {
+			request.SetHistoryCleanupDays(current.GetHistoryCleanupDays())
+		}
+	}
+
 	// Create new Host
 	response, _, err := r.client.HostConfigAPI.UpdateHostConfig(r.auth, strconv.Itoa(int(request.GetId()))).HostConfigResource(*request).Execute()
 	if err != nil {
@@ -506,6 +561,9 @@ func (h *Host) write(ctx context.Context, host *prowlarr.HostConfigResource, dia
 	h.ApplicationURL = types.StringValue(host.GetApplicationUrl())
 	h.BindAddress = types.StringValue(host.GetBindAddress())
 	h.URLBase = types.StringValue(host.GetUrlBase())
+	h.AllowedHosts = splitHostList(ctx, host.GetAllowedHosts(), diags)
+	h.TrustedNetworks = splitHostList(ctx, host.GetTrustedNetworks(), diags)
+	h.HistoryCleanupDays = types.Int64Value(int64(host.GetHistoryCleanupDays()))
 	h.ID = types.Int64Value(int64(host.GetId()))
 	h.Port = types.Int64Value(int64(host.GetPort()))
 	h.LaunchBrowser = types.BoolValue(host.GetLaunchBrowser())
@@ -596,6 +654,19 @@ func (h *Host) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.Host
 	host.SetApplicationUrl(h.ApplicationURL.ValueString())
 	host.SetBindAddress(h.BindAddress.ValueString())
 	host.SetUrlBase(h.URLBase.ValueString())
+
+	if !h.AllowedHosts.IsUnknown() && !h.AllowedHosts.IsNull() {
+		host.SetAllowedHosts(joinHostList(ctx, h.AllowedHosts, diags))
+	}
+
+	if !h.TrustedNetworks.IsUnknown() && !h.TrustedNetworks.IsNull() {
+		host.SetTrustedNetworks(joinHostList(ctx, h.TrustedNetworks, diags))
+	}
+
+	if !h.HistoryCleanupDays.IsUnknown() && !h.HistoryCleanupDays.IsNull() {
+		host.SetHistoryCleanupDays(int32(h.HistoryCleanupDays.ValueInt64()))
+	}
+
 	host.SetId(int32(h.ID.ValueInt64()))
 	host.SetPort(int32(h.Port.ValueInt64()))
 	host.SetLaunchBrowser(h.LaunchBrowser.ValueBool())
@@ -710,4 +781,29 @@ func assignObjectValue(ctx context.Context, diags *diag.Diagnostics, dest *types
 	diags.Append(tmp...)
 
 	*dest = obj
+}
+
+// splitHostList converts the API comma separated list into a set.
+func splitHostList(ctx context.Context, list string, diags *diag.Diagnostics) types.Set {
+	elements := []string{}
+
+	for _, e := range strings.Split(list, ",") {
+		if e = strings.TrimSpace(e); e != "" {
+			elements = append(elements, e)
+		}
+	}
+
+	set, tempDiag := types.SetValueFrom(ctx, types.StringType, elements)
+	diags.Append(tempDiag...)
+
+	return set
+}
+
+// joinHostList converts a set into the API comma separated list.
+func joinHostList(ctx context.Context, set types.Set, diags *diag.Diagnostics) string {
+	elements := []string{}
+	diags.Append(set.ElementsAs(ctx, &elements, false)...)
+	sort.Strings(elements)
+
+	return strings.Join(elements, ", ")
 }

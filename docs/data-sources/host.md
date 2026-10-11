@@ -23,10 +23,12 @@ data "prowlarr_host" "example" {
 
 ### Read-Only
 
+- `allowed_hosts` (Set of String) Hostnames allowed to access the application.
 - `application_url` (String) Application URL.
 - `authentication` (Attributes) Authentication configuration. (see [below for nested schema](#nestedatt--authentication))
 - `backup` (Attributes) Backup configuration. (see [below for nested schema](#nestedatt--backup))
 - `bind_address` (String) Bind address.
+- `history_cleanup_days` (Number) Days of history to keep, `0` disables the cleanup.
 - `id` (Number) Host ID.
 - `instance_name` (String) Instance name.
 - `launch_browser` (Boolean) Launch browser flag.
@@ -34,6 +36,7 @@ data "prowlarr_host" "example" {
 - `port` (Number) TCP port.
 - `proxy` (Attributes) Proxy configuration. (see [below for nested schema](#nestedatt--proxy))
 - `ssl` (Attributes) Backup configuration. (see [below for nested schema](#nestedatt--ssl))
+- `trusted_networks` (Set of String) IP addresses or CIDR ranges treated as local addresses.
 - `update` (Attributes) Update configuration. (see [below for nested schema](#nestedatt--update))
 - `url_base` (String) URL base.
 
