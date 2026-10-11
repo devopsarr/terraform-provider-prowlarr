@@ -71,6 +71,7 @@ resource "prowlarr_host" "test" {
 ### Optional
 
 - `allowed_hosts` (Set of String) Hostnames allowed to access the application. Required unless `authentication.required` is `enabled`. Defaults to the current value.
+- `history_cleanup_days` (Number) Days of history to keep, `0` disables the cleanup. Defaults to the current value.
 - `launch_browser` (Boolean) Launch browser flag.
 - `trusted_networks` (Set of String) IP addresses or CIDR ranges treated as local addresses. Defaults to the current value.
 

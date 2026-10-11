@@ -47,21 +47,22 @@ type HostResource struct {
 
 // Host describes the host data model.
 type Host struct {
-	ProxyConfig     types.Object `tfsdk:"proxy"`
-	SSLConfig       types.Object `tfsdk:"ssl"`
-	AuthConfig      types.Object `tfsdk:"authentication"`
-	BackupConfig    types.Object `tfsdk:"backup"`
-	UpdateConfig    types.Object `tfsdk:"update"`
-	LoggingConfig   types.Object `tfsdk:"logging"`
-	InstanceName    types.String `tfsdk:"instance_name"`
-	ApplicationURL  types.String `tfsdk:"application_url"`
-	BindAddress     types.String `tfsdk:"bind_address"`
-	URLBase         types.String `tfsdk:"url_base"`
-	AllowedHosts    types.Set    `tfsdk:"allowed_hosts"`
-	TrustedNetworks types.Set    `tfsdk:"trusted_networks"`
-	ID              types.Int64  `tfsdk:"id"`
-	Port            types.Int64  `tfsdk:"port"`
-	LaunchBrowser   types.Bool   `tfsdk:"launch_browser"`
+	ProxyConfig        types.Object `tfsdk:"proxy"`
+	SSLConfig          types.Object `tfsdk:"ssl"`
+	AuthConfig         types.Object `tfsdk:"authentication"`
+	BackupConfig       types.Object `tfsdk:"backup"`
+	UpdateConfig       types.Object `tfsdk:"update"`
+	LoggingConfig      types.Object `tfsdk:"logging"`
+	InstanceName       types.String `tfsdk:"instance_name"`
+	ApplicationURL     types.String `tfsdk:"application_url"`
+	BindAddress        types.String `tfsdk:"bind_address"`
+	URLBase            types.String `tfsdk:"url_base"`
+	AllowedHosts       types.Set    `tfsdk:"allowed_hosts"`
+	TrustedNetworks    types.Set    `tfsdk:"trusted_networks"`
+	HistoryCleanupDays types.Int64  `tfsdk:"history_cleanup_days"`
+	ID                 types.Int64  `tfsdk:"id"`
+	Port               types.Int64  `tfsdk:"port"`
+	LaunchBrowser      types.Bool   `tfsdk:"launch_browser"`
 }
 
 // ProxyConfig is part of Host.
@@ -231,6 +232,14 @@ func (r *HostResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 				ElementType:         types.StringType,
 				PlanModifiers: []planmodifier.Set{
 					setplanmodifier.UseStateForUnknown(),
+				},
+			},
+			"history_cleanup_days": schema.Int64Attribute{
+				MarkdownDescription: "Days of history to keep, `0` disables the cleanup. Defaults to the current value.",
+				Optional:            true,
+				Computed:            true,
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
 				},
 			},
 			"application_url": schema.StringAttribute{
@@ -448,7 +457,8 @@ func (r *HostResource) Create(ctx context.Context, req resource.CreateRequest, r
 	request.SetId(1)
 
 	// Unset values must keep the current ones, since the API rejects empty allowed hosts
-	if !request.AllowedHosts.IsSet() || !request.TrustedNetworks.IsSet() {
+	// and resets any field missing from the request
+	if !request.AllowedHosts.IsSet() || !request.TrustedNetworks.IsSet() || !request.HasHistoryCleanupDays() {
 		current, _, err := r.client.HostConfigAPI.GetHostConfig(r.auth).Execute()
 		if err != nil {
 			resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, hostResourceName, err))
@@ -462,6 +472,10 @@ func (r *HostResource) Create(ctx context.Context, req resource.CreateRequest, r
 
 		if !request.TrustedNetworks.IsSet() {
 			request.SetTrustedNetworks(current.GetTrustedNetworks())
+		}
+
+		if !request.HasHistoryCleanupDays() {
+			request.SetHistoryCleanupDays(current.GetHistoryCleanupDays())
 		}
 	}
 
@@ -549,6 +563,7 @@ func (h *Host) write(ctx context.Context, host *prowlarr.HostConfigResource, dia
 	h.URLBase = types.StringValue(host.GetUrlBase())
 	h.AllowedHosts = splitHostList(ctx, host.GetAllowedHosts(), diags)
 	h.TrustedNetworks = splitHostList(ctx, host.GetTrustedNetworks(), diags)
+	h.HistoryCleanupDays = types.Int64Value(int64(host.GetHistoryCleanupDays()))
 	h.ID = types.Int64Value(int64(host.GetId()))
 	h.Port = types.Int64Value(int64(host.GetPort()))
 	h.LaunchBrowser = types.BoolValue(host.GetLaunchBrowser())
@@ -646,6 +661,10 @@ func (h *Host) read(ctx context.Context, diags *diag.Diagnostics) *prowlarr.Host
 
 	if !h.TrustedNetworks.IsUnknown() && !h.TrustedNetworks.IsNull() {
 		host.SetTrustedNetworks(joinHostList(ctx, h.TrustedNetworks, diags))
+	}
+
+	if !h.HistoryCleanupDays.IsUnknown() && !h.HistoryCleanupDays.IsNull() {
+		host.SetHistoryCleanupDays(int32(h.HistoryCleanupDays.ValueInt64()))
 	}
 
 	host.SetId(int32(h.ID.ValueInt64()))

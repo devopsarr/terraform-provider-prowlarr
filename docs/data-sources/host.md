@@ -28,6 +28,7 @@ data "prowlarr_host" "example" {
 - `authentication` (Attributes) Authentication configuration. (see [below for nested schema](#nestedatt--authentication))
 - `backup` (Attributes) Backup configuration. (see [below for nested schema](#nestedatt--backup))
 - `bind_address` (String) Bind address.
+- `history_cleanup_days` (Number) Days of history to keep, `0` disables the cleanup.
 - `id` (Number) Host ID.
 - `instance_name` (String) Instance name.
 - `launch_browser` (Boolean) Launch browser flag.

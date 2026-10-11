@@ -28,6 +28,7 @@ func TestAccHostResource(t *testing.T) {
 					resource.TestCheckResourceAttrSet("prowlarr_host.test", "id"),
 					resource.TestCheckTypeSetElemAttr("prowlarr_host.test", "allowed_hosts.*", "prowlarr"),
 					resource.TestCheckTypeSetElemAttr("prowlarr_host.test", "trusted_networks.*", "10.0.0.0/8"),
+					resource.TestCheckResourceAttr("prowlarr_host.test", "history_cleanup_days", "30"),
 				),
 			},
 			// Unauthorized Read
@@ -73,6 +74,7 @@ func testAccHostResourceConfig(name, pass string) string {
 		instance_name = "%s"
 		allowed_hosts = ["localhost", lower("%[1]s")]
 		trusted_networks = ["192.168.1.0/24", "10.0.0.0/8"]
+		history_cleanup_days = 30
 		proxy = {
 			enabled = false
 		}

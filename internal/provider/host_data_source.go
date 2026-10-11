@@ -65,6 +65,10 @@ func (d *HostDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 				Computed:            true,
 				ElementType:         types.StringType,
 			},
+			"history_cleanup_days": schema.Int64Attribute{
+				MarkdownDescription: "Days of history to keep, `0` disables the cleanup.",
+				Computed:            true,
+			},
 			"application_url": schema.StringAttribute{
 				MarkdownDescription: "Application URL.",
 				Computed:            true,
