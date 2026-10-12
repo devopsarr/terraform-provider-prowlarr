@@ -62,7 +62,6 @@ resource "prowlarr_indexer" "example" {
 
 - `app_profile_id` (Number) Application profile ID.
 - `config_contract` (String) Indexer configuration template.
-- `fields` (Attributes Set) Set of configuration fields. All non-empty fields must be specified. (see [below for nested schema](#nestedatt--fields))
 - `implementation` (String) Indexer implementation name.
 - `name` (String) Indexer name.
 - `protocol` (String) Protocol. Valid values are 'usenet' and 'torrent'.
@@ -70,6 +69,7 @@ resource "prowlarr_indexer" "example" {
 ### Optional
 
 - `enable` (Boolean) Enable flag.
+- `fields` (Attributes Set) Set of configuration fields. All non-empty fields must be specified. (see [below for nested schema](#nestedatt--fields))
 - `priority` (Number) Priority.
 - `redirect` (Boolean) Redirect download request from client to indexer instead of proxying via Prowlarr.
 - `tags` (Set of Number) List of associated tags.

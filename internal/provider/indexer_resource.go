@@ -133,7 +133,8 @@ func (r *IndexerResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 				},
 			},
 			"fields": schema.SetNestedAttribute{
-				Required:            true,
+				Optional:            true,
+				Computed:            true,
 				MarkdownDescription: "Set of configuration fields. All non-empty fields must be specified.",
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: r.getFieldSchema().Attributes,
@@ -209,12 +210,8 @@ func (r *IndexerResource) Create(ctx context.Context, req resource.CreateRequest
 	}
 
 	tflog.Trace(ctx, "created "+indexerResourceName+": "+strconv.Itoa(int(response.GetId())))
-	// Save fields from plan to avoid inconsistent result error if API added/changed fields
-	planFields := indexer.Fields
 	// Generate resource state struct.
 	indexer.write(ctx, response, &resp.Diagnostics)
-	// Restore fields to match plan
-	indexer.Fields = planFields
 	resp.Diagnostics.Append(resp.State.Set(ctx, indexer)...)
 }
 
@@ -263,12 +260,8 @@ func (r *IndexerResource) Update(ctx context.Context, req resource.UpdateRequest
 	}
 
 	tflog.Trace(ctx, "updated "+indexerResourceName+": "+strconv.Itoa(int(response.GetId())))
-	// Save fields from plan to avoid inconsistent result error if API added/changed fields
-	planFields := indexer.Fields
 	// Generate resource state struct.
 	indexer.write(ctx, response, &resp.Diagnostics)
-	// Restore fields to match plan
-	indexer.Fields = planFields
 	resp.Diagnostics.Append(resp.State.Set(ctx, indexer)...)
 }
 
